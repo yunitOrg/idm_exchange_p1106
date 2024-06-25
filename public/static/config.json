@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "lasttime": "2024-04-117 09:38:08",
+  "author": "申龙",
+  "className": "exchange",
+  "module": [
+    {
+      "classId": "idm.componet.exchange.Iselectunit",
+      "comName": "选择单位",
+      "className": "ISelectUnit",
+      "comType": "common",
+      "comLangue": "vue"
+    }
+  ]
+}
