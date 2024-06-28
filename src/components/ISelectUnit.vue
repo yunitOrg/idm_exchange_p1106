@@ -90,15 +90,23 @@
           </div>
         </div>
       </div>
-      <div class="select-foot">
-        <div class="select-footbox">
-          <div class="foot-box">
-            <a-checkbox v-model="dingban">
-              定稿版式
-            </a-checkbox>
+      <!--附件-->
+      <div class="select-filecontainer" v-if="fileLib.length">
+        <div class="boxx" v-for="(item, index) in fileLib" :key="index">
+          <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem" @change="onChange">{{ item.attValueText }}</a-checkbox></div>
+          <div class="text">
+            <img :src="`/p1135/190313143112jfLuUxrc19Dchhv4BPU/images/${getFileIcon(item.fileName)}.svg`" alt="">
+            <span>{{ item.fileName }}</span>
           </div>
-          <div class="foot-file" v-for="(item, index) in chooseFile" :key="index">
-            {{ item.fileName }}
+        </div>
+      </div>
+      <!--文件-->
+      <div class="select-filecontainer" v-if="chooseFile.length">
+        <div class="boxx" v-for="(item, index) in chooseFile" :key="index">
+          <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
+          <div class="text">
+            <img :src="`/p1135/190313143112jfLuUxrc19Dchhv4BPU/images/${getFileIcon(item.fileName)}.svg`" alt="">
+            <span>{{ item.fileName }}</span>
           </div>
         </div>
       </div>
@@ -167,7 +175,7 @@
 
 <script>
 import API from '../api/index';
-import { handleUnitData, handleUnitFileData } from '../utils/mock'
+import { handleUnitData, handleUnitFileData, handleUnitAtta } from '../utils/mock'
 import { message } from 'ant-design-vue';
 message.config({
   top: '50%'
@@ -198,6 +206,8 @@ export default {
       },
       // 文件数据
       chooseFile: [],
+      // 附件数据
+      fileLib: [],
       // 所有数据
       treeData: {},
       propData: this.$root.propData.compositeAttr || {
@@ -221,6 +231,42 @@ export default {
     this.init();
   },
   methods: {
+    isImage(ext) {
+        return ['png', 'jpg', 'jpeg', 'bmp', 'gif', 'webp', 'psd', 'svg', 'tiff'].indexOf(ext.toLowerCase()) !== -1;
+    },
+    getFileIcon(fileName) {
+      let format = '';
+      if (fileName){
+        format = fileName.split('.')[1];
+        if (format){
+            switch (format) {
+                case "doc":
+                case "docx":
+                case "wps":
+                    format = "word";
+                    break;
+                case "xls":
+                case "xlsx":
+                    format = "xlsx";
+                    break;
+                case "htm":
+                case "html":
+                    format = "html";
+                    break;
+                case "ppt":
+                case "pptx":
+                    format = "ppt";
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (this.isImage(format)){
+            format = "img";
+        }
+      }
+      return format;
+    },
     // 创建组弹框
     async handleCreateSure() {
       let ids = '', texts = '';
@@ -427,10 +473,14 @@ export default {
         message.error('请选择需要发送的单位！')
         return
       }
+      this.chooseUnit.forEach(item => delete item.children)
       let params = {
+        // 单位
         chooseUnit: this.chooseUnit,
-        chooseFile: [{id: '240605104000KVAuUKJj7D0pknMUSeq', fileName: 'DreamBOS发布说明.pdf' }],
-        chooseRelationFile: [{id: '2406201339323yYaqNio20hHWiHS6M4', fileName: '关于开展上海市“十四五”规划实施初期评估工作的批复.doc'}]
+        // 文件
+        chooseFile: this.chooseFile.filter(item => item.checkboxItem),
+        // 附件
+        chooseRelationFile: this.fileLib.filter(item => item.checkboxItem)
       }
       if (this.propData.handleSureBtnFunc && this.propData.handleSureBtnFunc.length > 0) {
         let name = this.propData.handleSureBtnFunc[0].name
@@ -440,19 +490,45 @@ export default {
         });
       }
     },
-    // 处理数据
+    // 处理数据 常用组、单位数据
     hanldeData(data) {
       this.handleTreeAddTreeData(data.org, {check: false})
       this.handleTreeAddTreeData(data.zsdwGroup, {check: false})
       this.treeData = data
     },
+    // 附件数据
+    handleFileListData(data) {
+      if (data && data.length > 0) {
+        let { selectAtt } = this.handleParamsFunc();
+        // selectAtt = '0,1,3;0,1,2,4,3';
+        if (selectAtt) {
+          let split = selectAtt.split(';');
+          let chooseCheckbox = split[0].split(',')
+          data.forEach(item => {
+            item.checkboxItem = chooseCheckbox.includes(`${item.attValue}`);
+          })
+        }
+        this.fileLib = data;
+      }
+    },
+    // 文件数据
+    handleDataFile(data) {
+      if (data && data.length > 0) {
+        data.forEach(item => {
+          item.checkboxItem = false
+        })
+        this.chooseFile = data
+      }
+    },
     getMockData() {
       //  常用组、单位数据
-      let data = handleUnitData()
-      this.hanldeData(data)
+      this.hanldeData(handleUnitData())
+      // 附件
+      this.handleFileListData(handleUnitAtta())
       // 文件数据
-      this.chooseFile = handleUnitFileData()
+      this.handleDataFile(handleUnitFileData())
     },
+
     // 接口参数
     handleParamsFunc() {
       if (this.propData.handleParamsFunc && this.propData.handleParamsFunc.length > 0) {
@@ -469,6 +545,7 @@ export default {
         this.getMockData()
         return
       }
+      // 获取单位和常用组
       const params = this.handleParamsFunc()
       if (this.propData.dataSourceForm) {
         IDM.datasource.request(this.propData.dataSourceForm[0]?.id, {
@@ -478,9 +555,17 @@ export default {
             this.hanldeData(data)
         })
       }
+      // 附件
       let res = await API.ApiUnitExchangeList(params)
       if (res.code == '200') {
         let data = res.data;
+        this.handleFileListData(data)
+      }
+      // 文件
+      let fileres = await API.ApiUnitFileList(params)
+      if (fileres.code == '200') {
+        let data = fileres.data;
+        this.handleDataFile(data)
       }
     },
     init() {
@@ -539,6 +624,17 @@ export default {
     background-color: rgba(0, 0, 0, 0.1);
   }
   .select-content::-webkit-scrollbar-track-piece {
+    border-radius: 6px;
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+  .select-filecontainer::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .select-filecontainer::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+  .select-filecontainer::-webkit-scrollbar-track-piece {
     border-radius: 6px;
     background-color: rgba(0, 0, 0, 0.1);
   }
@@ -619,7 +715,6 @@ export default {
   .select-content{
     overflow-y: auto;
     padding-right: 3px;
-    margin-bottom: 10px;
     .select-ul{
       display: flex;
       flex-wrap: wrap;
@@ -765,22 +860,28 @@ export default {
       text-overflow: ellipsis;
     }
   }
-  .select-foot{
+  .select-filecontainer{
+    margin-top: 10px;
+  }
+  .select-filecontainer{
     max-height: 126px;
+    overflow-y: auto;
     border: 1px solid #e6e6e6;
-    margin-bottom: 10px;
     padding: 0px 16px 0px 16px;
-    
-    .select-footbox{
+    .boxx-checkbox{
+      width: 10%;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    img{
+      width: 16px;
+      height: 16px;
+      margin-right: 4px;
+    }
+    .boxx{
+      color: #333333;
       display: flex;
       margin: 16px 0px 16px 0px;
-      .foot-file+.foot-file{
-        margin-left: 10px;
-      }
-    }
-    .foot-box{
-      color: #333;
-      margin-right: 38px;
     }
   }
   .select-btnall{
@@ -788,6 +889,7 @@ export default {
     align-items: center;
     justify-content: flex-end;
     height: 50px;
+    margin-top: 10px;
     button{
       height: 40px;
     }

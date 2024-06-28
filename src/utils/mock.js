@@ -2000,11 +2000,13 @@ export function handleUnitFileData() {
     {
       "id": "240605104000KVAuUKJj7D0pknMUSeq",
       "icon": "",
+      "attValueText": "附件",
       "fileName": "DreamBOS发布说明.pdf"
     },
     {
       "id": "240605104000KVAuUKJj7D0pknMUSeq",
       "icon": "",
+      "attValueText": "附件",
       "fileName": "DreamBOS发布说明.pdf"
     }
   ]
