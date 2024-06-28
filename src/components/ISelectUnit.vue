@@ -283,6 +283,8 @@ export default {
       if (res.code == '200') {
         message.success(res.message)
         this.dialogCreategroup.visible = false;
+      } else {
+        message.success(res.message)
       }
     },
     // 创建组
@@ -327,6 +329,8 @@ export default {
       if (res.code == '200') {
         message.success(res.message)
         fn && fn()
+      } else {
+        message.success(res.message)
       }
     },
     // 选择常用组弹框
@@ -338,7 +342,9 @@ export default {
     },
     // 确定弹框
     async handleOk() {
-      this.handleUpdate(this.dialog.groupId, this.dialog.chooseAry)
+      this.handleUpdate(this.dialog.groupId, this.dialog.chooseAry, () => {
+        this.dialog.visible = false;
+      })
     },
     // 弹框删除
     handleDialogDelete(index) {
