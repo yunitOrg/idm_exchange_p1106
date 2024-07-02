@@ -10,6 +10,13 @@
       "className": "ISelectUnit",
       "comType": "common",
       "comLangue": "vue"
+    },
+    {
+      "classId": "idm.componet.exchange.iarchivestat",
+      "comName": "档案统计",
+      "className": "IarchiveStat",
+      "comType": "common",
+      "comLangue": "vue"
     }
   ]
 }
