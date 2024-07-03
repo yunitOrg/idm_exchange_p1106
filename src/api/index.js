@@ -4,6 +4,25 @@ export default {
         return IDM.http.getSync('/ctrl/idm/form/getSysConfigInfo', { key })
     },
     /**
+    * @Desc 单位选择-常用组-单位
+    * @Author hjp
+    */
+    async ApiExchangeList({sendLevel, pk, moduleId, operationFlag, flat, mode}) {
+        let formdata = new FormData();
+        formdata.append('sendLevel', sendLevel)
+        formdata.append('pk', pk)
+        formdata.append('moduleId', moduleId)
+        formdata.append('operationFlag', operationFlag)
+        formdata.append('flat', flat)
+        formdata.append('mode', mode)
+        const { data } = await window.IDM.http.post('ctrl/remote/sendRangeData', formdata, {
+            headers: {
+            'Content-Type': 'application/json'
+            },
+        })
+        return data
+    },
+    /**
     * @Desc 单位选择-附件
     * @Author hjp
     */

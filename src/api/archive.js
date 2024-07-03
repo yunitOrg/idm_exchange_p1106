@@ -11,8 +11,8 @@ export default {
    * @Desc 档案数量
    * @Author hjp
    */
-  async ApiQueryCountData({achiveStage, archicvePeriod, archiveYear, archiveOpenStatus}) {
-    const { data } = await window.IDM.http.get('ctrl/archive/statistics/getArchiveStatisticsCountData', {achiveStage, archicvePeriod, archiveYear, archiveOpenStatus})
+  async ApiQueryCountData({archiveState, archicvePeriod, archiveYear, archiveOpenStatus}) {
+    const { data } = await window.IDM.http.get('ctrl/archive/statistics/getArchiveStatisticsCountData', {archiveState, archicvePeriod, archiveYear, archiveOpenStatus})
     return data
   },
   /**

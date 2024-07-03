@@ -16,7 +16,7 @@
       <div class="super-middle" style="width: 25%;">
         <span class="super-mr10">保管期限</span>
         <a-select v-model="search.archicvePeriod" allowClear style="width: 50%">
-          <a-select-option :value="item.value" v-for="(item, index) in selectData.arvhicePeriodList" :key="index">
+          <a-select-option :value="item.value" v-for="(item, index) in selectData.arvhivePeriodList" :key="index">
             {{ item.text }}
           </a-select-option>
         </a-select>
