@@ -10,7 +10,7 @@
     :id="moduleObject.id"
     :idm-ctrl-id="moduleObject.id"
   >
-    <div class="selectunit">
+    <div class="selectunit" @click="hanldeClick">
       <div class="chooseunit">
         <div class="font16">已选单位：</div>
         <div class="disflex">
@@ -19,12 +19,17 @@
             已选： <span class="colorblue">{{chooseUnit.length}}条</span>
           </div>
           <div class="select-input">
-            <input checked type="text" @input="handleInput" @blur="handleInputBlur">
+            <input checked type="text" v-model="searchInput" @input="handleInput">
             <div class="select-search-div" v-show="showSearchDialog">
-              <div class="search-li" v-for="(item, index) in pinyinAryAll" :key="index">{{ item.name }}</div>
+              <div class="search-li"
+                v-for="(item, index) in pinyinAryAll"
+                :key="index"
+                @click.stop="handleSearchChoose(item)"
+                :class="{'checked': item.check}"
+              >{{ item.name }}</div>
             </div>
           </div>
-          <div class="btn">重置</div>
+          <div class="btn" @click="handleReset">重置</div>
         </div>
       </div>
       <div class="select-content" :style="{height: propData.contentHeight}">
@@ -38,7 +43,7 @@
         <div class="select-common select-border mbl10">
           <div class="select-top">
             <div class="left disflex">
-              <div class="show"></div>
+              <div class="show" @click="groupTtype=!groupTtype"></div>
               <span >常用组</span>
               <div>
                 <a-checkbox @change="hadnleGroutChoose">
@@ -57,7 +62,7 @@
               </div>
             </div>
           </div>
-          <div class="select-unit-content">
+          <div class="select-unit-content" v-show="groupTtype">
             <div class="select-item" v-for="(item, index) in treeData.zsdwGroup" :key="index">
               <a-checkbox v-model="item.check" class="select-check-common" @change="(e) => handleAddGroup(e, item)">
                 <span class="select-item-name">{{ item.name }}</span>
@@ -71,7 +76,7 @@
           <div class="select-border" v-for="(item, index) in treeData.org" :key="index">
             <div class="select-top">
               <div class="left disflex">
-                <div class="show"></div>
+                <div class="show" @click="item.foldtype = !item.foldtype"></div>
                 <span >{{ item.name }}</span>
                 <div>
                   <a-checkbox v-model="item.check" @change="(e) => handleAllCheck(e, item)">
@@ -83,7 +88,7 @@
                 <div>已勾选：<span class="colorblue">{{ item.chooseNum }}条</span></div>
               </div>
             </div>
-            <div class="select-unit-content">
+            <div class="select-unit-content" v-show="item.foldtype">
               <div class="select-item" v-for="(subitem, subindex) in item.children" :key="subindex">
                 <a-checkbox v-model="subitem.check" class="select-check" @change="(e) => handleCheck(subitem)">
                   <span class="select-item-name">{{ subitem.name }}</span>
@@ -187,6 +192,8 @@ export default {
   name: 'ISelectUnit',
   data() {
     return {
+      groupTtype: true,
+      searchInput: '',
       chooseUnit: [],
       dingban: true,
       moduleObject: {},
@@ -273,9 +280,31 @@ export default {
       }
       return format;
     },
-    // 失去焦点
-    handleInputBlur() {
+    // 重置
+    handleReset() {
+      this.searchInput = '';
+      // this.showSearchDialog = false;
+    },
+    hanldeClick() {
       this.showSearchDialog = false;
+    },
+    // 搜索框点击li
+    handleSearchChoose(item) {
+      let flag = !item.check
+      if (item.children && item.children.length > 0) {
+        item.children.forEach(item => item.check = flag)
+      }
+      item.check = flag;
+      if (item.children?.length > 0) {
+        let chooseIdAry = item.children.map(item => item.id)
+        // 选中单位复选框
+        this.handleTreeChoose(this.treeData.org, chooseIdAry, flag);
+
+      }
+      // 检查单位全选和选中条数
+      this.handleFatherChoose(this.treeData.org)
+      
+      this.defaultChooseUnit()
     },
     // 查询拼音数据
     searchGroupUnit(key) {
@@ -290,17 +319,25 @@ export default {
             item.children?.length > 0 && searchGroup(item.children, key)
           })
         }
+      };
+      const searchUnit =(tree, key) => {
+        if (tree && tree.length>0) {
+          tree.forEach(item => {
+            if (item.attrs.fullPinYin.includes(key) || item.name.includes(key)) {
+              !this.pinyinAryAll.map(k => k.id).includes(item.id) && this.pinyinAryAll.push(item)
+            }
+            item.children?.length > 0 && searchUnit(item.children, key)
+          })
+        }
       }
       searchGroup(this.treeData.org, key)
+      searchUnit(this.treeData.zsdwGroup, key)
     },
     handleInput(e) {
       this.showSearchDialog = true;
-      let val = e.target.value;
-      console.log(val, 99)
+
       this.pinyinAryAll = []
-      this.searchGroupUnit(val)
-      console.log(this.pinyinAryAll, 43)
-      
+      this.searchGroupUnit(this.searchInput)
     },
     // 创建组弹框
     async handleCreateSure() {
@@ -441,7 +478,7 @@ export default {
        this.handleFatherChoose(this.treeData.org)
        // 检查常用组选中
        this.handleTreeAddTreeData(this.treeData.zsdwGroup, {chooseId: item.id, targetflag: false })
-       this.handleCheckGroupChoose(this.treeData.zsdwGroup, item.id)
+       this.handleCheckGroupChoose(this.treeData.zsdwGroup)
     },
     propDataWatchHandle(propData) {
       this.propData = propData.compositeAttr || {};
@@ -544,6 +581,11 @@ export default {
       let chooseTrueCheck = fatherobj.children.filter(item => item.check)
       fatherobj.check = fatherobj.children.length == chooseTrueCheck.length
       fatherobj.chooseNum = chooseTrueCheck.length
+
+      // 检查常用组选中
+      this.handleTreeAddTreeData(this.treeData.zsdwGroup, {chooseId: item.id, targetflag: item.check })
+      this.handleCheckGroupChoose(this.treeData.zsdwGroup)
+
       this.defaultChooseUnit()
     },
     defaultChooseUnit() {
@@ -619,8 +661,11 @@ export default {
     hanldeData(data) {
       this.handleTreeAddTreeData(data.org, {check: false})
       this.handleTreeAddTreeData(data.zsdwGroup, {check: false})
+      data.org.forEach(item => {
+        item.foldtype = true
+      })
       this.treeData = data
-
+      console.log(this.treeData.org, 232)
     },
     // 附件数据
     handleFileListData(data) {
@@ -842,6 +887,28 @@ export default {
       top: 55px;
       display: block;
       max-height: 400px;
+      min-width: 198px;
+      padding: 5px;
+      margin-top: 2px;
+      overflow: auto;
+      box-sizing: border-box;
+      border: 1px solid #e4e5e9;
+      box-shadow: 0px 0px 3px #e4e5e9;
+      background-color: #ffffff;
+      position: absolute;
+      z-index: 9999;
+      .search-li{
+        text-align: left;
+        cursor: pointer;
+        line-height: 25px;
+        font-size: 14px;
+        width: auto;
+        white-space: nowrap;
+        color: #333;
+      }
+      .checked{
+        color: #d2d2d2;
+      }
     }
     .btn{
       padding: 0 24px;
@@ -851,6 +918,7 @@ export default {
       color: #333;
       border: 1px solid #cccccc;
       border-radius: 2px;
+      cursor: pointer;
     }
   }
   
