@@ -90,7 +90,7 @@
             </div>
             <div class="select-unit-content" v-show="item.foldtype">
               <div class="select-item" v-for="(subitem, subindex) in item.children" :key="subindex">
-                <a-checkbox v-model="subitem.check" class="select-check" @change="(e) => handleCheck(subitem)">
+                <a-checkbox v-model="subitem.check" class="select-check" :disabled="subitem.attrs.noselect" @change="(e) => handleCheck(subitem)">
                   <span class="select-item-name">{{ subitem.name }}</span>
                 </a-checkbox>
               </div>
@@ -435,10 +435,11 @@ export default {
         this.dialogGroup.visible = false;
       })
     },
-    // 确定弹框
+    // 常用组 确定弹框
     async handleOk() {
       this.handleUpdate(this.dialog.groupId, this.dialog.chooseAry, () => {
         this.dialog.visible = false;
+        this.handleGetGroupData()
       })
     },
     // 弹框删除
@@ -649,6 +650,7 @@ export default {
         // 附件
         chooseRelationFile: this.fileLib.filter(item => item.checkboxItem)
       }
+      console.log('最终数据', params);
       if (this.propData.handleSureBtnFunc && this.propData.handleSureBtnFunc.length > 0) {
         let name = this.propData.handleSureBtnFunc[0].name
         window[name] && window[name].call(this, {
@@ -665,7 +667,6 @@ export default {
         item.foldtype = true
       })
       this.treeData = data
-      console.log(this.treeData.org, 232)
     },
     // 附件数据
     handleFileListData(data) {
@@ -716,7 +717,25 @@ export default {
       const params = this.handleParamsFunc()
       let unitRes = await API.ApiExchangeList(params)
       if (unitRes.code == '200') {
-        this.hanldeData(unitRes.data)
+        this.hanldeData(unitRes.data);
+        this.handleDataBack()
+      }
+    },
+
+    // 回显数据 org
+    handleDataBack() {
+      if (this.chooseUnit?.length > 0) {
+        let chooseIdAry = this.chooseUnit.map(item => item.id)
+        // 选中单位复选框
+        this.handleTreeChoose(this.treeData.org, chooseIdAry, true);
+        // 检查单位全选和选中条数
+        this.handleFatherChoose(this.treeData.org)
+
+        // 检查常用组选中
+        this.handleTreeChoose(this.treeData.zsdwGroup, chooseIdAry, true)
+        this.handleCheckGroupChoose(this.treeData.zsdwGroup)
+        
+        this.defaultChooseUnit()
       }
     },
     async initData() {

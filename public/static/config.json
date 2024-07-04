@@ -17,6 +17,13 @@
       "className": "IarchiveStat",
       "comType": "common",
       "comLangue": "vue"
+    },
+    {
+      "classId": "idm.componet.exchange.irecordrule",
+      "comName": "档号规则",
+      "className": "IRecordRule",
+      "comType": "common",
+      "comLangue": "vue"
     }
   ]
 }

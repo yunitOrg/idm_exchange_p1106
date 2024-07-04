@@ -127,13 +127,6 @@
           "desc": "接口参数：自定义函数参数：{_this: this}",
           "bindKey": "handleParamsFunc",
           "multiple": false
-        },
-        {
-          "type": "dataSourceSelect",
-          "layoutType": "inline",
-          "text": "数据源",
-          "desc": "用于选择数据源: 接口返回格式：{zsdwGroup: [], org: [], fileObj: []}",
-          "bindKey": "dataSourceForm"
         }
       ]
     }

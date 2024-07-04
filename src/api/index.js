@@ -7,14 +7,15 @@ export default {
     * @Desc 单位选择-常用组-单位
     * @Author hjp
     */
-    async ApiExchangeList({sendLevel, pk, moduleId, operationFlag, flat, mode}) {
+    async ApiExchangeList({sendLevel, pk, moduleId, operationFlag, flat, mode, recordId}) {
         let formdata = new FormData();
-        formdata.append('sendLevel', sendLevel)
-        formdata.append('pk', pk)
-        formdata.append('moduleId', moduleId)
-        formdata.append('operationFlag', operationFlag)
-        formdata.append('flat', flat)
-        formdata.append('mode', mode)
+        sendLevel && formdata.append('sendLevel', sendLevel)
+        pk && formdata.append('pk', pk)
+        moduleId && formdata.append('moduleId', moduleId)
+        operationFlag && formdata.append('operationFlag', operationFlag)
+        flat &&  formdata.append('flat', flat)
+        mode && formdata.append('mode', mode)
+        recordId && formdata.append('recordId', recordId)
         const { data } = await window.IDM.http.post('ctrl/remote/sendRangeData', formdata, {
             headers: {
             'Content-Type': 'application/json'
@@ -28,9 +29,9 @@ export default {
     */
     async ApiUnitExchangeList({moduleId, pk, selectAtt}) {
         let formdata = new FormData();
-        formdata.append('moduleId', moduleId)
-        formdata.append('pk', pk)
-        formdata.append('selectAtt', selectAtt)
+        moduleId && formdata.append('moduleId', moduleId)
+        pk && formdata.append('pk', pk)
+        selectAtt && formdata.append('selectAtt', selectAtt)
         const { data } = await window.IDM.http.post('ctrl/remoteExchangeView/attachmentData', formdata, {
             headers: {
             'Content-Type': 'application/json'
@@ -44,9 +45,9 @@ export default {
     */
     async ApiUnitFileList({moduleId, pk, selectFileRelationValue}) {
         let formdata = new FormData();
-        formdata.append('moduleId', moduleId)
-        formdata.append('pk', pk)
-        formdata.append('selectFileRelationValue', selectFileRelationValue)
+        moduleId && formdata.append('moduleId', moduleId)
+        pk && formdata.append('pk', pk)
+        selectFileRelationValue && formdata.append('selectFileRelationValue', selectFileRelationValue)
         const { data } = await window.IDM.http.post('ctrl/remoteExchangeView/fileRelationData', formdata, {
             headers: {
             'Content-Type': 'application/json'
