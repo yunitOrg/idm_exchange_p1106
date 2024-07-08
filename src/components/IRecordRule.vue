@@ -19,7 +19,7 @@
               <a-textarea v-model="recordField" :rows="6" @blur="handleBlur"></a-textarea>
             </div>
             <div class="mt20">
-              <span>预览：xxxx</span>
+              <span>预览：{{ previewFiled }}</span>
               <div class="record-ul mb10">
                 <span v-for="(item, index) in chartList" :key="index" @click="handleClick(item)">{{ item.label }}</span>
               </div>
@@ -30,25 +30,52 @@
           <div class="record-head pd10">
             <span>变量</span>
             <div>
-              <a-button>删除变量</a-button>
-              <a-button class="ml10">新增自定义变量</a-button>
+              <a-button @click="handleDel">删除变量</a-button>
+              <a-button class="ml10" @click="hanldeAddField">新增自定义变量</a-button>
             </div>
           </div>
           <div class="record-tree pdall">
             <div class="record-tree-ul" v-for="(item, index) in recordList" :key="index">
               <div class="record-tree-li" @click="handleShow(item)">
-                <span class="recordsvg">
-                  <svg-icon iconClass="arrow"></svg-icon>
-                </span>
+                <svg-icon iconClass="arrow" :class="item.isShow ? 'recordDown' : 'recordUp'"></svg-icon>
                 {{ item.text }}
               </div>
               <div class="record-tree-box" v-show="item.isShow">
-                <div v-for="(subitem, subindex) in item.children" :key="subindex" @click="handleChoose(subitem)">{{ subitem.text }}</div>
+                <div v-for="(subitem, subindex) in item.children" :key="subindex" >
+                  <template v-if="item.value == 2">
+                    <a-radio v-model="subitem.check" @change="(e) => handleRadio(e, subitem)"></a-radio>
+                  </template>
+                  <span @click="handleChoose(subitem)">{{ subitem.text }}</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <div class="textright mt20">
+        <a-button type="primary" class="recordbtn" @click="handleSendParams">确定</a-button>
+      </div>
+      <!--新增变量-->
+      <a-modal v-model="dialog.visibile"
+        title="新增自定义变量"
+        @ok="handleOk"
+        okText="确定"
+        cancelText="取消"
+      >
+        <a-form-model ref="ruleForm" :model="form" :rules="rules" :label-col="dialog.labelCol" :wrapper-col="dialog.wrapperCol">
+          <a-form-model-item label="变量名称：" prop="variableName">
+            <a-input v-model="form.variableName" placeholder="请输入变量名称"></a-input>
+          </a-form-model-item>
+          <a-form-model-item label="变量类型：" prop="radio">
+            <a-radio-group v-model="form.radio">
+              <a-radio :value="item.value" v-for="(item, index) in dialog.ary" :key="index">{{ item.label }}</a-radio>
+            </a-radio-group>
+          </a-form-model-item>
+          <a-form-model-item label="默认值：" prop="defaultValue">
+            <a-input v-model="form.defaultValue" placeholder="请输入默认值"></a-input>
+          </a-form-model-item>
+        </a-form-model>
+      </a-modal>
     </div>
   </div>
 </template>
@@ -66,7 +93,27 @@ export default {
         {label: '*', value: 1},{label: '.', value: 2},{label: '【', value: 3},{label: '】', value: 4},{label: '{', value: 5},{label: '}', value: 6},
         {label: '〔', value: 7},{label: '〕', value: 8},
         {label: '&', value: 9},{label: '@', value: 10},{label: '「', value: 11},{label: '」', value: 12}],
+      // 变量
       recordList: [],
+      recordListAry: [],
+      // 弹框
+      dialog:{
+        visibile: false,
+        ary: [{label: '数字', value: 1},{label: '文本', value: 2}],
+        labelCol: { span: 4 },
+        wrapperCol: { span: 14 }
+      },
+      form: {
+        variableName: '',
+        radio: 1,
+        defaultValue: ''
+      },
+      rules: {
+        variableName: [{ required: true, message: '请输入变量名称', trigger: 'blur' }],
+        radio: [{ required: true, message: '请选择变量类型', trigger: 'change' }],
+        defaultValue: [{ required: true, message: '请输入默认值', trigger: 'blur' }],
+      },
+      sureObj: {},
       moduleObject: {},
       propData: this.$root.propData.compositeAttr || {
         ulbox: {
@@ -82,11 +129,79 @@ export default {
       }
     }
   },
+  computed: {
+    previewFiled() {
+      const regex = /\[(.*?)\]/g;
+      return this.recordField.replace(regex, (val) => {
+        let name = val.slice(1, -1)
+        return this.recordListAry.find(item => item.text == name)?.defaultValue
+      })
+    }
+  },
   mounted() {
     this.moduleObject = this.$root.moduleObject;
     this.init();
   },
   methods: {
+    // 单选框
+    handleRadio(e, item) {
+      let ary = this.recordList.find(item => item.value == 2).children;
+      ary.forEach(item => item.check = false);
+      item.check = true;
+    },
+    // 删除变量
+    async handleDel() {
+      let ary = this.recordList.find(item => item.value == 2).children
+      if (ary && ary.length > 0) {
+        let chooseAry = ary.filter(item => item.check)
+        if (chooseAry && chooseAry.length > 0) {
+          let res = await API.ApiRecordDelete({ variableName: chooseAry[0]?.text });
+          if (res.code == '200') {
+            this.$message.success(res.message);
+            this.initData()
+          } else {
+            this.$message.error(res.message);
+          }
+        } else {
+          this.$message.error('请选择自定义变量')
+        }
+      }
+    },
+    // 新增变量
+    hanldeAddField() {
+      this.form.variableName = '';
+      this.form.radio = 1;
+      this.form.defaultValue = '';
+      this.dialog.visibile = true;
+      this.$refs.ruleForm?.resetFields();
+    },
+    handleOk() {
+      this.$refs.ruleForm.validate(valid => {
+        if (valid) {
+          this.hanldeAddFile()
+        } else {
+          return false
+        }
+      })
+    },
+    // 新增自定义变量
+    async hanldeAddFile() {
+      let obj = {
+        variableType: this.form.radio,
+        variableTypeText: this.dialog.ary.find(item => item.value = this.form.radio).label,
+        variableName: this.form.variableName,
+        defaultValue: this.form.defaultValue
+      }
+      let res = await API.ApiRecordAdd(obj)
+      if (res.code == '200') {
+        this.$message.success(res.message);
+        this.dialog.visibile = false;
+        this.initData()
+      } else {
+        this.$message.error(res.message);
+        this.dialog.visibile = false;
+      }
+    },
     handleBlur(e) {
       this.cursorPos = e.srcElement.selectionStart;
     },
@@ -156,18 +271,43 @@ export default {
       window.IDM.setStyleToPageHead(this.moduleObject.id + " .recordrule-wrap", styleObject);
     },
     async initData() {
+      this.recordListAry = [];
       let res = await API.ApiRecordList()
       if (res.code == '200') {
         let ary = res.data || [];
         ary.forEach((item, index) => {
-          item.isShow = index == 0
+          item.isShow = index == 0;
+          if (item.children && item.children.length > 0) {
+            item.children.forEach(k => {
+              k.check = false;
+              this.recordListAry.push(k);
+            })
+          }
         })
         this.recordList = ary;
       }
     },
+    // URL 参数
+    handleParamsFunc() {
+      return IDM.url.queryObject()
+    },
+    checkPage() {
+      this.sureObj = this.handleParamsFunc();
+      if (this.sureObj.archiveRule) {
+        this.recordField = this.sureObj.archiveRule;
+      }
+    },
+    handleSendParams() {
+      try{
+        top.loadParentData(this.recordField, this.sureObj.subTrIndex); // 调用dsf方法初始化
+      } catch(e) {
+        console.log(e)
+      }
+    },
     init() {
+      this.checkPage();
       this.handleStyle();
-      this.initData()
+      this.initData();
     }
   }
 }
@@ -177,9 +317,17 @@ export default {
 .recordrule-wrap{
   font-size: 16px;
   color: #333;
+  .textright{
+    text-align: right;
+  }
   .recordrule{
     display: flex;
     border: 1px solid #e8e8e8;
+  }
+  .recordbtn{
+    width: 80px;
+    height: 40px;
+    font-size: 16px;
   }
   .pd10{
     padding: 0 10px;
@@ -195,6 +343,12 @@ export default {
   }
   .pdall{
     padding: 10px;
+  }
+  .recordDown{
+    transform: rotate(0deg);
+  }
+  .recordUp{
+    transform: rotate(-94deg);
   }
   .record-title{
     line-height: 45px;
@@ -248,7 +402,7 @@ export default {
       div{
         cursor: pointer;
       }
-      div:active{
+      span:active{
         color: #ccc;
       }
     }
