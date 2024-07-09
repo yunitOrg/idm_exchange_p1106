@@ -54,6 +54,7 @@
       </div>
       <div class="textright mt20">
         <a-button type="primary" class="recordbtn" @click="handleSendParams">确定</a-button>
+        <a-button class="recordbtn" @click="handleCloseDialog">取消</a-button>
       </div>
       <!--新增变量-->
       <a-modal v-model="dialog.visibile"
@@ -294,14 +295,23 @@ export default {
     checkPage() {
       this.sureObj = this.handleParamsFunc();
       if (this.sureObj.archiveRule) {
-        this.recordField = this.sureObj.archiveRule;
+        this.recordField = encodeURIComponent(this.sureObj.archiveRule);
       }
     },
+    // 取消按钮
+    handleCloseDialog() {
+      try{
+        window.closeIdmWindow()
+      } catch(e) {
+        console.log('取消按钮报错', e)
+      }
+    },
+    // 确定按钮
     handleSendParams() {
       try{
-        top.loadParentData(this.recordField, this.sureObj.subTrIndex); // 调用dsf方法初始化
+        window.loadParentData(this.recordField, this.sureObj.subTrIndex); // 调用dsf方法初始化
       } catch(e) {
-        console.log(e)
+        console.log('确定按钮报错', e)
       }
     },
     init() {

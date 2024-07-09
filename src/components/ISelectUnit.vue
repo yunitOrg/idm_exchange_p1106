@@ -91,7 +91,7 @@
             <div class="select-unit-content" v-show="item.foldtype">
               <div class="select-item" v-for="(subitem, subindex) in item.children" :key="subindex">
                 <a-checkbox v-model="subitem.check" class="select-check" :disabled="subitem.attrs.noselect" @change="(e) => handleCheck(subitem)">
-                  <span class="select-item-name">{{ subitem.name }}</span>
+                  <span class="select-item-name" :class="subitem.attrs.noselect&&'select-item-nameno'">{{ subitem.name }}</span>
                 </a-checkbox>
               </div>
             </div>
@@ -736,6 +736,7 @@ export default {
         this.handleCheckGroupChoose(this.treeData.zsdwGroup)
         
         this.defaultChooseUnit()
+
       }
     },
     async initData() {
@@ -810,6 +811,7 @@ export default {
   margin-bottom: 10px;
 }
 .selectunit{
+  position: relative;
   .select-border{
     border: 1px solid #e6e6e6;
   }
@@ -1088,6 +1090,10 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
     }
+    .select-item-nameno{
+      color: #999;
+      cursor: not-allowed;
+    }
   }
   .select-filecontainer{
     margin-top: 10px;
@@ -1119,6 +1125,9 @@ export default {
     justify-content: flex-end;
     height: 50px;
     margin-top: 10px;
+    position: absolute;
+    right: 20px;
+    bottom: 30px;
     button{
       height: 40px;
     }
