@@ -54,7 +54,7 @@
       </div>
       <div class="textright mt20">
         <a-button type="primary" class="recordbtn" @click="handleSendParams">确定</a-button>
-        <a-button class="recordbtn" @click="handleCloseDialog">取消</a-button>
+        <a-button class="recordbtn ml10" @click="handleCloseDialog">取消</a-button>
       </div>
       <!--新增变量-->
       <a-modal v-model="dialog.visibile"
@@ -309,7 +309,7 @@ export default {
     // 确定按钮
     handleSendParams() {
       try{
-        window.loadParentData(this.recordField, this.sureObj.subTrIndex); // 调用dsf方法初始化
+        window.loadParentData(this.recordField, this.sureObj.subTrIndex, this.sureObj.metaId); // 调用dsf方法初始化
       } catch(e) {
         console.log('确定按钮报错', e)
       }
