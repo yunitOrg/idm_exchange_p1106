@@ -617,7 +617,7 @@ export default {
           } else{
             item.check = check;
             item.chooseNum = 0;
-          } 
+          }
           item.children?.length > 0 && this.handleTreeAddTreeData(item.children, params)
         })
       }

@@ -18,6 +18,7 @@ import 'ant-design-vue/lib/message/style/css';
 import 'ant-design-vue/lib/radio/style/css';
 import 'ant-design-vue/lib/form/style/css';
 import 'ant-design-vue/lib/form-model/style/css';
+import 'ant-design-vue/lib/input-number/style/css';
 
 import {
     Input,
@@ -40,7 +41,8 @@ import {
     Checkbox,
     Radio,
     Form,
-    FormModel
+    FormModel,
+    InputNumber
 } from 'ant-design-vue'
 
 Vue.use(Input)
@@ -63,4 +65,5 @@ Vue.use(Checkbox);
 Vue.use(Radio);
 Vue.use(Form);
 Vue.use(FormModel);
+Vue.use(InputNumber);
 Vue.prototype.$message = message;

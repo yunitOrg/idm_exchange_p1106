@@ -13,7 +13,7 @@
     <div class="recordrule-wrap">
       <div class="recordrule">
         <div class="record-left">
-          <div class="record-title pd10">档好规则</div>
+          <div class="record-title pd10">档号规则</div>
           <div class="pd10">
             <div class="record-input">
               <a-textarea v-model="recordField" :rows="6" @blur="handleBlur"></a-textarea>
@@ -77,6 +77,20 @@
           </a-form-model-item>
         </a-form-model>
       </a-modal>
+      <!--件号-->
+      <a-modal
+        v-model="jiandialog.visibile"
+        title="件号"
+        okText="确定"
+        width="400px"
+        @ok="handleJianOk"
+        cancelText="取消">
+        <a-form-model ref="jianrule" :model="jianform" :rules="jianrules" :label-col="dialog.labelCol" :wrapper-col="dialog.wrapperCol">
+          <a-form-model-item label="位数：" prop="name">
+            <a-input-number style="width:300px" :max="6" v-model="jianform.name" placeholder="请输入位数"></a-input-number>
+          </a-form-model-item>
+        </a-form-model>
+      </a-modal>
     </div>
   </div>
 </template>
@@ -97,6 +111,10 @@ export default {
       // 变量
       recordList: [],
       recordListAry: [],
+      //件号
+      jiandialog: {
+        visibile: false
+      },
       // 弹框
       dialog:{
         visibile: false,
@@ -108,6 +126,12 @@ export default {
         variableName: '',
         radio: 1,
         defaultValue: ''
+      },
+      jianform: {
+        name: ''
+      },
+      jianrules: {
+        name: [{ required: true, message: '请输入位数', trigger: 'blur' }],
       },
       rules: {
         variableName: [{ required: true, message: '请输入变量名称', trigger: 'blur' }],
@@ -134,7 +158,13 @@ export default {
     previewFiled() {
       const regex = /\[(.*?)\]/g;
       return this.recordField.replace(regex, (val) => {
-        let name = val.slice(1, -1)
+        let name = val.slice(1, -1);
+        if (name.indexOf('件号') > -1) {
+          let k = name.split(',')[1];
+          if (k) {
+            return Array.from({length:parseFloat(k)}, () => '0').join('')
+          }
+        }
         return this.recordListAry.find(item => item.text == name)?.defaultValue
       })
     }
@@ -175,6 +205,17 @@ export default {
       this.form.defaultValue = '';
       this.dialog.visibile = true;
       this.$refs.ruleForm?.resetFields();
+    },
+    handleJianOk() {
+      this.$refs.jianrule.validate(valid => {
+        if (valid) {
+          this.addVar({text: `件号,${this.jianform.name}`}, () => {
+            this.jiandialog.visibile = false;
+          });
+        } else {
+          return false
+        }
+      })
     },
     handleOk() {
       this.$refs.ruleForm.validate(valid => {
@@ -222,6 +263,14 @@ export default {
     },
     // 选中变量
     handleChoose(item) {
+      if (item.text == '件号') { // 件号
+        this.jiandialog.visibile = true;
+        this.$refs.jianrule?.resetFields();
+        return
+      }
+      this.addVar(item)
+    },
+    addVar(item, fn) {
       let str = `[${item.text}]`;
       if (this.recordField == undefined) {
         this.recordField = str;
@@ -231,6 +280,7 @@ export default {
         this.recordField = `${start}${str}${end}`;
       }
       this.cursorPos = this.cursorPos + str.length;
+      fn && fn()
     },
     propDataWatchHandle(propData) {
       this.propData = propData.compositeAttr || {};
@@ -295,13 +345,13 @@ export default {
     checkPage() {
       this.sureObj = this.handleParamsFunc();
       if (this.sureObj.archiveRule) {
-        this.recordField = encodeURIComponent(this.sureObj.archiveRule);
+        this.recordField = decodeURIComponent(this.sureObj.archiveRule);
       }
     },
     // 取消按钮
     handleCloseDialog() {
       try{
-        window.closeIdmWindow()
+        parent && parent[0][0][0].closeIdmWindow()
       } catch(e) {
         console.log('取消按钮报错', e)
       }
@@ -309,7 +359,7 @@ export default {
     // 确定按钮
     handleSendParams() {
       try{
-        window.loadParentData(this.recordField, this.sureObj.subTrIndex, this.sureObj.metaId); // 调用dsf方法初始化
+        parent && parent[0][0][0].loadParentData(this.recordField, this.sureObj.subTrIndex, this.sureObj.metaId); // 调用dsf方法初始化
       } catch(e) {
         console.log('确定按钮报错', e)
       }
