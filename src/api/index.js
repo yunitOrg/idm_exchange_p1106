@@ -87,4 +87,22 @@ export default {
         })
         return data
     },
+
+    /**
+    * @Desc 树形-单位选择-常用组
+    * @Author hjp
+    */
+    async ApiGetTreeListGroup({name, ids, texts}) {
+        let formdata = new FormData();
+        formdata.append('name', name)
+        formdata.append('ids', ids)
+        formdata.append('texts', texts)
+        const { data } = await window.IDM.http.post('ctrl/exRemoteInterfaceController/selSendRange', formdata, {
+            headers: {
+            'Content-Type': 'application/json'
+            },
+        })
+        return data
+    },
+
 }

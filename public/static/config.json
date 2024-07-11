@@ -24,6 +24,13 @@
       "className": "IRecordRule",
       "comType": "common",
       "comLangue": "vue"
+    },
+    {
+      "classId": "idm.componet.exchange.Itreeselectunit",
+      "comName": "树形选择单位",
+      "className": "ITreeSelectUnit",
+      "comType": "common",
+      "comLangue": "vue"
     }
   ]
 }

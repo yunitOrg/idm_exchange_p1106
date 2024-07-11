@@ -118,7 +118,7 @@
           </div>
         </div>
       </div>
-      <div class="select-btnall">
+      <div class="select-btnall" v-if="treeData.org.length > 0">
         <a-button @click="handleChooseAll">选择全部</a-button>
         <a-button @click="handleDeleteAll">清除已选</a-button>
         <a-button type="primary" @click="handleSure">确定</a-button>
@@ -220,7 +220,10 @@ export default {
       // 附件数据
       fileLib: [],
       // 所有数据
-      treeData: {},
+      treeData: {
+        org: {},
+        zsdwGroup: {}
+      },
       // 总拼音数据
       pinyinAryAll: [],
       propData: this.$root.propData.compositeAttr || {
@@ -562,7 +565,7 @@ export default {
       if (tree && tree.length>0) {
         tree.forEach(item => {
           if (chooseIdAry.includes(item.id)) {
-            item.check = chooseType
+            !item.attrs.noselect && (item.check = chooseType)
           }
           item.children?.length > 0 && this.handleTreeChoose(item.children, chooseIdAry, chooseType)
         })
@@ -615,7 +618,7 @@ export default {
               return
             }
           } else{
-            item.check = check;
+            !item.attrs.noselect && (item.check = check);
             item.chooseNum = 0;
           }
           item.children?.length > 0 && this.handleTreeAddTreeData(item.children, params)
