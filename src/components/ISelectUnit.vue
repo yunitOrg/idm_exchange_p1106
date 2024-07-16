@@ -11,6 +11,7 @@
     :idm-ctrl-id="moduleObject.id"
   >
     <div class="selectunit" @click="hanldeClick">
+      <a-spin class="select-loading" :spinning="loading"></a-spin>
       <div class="chooseunit">
         <div class="font16">已选单位：</div>
         <div class="disflex">
@@ -99,9 +100,9 @@
         </div>
       </div>
       <!--附件-->
-      <div class="select-filecontainer" v-if="fileLib.length">
+      <div class="select-filecontainer" v-if="!handleParamsFunc().recordld && fileLib.length">
         <div class="boxx" v-for="(item, index) in fileLib" :key="index">
-          <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem" @change="onChange">{{ item.attValueText }}</a-checkbox></div>
+          <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
           <div class="text">
             <img :src="`/p1135/190313143112jfLuUxrc19Dchhv4BPU/images/${getFileIcon(item.fileName)}.svg`" alt="">
             <span>{{ item.fileName }}</span>
@@ -109,7 +110,7 @@
         </div>
       </div>
       <!--文件-->
-      <div class="select-filecontainer" v-if="chooseFile.length">
+      <div class="select-filecontainer" v-if="!handleParamsFunc().recordld && chooseFile.length">
         <div class="boxx" v-for="(item, index) in chooseFile" :key="index">
           <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
           <div class="text">
@@ -118,7 +119,7 @@
           </div>
         </div>
       </div>
-      <div class="select-btnall" v-if="treeData.org.length > 0">
+      <div class="select-btnall" :style="`bottom:${propData.footBottom};right:${propData.footRight}`" v-if="treeData.org.length > 0">
         <a-button @click="handleChooseAll">选择全部</a-button>
         <a-button @click="handleDeleteAll">清除已选</a-button>
         <a-button type="primary" @click="handleSure">确定</a-button>
@@ -196,6 +197,7 @@ export default {
       searchInput: '',
       chooseUnit: [],
       dingban: true,
+      loading: false,
       moduleObject: {},
       dialog: {
         title: '',
@@ -227,8 +229,10 @@ export default {
       // 总拼音数据
       pinyinAryAll: [],
       propData: this.$root.propData.compositeAttr || {
-        height: '809px',
-        contentHeight: 'calc(100% - 204px)',
+        height: '100vh',
+        contentHeight: 'calc(100vh - 330px)',
+        footBottom: '30px',
+        footRight: '20px',
         ulbox: {
           marginTopVal: "",
           marginRightVal: "",
@@ -532,6 +536,7 @@ export default {
         this.handleTreeChoose(this.treeData.org, chooseIdAry, e.target.checked);
         // 检查单位全选和选中条数
         this.handleFatherChoose(this.treeData.org)
+        console.log(this.treeData.zsdwGroup, 88)
         
         this.defaultChooseUnit()
       }
@@ -618,7 +623,10 @@ export default {
               return
             }
           } else{
-            !item.attrs.noselect && (item.check = check);
+            if (item.attrs.noselect && item.children?.length==0) {
+            } else {
+              item.check = check;
+            }
             item.chooseNum = 0;
           }
           item.children?.length > 0 && this.handleTreeAddTreeData(item.children, params)
@@ -718,10 +726,14 @@ export default {
     // 获取常用组和单位数据
     async handleGetGroupData() {
       const params = this.handleParamsFunc()
+      this.loading = true;
       let unitRes = await API.ApiExchangeList(params)
       if (unitRes.code == '200') {
+        this.loading = false;
         this.hanldeData(unitRes.data);
         this.handleDataBack()
+      } else {
+        this.loading = false;
       }
     },
 
@@ -807,6 +819,11 @@ export default {
       padding: 0 7px;
     }
   }
+}
+.select-loading{
+  position: absolute;
+  left: 50%;
+  top: 50%;
 }
 .dialog-radio{
   width: 100%;
@@ -1129,8 +1146,6 @@ export default {
     height: 50px;
     margin-top: 10px;
     position: absolute;
-    right: 20px;
-    bottom: 30px;
     button{
       height: 40px;
     }

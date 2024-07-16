@@ -25,6 +25,22 @@
           "text": "内容高度",
           "bindKey": "contentHeight",
           "default": "calc(100% - 204px)"
+        },
+        {
+          "type": "input",
+          "layoutType": "inline",
+          "text": "底部X",
+          "desc": "填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",
+          "bindKey": "footRight",
+          "default": "20px"
+        },
+        {
+          "type": "input",
+          "layoutType": "inline",
+          "text": "底部Y",
+          "desc": "填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",
+          "bindKey": "footBottom",
+          "default": "30px"
         }
       ]
     },
@@ -54,7 +70,7 @@
                 "desc": "填写auto则为自适应，或者使用px、%、vh等单位，比如100%、100px、100vh等等",
                 "bindKey": "height",
                 "width": "60px",
-                "default": "100%"
+                "default": "100vh"
               }
             ]
           },

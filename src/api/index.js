@@ -92,12 +92,21 @@ export default {
     * @Desc 树形-单位选择-常用组
     * @Author hjp
     */
-    async ApiGetTreeListGroup({name, ids, texts}) {
+    async ApiGetTreeListGroup({infotype, pk, moduleId, exchangeModeId, sendType,selectAttvalue,isJoint,flat,templateId, operationFlag, sendLevel}) {
         let formdata = new FormData();
-        formdata.append('name', name)
-        formdata.append('ids', ids)
-        formdata.append('texts', texts)
-        const { data } = await window.IDM.http.post('ctrl/exRemoteInterfaceController/selSendRange', formdata, {
+        sendLevel && formdata.append('sendLevel', sendLevel)
+        infotype && formdata.append('infotype', infotype)
+        pk && formdata.append('pk', pk)
+        moduleId && formdata.append('moduleId', moduleId)
+        exchangeModeId && formdata.append('exchangeModeId', exchangeModeId)
+        sendType && formdata.append('sendType', sendType)
+        selectAttvalue && formdata.append('selectAttvalue', selectAttvalue)
+        isJoint && formdata.append('isJoint', isJoint)
+        flat && formdata.append('flat', flat)
+        templateId && formdata.append('templateId', templateId)
+        operationFlag && formdata.append('operationFlag', operationFlag)
+        // ctrl/exRemoteInterfaceController/selSendRange
+        const { data } = await window.IDM.http.post('ctrl/remote/sendRangeData', formdata, {
             headers: {
             'Content-Type': 'application/json'
             },
