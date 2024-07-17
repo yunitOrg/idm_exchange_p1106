@@ -70,23 +70,32 @@
           </div>
           <div class="treeselect-choose">
             <span class="w20">已选机构</span>
-            <span class="w20" v-if="tablelist.enableCopy==1">份数</span>
-            <span class="w20" v-if="tablelist.enablePage==1">编号</span>
-            <span class="w20" v-if="tablelist.enableDown==1">下载次数</span>
+            <span class="w20">
+              <span v-if="tablelist.enableCopy==1">份数</span>
+            </span>
+            <span class="w20">
+              <span v-if="tablelist.enablePage==1">编号</span>
+            </span>
+            <span class="w20">
+              <span v-if="tablelist.enableDown==1">下载次数</span>
+            </span>
           </div>
           <div class="chooseAly">
             <div class="choose-line" v-for="(item, index) in chooseUnit" :key="index">
               <span class="w20">{{ item.name }}</span>
-              <div class="w20 choosecopy" v-if="tablelist.enableCopy==1">
-                <a-input-number v-model="item.copy" @change="(val) => inputChange(val, item)"></a-input-number>
+              <div class="w20 choosecopy" >
+                <a-input-number v-if="tablelist.enableCopy==1" v-model="item.copycop" @change="(val) => inputChange(val, item)"></a-input-number>
+                <a-input-number v-if="tablelist.enableCopy!=1 && tablelist.enablePage==1" v-model="item.copycop" @change="(val) => inputChange(val, item)"></a-input-number>
               </div>
-              <div class="w20 choosepage" v-if="tablelist.enablePage==1">
-                <a-input-number  disabled v-model="item.page1"></a-input-number>
-                <span>-</span>
-                <a-input-number  disabled v-model="item.page2"></a-input-number>
+              <div class="w20 choosepage">
+                <template v-if="tablelist.enablePage==1">
+                  <a-input-number  disabled v-model="item.page1"></a-input-number>
+                  <span>-</span>
+                  <a-input-number  disabled v-model="item.page2"></a-input-number>
+                </template>
               </div>
-              <div class="w20 choosedown" v-if="tablelist.enableDown==1">
-                <a-input-number v-model="item.down"></a-input-number>
+              <div class="w20 choosedown" >
+                <a-input-number v-if="tablelist.enableDown==1" v-model="item.down"></a-input-number>
               </div>
               <data value="w20">
                 <i class="icon-op icon-up-arrow" @click="handleMoveUp(index)" :class="index>0 && 'op'"></i>
@@ -102,7 +111,7 @@
         <div class="boxx" v-for="(item, index) in fileLib" :key="index">
           <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
           <div class="text">
-            <img :src="`/p1135/190313143112jfLuUxrc19Dchhv4BPU/images/${getFileIcon(item.fileName)}.svg`" alt="">
+            <img :src="handleGetImg(item)" alt="">
             <span>{{ item.fileName }}</span>
           </div>
         </div>
@@ -112,7 +121,7 @@
         <div class="boxx" v-for="(item, index) in chooseFile" :key="index">
           <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
           <div class="text">
-            <img :src="`/p1135/190313143112jfLuUxrc19Dchhv4BPU/images/${getFileIcon(item.fileName)}.svg`" alt="">
+            <img :src="handleGetImg(item)" alt="">
             <span>{{ item.fileName }}</span>
           </div>
         </div>
@@ -175,22 +184,25 @@ export default {
     this.init()
   },
   methods: {
+    handleGetImg(item) {
+      let str = `/p1135/190313143112jfLuUxrc19Dchhv4BPU/images/${this.getFileIcon(item.fileName)}.svg`
+      return IDM.url.getModuleAssetsWebPath(str, this.moduleObject)
+    },
     // 点击item
     handleClick(item) {
-      console.log(item, 4343)
       let flag = !item.check
-      if (item.children && item.children.length > 0) {
-        item.children.forEach(item => item.check = flag)
-      }
+      // if (item.children && item.children.length > 0) {
+      //   item.children.forEach(item => item.check = flag)
+      // }
       item.check = flag;
-      if (item.children?.length > 0) {
-        let chooseIdAry = item.children.map(item => item.id)
-        // 选中单位复选框
-        this.handleTreeChoose(this.unitTree, chooseIdAry, flag);
-      }
+      // if (item.children?.length > 0) {
+      //   let chooseIdAry = item.children.map(item => item.id)
+      //   // 选中单位复选框
+      //   this.handleTreeChoose(this.unitTree, chooseIdAry, flag);
+      // }
       // 检查单位全选和选中条数
+      this.handleTreeAddTreeData(this.unitTree, {chooseId: item.id, targetflag: flag })
       this.handleFatherChoose(this.unitTree)
-      console.log(this.unitTree, 232)
       this.defaultChooseUnit()
     },
     // 查询拼音数据
@@ -200,7 +212,7 @@ export default {
           tree.forEach(item => {
             if (item.children?.length == 0) {
               if (item.name.includes(key) || item.name.includes(key) && item.children?.length <= 0) {
-                this.pinyinAryAll.push(item)
+                !this.pinyinAryAll.map(k => k.id).includes(item.id) && this.pinyinAryAll.push(item)
               }
             }
             item.children?.length > 0 && searchGroup(item.children, key)
@@ -221,6 +233,7 @@ export default {
       searchUnit(this.unitTree, key);
       console.log(this.pinyinAryAll, 88)
     },
+    // 搜索框
     handleInput() {
       if (this.searchName) {
         this.showSearchDialog = true;
@@ -289,13 +302,13 @@ export default {
     updateChooseNum(ary) {
       if (ary?.length <= 0) return
       ary[0].page1 = 1;
-      ary[0].page2 = ary[0].copy;
-      let defaultCopy = ary[0].copy, defaultPage1 = ary[0].page1, defaultPage2 = ary[0].page2;
+      ary[0].page2 = ary[0].copycop;
+      let defaultCopy = ary[0].copycop, defaultPage1 = ary[0].page1, defaultPage2 = ary[0].page2;
       ary.forEach((k, i) => {
         if (i > 0) {
           k.page1 = parseInt(defaultCopy) + parseInt(defaultPage1);
-          k.page2 = parseInt(k.copy) + parseInt(defaultPage2);
-          defaultCopy = k.copy;
+          k.page2 = parseInt(k.copycop) + parseInt(defaultPage2);
+          defaultCopy = k.copycop;
           defaultPage1 = k.page1;
           defaultPage2 = k.page2;
         }
@@ -492,8 +505,8 @@ export default {
     hanldeAddField(tree, flag) {
       if (tree && tree.length>0) {
         tree.forEach(item => {
-          item.shrink = flag;
-          item.check = false;
+          this.$set(item, 'shrink', flag)
+          this.$set(item, 'check', false)
           item.chooseNum = 0;
           item.children?.length > 0 && this.hanldeAddField(item.children, false)
         })
@@ -506,8 +519,9 @@ export default {
       let unitRes = await API.ApiGetTreeListGroup(params)
       if (unitRes.code == '200') {
         this.loading = false;
-        this.tablelist = unitRes.data || {};
-        let { codeList } = unitRes.data || {};
+        let obj = unitRes.data || {};
+        this.tablelist = obj;
+        let { codeList } = obj;
         let group = codeList.filter(item => item.id == 'zsdwRootGroup');
         this.hanldeAddField(group, false)
         group.forEach(item => item.shrink = true);
@@ -522,10 +536,13 @@ export default {
     defaultChooseUnit() {
       this.chooseUnit = this.getTreeCheckData(this.unitTree);
       this.chooseUnit.forEach(item => {
-        this.$set(item, 'copy', 3)
-        item.page1 = 1;
-        item.page2 = 1;
-        item.down = ''
+        this.tablelist.enableCopy==1 && this.$set(item, 'copycop', 3);
+        if (this.tablelist.enablePage==1) {
+          this.$set(item, 'copycop', 3)
+          item.page1 = 1;
+          item.page2 = 1;
+        }
+        this.tablelist.enableDown==1 && (item.down = '');
       })
       this.updateChooseNum(this.chooseUnit);
     },
@@ -563,7 +580,8 @@ export default {
         return
       }
       this.chooseUnit.forEach(item => {
-        item.page = `${item.page1}-${item.page2}`;
+        this.tablelist.enableCopy==1 && (item.copy = item.copycop);
+        this.tablelist.enablePage==1 && (item.page = `${item.page1}-${item.page2}`);
         delete item.children
       })
       let params = {
@@ -762,6 +780,10 @@ $bgColor: #efeff2;
       width: 10%;
       margin-right: 10px;
       cursor: pointer;
+      ::v-deep .ant-checkbox-inner{
+        width: 18px;
+        height: 18px;
+      }
     }
     img{
       width: 16px;

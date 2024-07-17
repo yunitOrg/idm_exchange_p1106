@@ -104,7 +104,7 @@
         <div class="boxx" v-for="(item, index) in fileLib" :key="index">
           <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
           <div class="text">
-            <img :src="`/p1135/190313143112jfLuUxrc19Dchhv4BPU/images/${getFileIcon(item.fileName)}.svg`" alt="">
+            <img :src="handleGetImg(item)" alt="">
             <span>{{ item.fileName }}</span>
           </div>
         </div>
@@ -114,7 +114,7 @@
         <div class="boxx" v-for="(item, index) in chooseFile" :key="index">
           <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
           <div class="text">
-            <img :src="`/p1135/190313143112jfLuUxrc19Dchhv4BPU/images/${getFileIcon(item.fileName)}.svg`" alt="">
+            <img :src="handleGetImg(item)" alt="">
             <span>{{ item.fileName }}</span>
           </div>
         </div>
@@ -251,6 +251,10 @@ export default {
     this.init();
   },
   methods: {
+    handleGetImg(item) {
+      let str = `/p1135/190313143112jfLuUxrc19Dchhv4BPU/images/${this.getFileIcon(item.fileName)}.svg`
+      return IDM.url.getModuleAssetsWebPath(str, this.moduleObject)
+    },
     isImage(ext) {
         return ['png', 'jpg', 'jpeg', 'bmp', 'gif', 'webp', 'psd', 'svg', 'tiff'].indexOf(ext.toLowerCase()) !== -1;
     },
@@ -318,9 +322,9 @@ export default {
       const searchGroup = (tree, key) => {
         if (tree && tree.length>0) {
           tree.forEach(item => {
-            if (item.type != 1) {
+            if (item.children?.length == 0) {
               if (item.attrs.fullPinYin.includes(key) || item.name.includes(key)) {
-                this.pinyinAryAll.push(item)
+                !this.pinyinAryAll.map(k => k.id).includes(item.id) && this.pinyinAryAll.push(item)
               }
             }
             item.children?.length > 0 && searchGroup(item.children, key)
@@ -535,8 +539,10 @@ export default {
         // 选中单位复选框
         this.handleTreeChoose(this.treeData.org, chooseIdAry, e.target.checked);
         // 检查单位全选和选中条数
-        this.handleFatherChoose(this.treeData.org)
-        console.log(this.treeData.zsdwGroup, 88)
+        this.handleFatherChoose(this.treeData.org);
+        // 检查常用组其他是否选中
+        this.handleTreeChoose(this.treeData.zsdwGroup, chooseIdAry, e.target.checked);
+        this.handleCheckGroupChoose(this.treeData.zsdwGroup)
         
         this.defaultChooseUnit()
       }
@@ -558,7 +564,7 @@ export default {
       if (tree && tree.length>0) {
         tree.forEach(item => {
           item.chooseNum = item.children.filter(k => k.check).length;
-          if (item.type == 1) {
+          if (item.children.length > 0) {
             item.check = (item.children.filter(k => k.check).length == item.children.length);
           }
           item.children?.length > 0 && this.handleFatherChoose(item.children)
@@ -570,7 +576,10 @@ export default {
       if (tree && tree.length>0) {
         tree.forEach(item => {
           if (chooseIdAry.includes(item.id)) {
-            !item.attrs.noselect && (item.check = chooseType)
+            if(item.attrs.noselect && item.children?.length==0) {
+            } else {
+              item.check = chooseType
+            }
           }
           item.children?.length > 0 && this.handleTreeChoose(item.children, chooseIdAry, chooseType)
         })
@@ -605,7 +614,7 @@ export default {
     getTreeCheckData(tree, select=[]) {
       if (tree && tree.length>0) {
         tree.forEach(item => {
-          (item.check && item.type!=1) && select.push(item)
+          (item.check && item.children.length==0) && select.push(item)
           if (item.children?.length > 0) {
             return this.getTreeCheckData(item.children, select)
           }
