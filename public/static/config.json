@@ -31,6 +31,13 @@
       "className": "ITreeSelectUnit",
       "comType": "common",
       "comLangue": "vue"
+    },
+    {
+      "classId": "idm.componet.exchange.Isearchlinechart",
+      "comName": "带搜索折线图",
+      "className": "ISearchLineChart",
+      "comType": "common",
+      "comLangue": "vue"
     }
   ]
 }

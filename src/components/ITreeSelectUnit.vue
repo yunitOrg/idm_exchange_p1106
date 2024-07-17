@@ -84,18 +84,18 @@
             <div class="choose-line" v-for="(item, index) in chooseUnit" :key="index">
               <span class="w20">{{ item.name }}</span>
               <div class="w20 choosecopy" >
-                <a-input-number v-if="tablelist.enableCopy==1" v-model="item.copycop" @change="(val) => inputChange(val, item)"></a-input-number>
-                <a-input-number v-if="tablelist.enableCopy!=1 && tablelist.enablePage==1" v-model="item.copycop" @change="(val) => inputChange(val, item)"></a-input-number>
+                <a-input-number :min="1" v-if="tablelist.enableCopy==1" v-model="item.copycop" @change="(val) => inputChange(val, item)"></a-input-number>
+                <a-input-number :min="1" v-if="tablelist.enableCopy!=1 && tablelist.enablePage==1" v-model="item.copycop" @change="(val) => inputChange(val, item)"></a-input-number>
               </div>
               <div class="w20 choosepage">
                 <template v-if="tablelist.enablePage==1">
-                  <a-input-number  disabled v-model="item.page1"></a-input-number>
+                  <a-input-number :min="1" disabled v-model="item.page1"></a-input-number>
                   <span>-</span>
-                  <a-input-number  disabled v-model="item.page2"></a-input-number>
+                  <a-input-number :min="1" disabled v-model="item.page2"></a-input-number>
                 </template>
               </div>
               <div class="w20 choosedown" >
-                <a-input-number v-if="tablelist.enableDown==1" v-model="item.down"></a-input-number>
+                <a-input-number :min="1" v-if="tablelist.enableDown==1" v-model="item.down"></a-input-number>
               </div>
               <data value="w20">
                 <i class="icon-op icon-up-arrow" @click="handleMoveUp(index)" :class="index>0 && 'op'"></i>
@@ -756,8 +756,8 @@ $bgColor: #efeff2;
       color: #333;
     }
     .chooseAly{
-      height: 32px;
-      line-height: 32px;
+      height: 436px;
+      overflow-y: auto;
       padding: 0 12px 0 17px;
       color: #333;
       .choose-line{

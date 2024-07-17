@@ -1,0 +1,24 @@
+{
+  "classId": "idm.componet.exchange.Isearchlinechart",
+  "comName": "带搜索折线图",
+  "className": "ISearchLineChart",
+  "comType": "common",
+  "comLangue": "vue",
+  "compositeAttr": [
+    {
+        "type": "input",
+        "layoutType": "inline",
+        "text": "唯一标识",
+        "bindKey": "ctrlId",
+        "disabled": true,
+        "default": "@[packageid]",
+        "desc": ""
+    },
+    {
+      "type": "group",
+      "text": "基本属性",
+      "desc": "提供设置组件能达到展示效果的基本属性设置信息",
+      "children": []
+    }
+  ]
+}
