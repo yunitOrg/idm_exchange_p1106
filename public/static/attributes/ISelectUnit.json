@@ -28,6 +28,13 @@
         },
         {
           "type": "input",
+          "layoutType": "block",
+          "text": "无附件内容高度",
+          "bindKey": "noFileHeigt",
+          "default": "calc(100% - 204px)"
+        },
+        {
+          "type": "input",
           "layoutType": "inline",
           "text": "底部X",
           "desc": "填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",

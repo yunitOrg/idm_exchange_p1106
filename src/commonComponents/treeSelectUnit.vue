@@ -10,7 +10,7 @@
           </template>
           <template v-else>
             <a-checkbox v-model="res.check" @change="(e) => handleChoose(res)" :disabled="res.attrs.noselect">
-              <span>{{ res.name }}</span>
+              <span :class="res.attrs.noselect&&'select-item-nameno'">{{ res.name }}</span>
             </a-checkbox>
           </template>
         </div>
@@ -89,6 +89,10 @@ export default {
         display: block !important;
       }
     }
+  }
+  .select-item-nameno{
+    color: #999;
+    cursor: not-allowed;
   }
 }
 </style>

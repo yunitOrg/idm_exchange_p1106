@@ -33,7 +33,7 @@
           <div class="btn" @click="handleReset">重置</div>
         </div>
       </div>
-      <div class="select-content" :style="{height: propData.contentHeight}">
+      <div class="select-content" :style="setHeight()">
         <div class="select-ul" v-if="chooseUnit.length>0">
           <div class="select-label" v-for="(item, index) in chooseUnit" :key="index">
             {{ item.name }}
@@ -100,7 +100,7 @@
         </div>
       </div>
       <!--附件-->
-      <div class="select-filecontainer" v-if="!handleParamsFunc().recordld && fileLib.length">
+      <div class="select-filecontainer" v-if="!handleParamsFunc().recordId && fileLib.length">
         <div class="boxx" v-for="(item, index) in fileLib" :key="index">
           <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
           <div class="text">
@@ -115,7 +115,7 @@
         </div>
       </div>
       <!--文件-->
-      <div class="select-filecontainer" v-if="!handleParamsFunc().recordld && chooseFile.length">
+      <div class="select-filecontainer" v-if="!handleParamsFunc().recordId && chooseFile.length">
         <div class="boxx" v-for="(item, index) in chooseFile" :key="index">
           <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
           <div class="text">
@@ -241,6 +241,7 @@ export default {
       propData: this.$root.propData.compositeAttr || {
         height: '100vh',
         contentHeight: 'calc(100vh - 330px)',
+        noFileHeigt: 'calc(100vh - 260px)',
         footBottom: '30px',
         footRight: '20px',
         ulbox: {
@@ -261,6 +262,12 @@ export default {
     this.init();
   },
   methods: {
+    setHeight() {
+      let flag = this.handleParamsFunc().recordId;
+      return  {
+        "height": flag ? this.propData.noFileHeigt : this.propData.contentHeight
+      }
+    },
     handleGetImg(item) {
       let key = this.getFileIcon(item.fileName);
       return `${IDM.url.getURLRoot()}p1135/190313143112jfLuUxrc19Dchhv4BPU/images/${key}.svg`;

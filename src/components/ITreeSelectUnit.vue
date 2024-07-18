@@ -11,7 +11,9 @@
     :idm-ctrl-id="moduleObject.id"
   >
     <div class="itreeselectunit">
-      <div class="treeselect-top">
+      <div class="treeselect-top" :class="{
+        'treeborder': handleParamsFunc().recordId
+      }">
         <div class="treeselect-left">
           <div class="treeselect-search search-combg">
             <a-input ref="userNameInput" class="search-input" v-model="searchName" placeholder="请输入" @input="handleInput">
@@ -22,7 +24,7 @@
             <span class="selecttip-icon"></span>
             <span>选择机构</span>
           </div>
-          <div class="unit-box">
+          <div class="unit-box" :style="setHeight()">
             <a-spin class="select-loading" :spinning="loading"></a-spin>
             <!--常用组-->
             <div class="comgroup-box" v-show="!showSearchDialog">
@@ -80,7 +82,7 @@
               <span v-if="tablelist.enableDown==1">下载次数</span>
             </span>
           </div>
-          <div class="chooseAly">
+          <div class="chooseAly" :style="setHeight()">
             <div class="choose-line" v-for="(item, index) in chooseUnit" :key="index">
               <span class="w20">{{ item.name }}</span>
               <div class="w20 choosecopy" >
@@ -107,7 +109,7 @@
         </div>
       </div>
       <!--附件-->
-      <div class="select-filecontainer" >
+      <div class="select-filecontainer" v-if="!handleParamsFunc().recordId &&fileLib.length">
         <div class="boxx" v-for="(item, index) in fileLib" :key="index">
           <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
           <div class="text">
@@ -122,7 +124,7 @@
         </div>
       </div>
       <!--文件-->
-      <div class="select-filecontainer" v-if="chooseFile.length">
+      <div class="select-filecontainer" v-if="!handleParamsFunc().recordId && chooseFile.length">
         <div class="boxx" v-for="(item, index) in chooseFile" :key="index">
           <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
           <div class="text">
@@ -180,7 +182,9 @@ export default {
       moduleObject: {},
       propData: this.$root.propData.compositeAttr || {
         height: '100vh',
-        footBottom: '0px'
+        footBottom: '0px',
+        unitHeight: '436px',
+        unitNoFileHeight: "500px"
       }
     }
   },
@@ -194,6 +198,12 @@ export default {
     this.init()
   },
   methods: {
+    setHeight() {
+      let flag = this.handleParamsFunc().recordId;
+      return  {
+        "height": flag ? this.propData.unitNoFileHeight : this.propData.unitHeight
+      }
+    },
     handleGetImg(item) {
       let key = this.getFileIcon(item.fileName);
       return `${IDM.url.getURLRoot()}p1135/190313143112jfLuUxrc19Dchhv4BPU/images/${key}.svg`;
@@ -758,6 +768,9 @@ $bgColor: #efeff2;
   .treeselect-top{
     width: 100%;
     display: flex;
+  }
+  .treeborder{
+    border-bottom: 1px solid #e6e6e6;
   }
   .treeselect-left{
     width: 50%;

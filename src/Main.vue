@@ -19,11 +19,11 @@ export default {
         login() {
             if ( process.env.NODE_ENV == "development" ) {
                 // IDM.http.post('/ctrl/login', {
-                //   logName: 'okZxvxjQS4fP3W/bygvyYdJXizuU0R6kmvEhsGWtSRPcnimRduUbuDc49ejZGssNHqRR9/45fwz8OFDhLi1Rp/acD7Kr5UZns22d89as5F5H/npV8KrIMpPUAzVUr0ewFk2XOcWoNeNI3r3k6bdE6x0aX5sdeum2FFCoSQjES5Q=',
-                //   password: 'c4gJqfkk+IJP4qqu1PbzZ0mmMnk9/P3eoIoKHis5BJbZHJDl3Sda4y+bBIVbihqMhnnt7p69rKtpYMF53PMlNtYktMMFS5I/W9CKyk6Fa4K9GcrfX402F9xT2OzeT+MbY+xklmp2bAONgQxUfz91IvFqMZqJ6TwWnHV/43leDco=',
+                //   logName: 'IZARzgywgf1ITKIOr54DAJ4hrPg/UTkF2YHrd3Dk2nruausIm3QbiXOfs0lAORYd3+zU0wwbplG+LuAFHpzn4g73+h99iMo6hMO0EJdupi2lwJibgvfRULGRHQuNUc0CSsZx7rAeYDy33RIRq7nvAtJCJ0oR0eJ/fLhhc1c6sgQ=',
+                //   password: 'm0DLdtZ7RwfS/209yKC3nyFARUeNS/EYQnrVsCmed43ts7T5960j84wE9TocAbWvktKz/AKZnDqPr62EcviMx3lUHDQUh6QqQYdzzS3gobL6I20SOXtJfNHYSl9Cc6s4zLkwv7hNiAlJMJZ2HLteqGkoVdqbHQ83O61SeOrMqzA=',
                 //   verifyCode: 1,
                 //   // unitId: '1912121746591gjCGWEyAnixZD052E9',
-                //   verifyCodeKey: '240711153649THZ6CKIWxoAmV9xw81j',
+                //   verifyCodeKey: '2407181413160dbbRuCUJ6OgYFdkqx7',
                 //   w: '1920',
                 //   h: '1032',
                 //   decrypt: 'RSA',
