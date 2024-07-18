@@ -156,7 +156,7 @@ export default {
   },
   computed: {
     previewFiled() {
-      const regex = /\[(.*?)\]/g;
+      const regex = /\{(.*?)\}/g;
       return this.recordField.replace(regex, (val) => {
         let name = val.slice(1, -1);
         if (name.indexOf('件号') > -1) {
@@ -165,7 +165,7 @@ export default {
             return Array.from({length:parseFloat(k)}, () => '0').join('')
           }
         }
-        return this.recordListAry.find(item => item.text == name)?.defaultValue
+        return this.recordListAry.find(item => item.text == name) == undefined ? val : this.recordListAry.find(item => item.text == name)?.defaultValue
       })
     }
   },
@@ -271,7 +271,7 @@ export default {
       this.addVar(item)
     },
     addVar(item, fn) {
-      let str = `[${item.text}]`;
+      let str = `{${item.text}}`;
       if (this.recordField == undefined) {
         this.recordField = str;
       } else {
@@ -351,7 +351,8 @@ export default {
     // 取消按钮
     handleCloseDialog() {
       try{
-        parent && parent[0][0][0].closeIdmWindow()
+        // parent && parent[0][0][0].closeIdmWindow()
+        top.openInnerViewWindow.closeIdmWindow()
       } catch(e) {
         console.log('取消按钮报错', e)
       }
@@ -359,7 +360,7 @@ export default {
     // 确定按钮
     handleSendParams() {
       try{
-        parent && parent[0][0][0].loadParentData(this.recordField, this.sureObj.subTrIndex, this.sureObj.metaId); // 调用dsf方法初始化
+        top.openInnerViewWindow.loadParentData(this.recordField, this.sureObj.subTrIndex, this.sureObj.metaId) // 调用dsf方法初始化
       } catch(e) {
         console.log('确定按钮报错', e)
       }

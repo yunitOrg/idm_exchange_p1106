@@ -111,7 +111,12 @@
         <div class="boxx" v-for="(item, index) in fileLib" :key="index">
           <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
           <div class="text">
-            <img :src="handleGetImg(item)" alt="">
+            <template v-if="getFileIcon(item.fileName) == 'common'">
+              <svg-icon iconClass="common" class="treesvg"></svg-icon>
+            </template>
+            <template v-else>
+              <img :src="handleGetImg(item)" alt="">
+            </template>
             <span>{{ item.fileName }}</span>
           </div>
         </div>
@@ -121,7 +126,12 @@
         <div class="boxx" v-for="(item, index) in chooseFile" :key="index">
           <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
           <div class="text">
-            <img :src="handleGetImg(item)" alt="">
+            <template v-if="this.getFileIcon(item.fileName) == 'common'">
+              <svg-icon iconClass="common" class="treesvg"></svg-icon>
+            </template>
+            <template v-else>
+              <img :src="handleGetImg(item)" alt="">
+            </template>
             <span>{{ item.fileName }}</span>
           </div>
         </div>
@@ -170,7 +180,7 @@ export default {
       moduleObject: {},
       propData: this.$root.propData.compositeAttr || {
         height: '100vh',
-        footBottom: '10px'
+        footBottom: '0px'
       }
     }
   },
@@ -185,8 +195,8 @@ export default {
   },
   methods: {
     handleGetImg(item) {
-      let str = `/p1135/190313143112jfLuUxrc19Dchhv4BPU/images/${this.getFileIcon(item.fileName)}.svg`
-      return IDM.url.getModuleAssetsWebPath(str, this.moduleObject)
+      let key = this.getFileIcon(item.fileName);
+      return `${IDM.url.getURLRoot()}p1135/190313143112jfLuUxrc19Dchhv4BPU/images/${key}.svg`;
     },
     // 点击item
     handleClick(item) {
@@ -231,7 +241,6 @@ export default {
       }
       searchGroup(this.comGroup, key);
       searchUnit(this.unitTree, key);
-      console.log(this.pinyinAryAll, 88)
     },
     // 搜索框
     handleInput() {
@@ -389,6 +398,7 @@ export default {
                     format = "ppt";
                     break;
                 default:
+                    format = "common";
                     break;
             }
         }
@@ -528,10 +538,33 @@ export default {
         this.comGroup = group;
         let unit = codeList.filter(item => item.id !== 'zsdwRootGroup');
         this.hanldeAddField(unit, true)
-        this.unitTree = unit
+        this.unitTree = unit;
+        this.handleDataBack()
       } else {
         this.loading = false;
       }
+    },
+    hanldeReply(data) {
+      if (data && data.ids) {
+        let chooseIdAry = data.ids.split(',')
+        // 选中单位复选框
+        this.handleTreeChoose(this.unitTree, chooseIdAry, true);
+
+        this.defaultChooseUnit()
+      }
+    },
+    // 回显数据
+    handleDataBack() {
+      if (this.moduleObject.env !== 'production') {
+        let params = {
+          ids: ",230729190259ierAg1NWmdClVxayyGG,2304241611407jknbFQF0TF9WWP2e98,2307291902598W4QioooBGNlWFOQzTL",
+          text: ",市政府办公厅,市经济信息化委,市科委"
+        }
+        this.hanldeReply(params)
+        return
+      }
+      let params = this.handleParamsFunc();
+      this.hanldeReply(params.initData)
     },
     defaultChooseUnit() {
       this.chooseUnit = this.getTreeCheckData(this.unitTree);
@@ -648,6 +681,10 @@ $bgColor: #efeff2;
       line-height: 28px;
       cursor: pointer;
     }
+  }
+  .treesvg{
+    font-size: 16px;
+    margin-right: 4px;
   }
   .select-loading{
     position: absolute;

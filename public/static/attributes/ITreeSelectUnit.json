@@ -25,7 +25,7 @@
           "text": "底部Y",
           "desc": "填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",
           "bindKey": "footBottom",
-          "default": "10px"
+          "default": "0px"
         }
       ]
     },
