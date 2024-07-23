@@ -1,0 +1,638 @@
+{
+  "classId": "idm.componet.exchange.imodulehead",
+  "comName": "模块头部",
+  "className": "ImoduleHead",
+  "comType": "common",
+  "comLangue": "vue",
+  "compositeAttr": [
+    {
+        "type": "input",
+        "layoutType": "inline",
+        "text": "唯一标识",
+        "bindKey": "ctrlId",
+        "disabled": true,
+        "default": "@[packageid]",
+        "desc": ""
+    },
+    {
+      "type": "group",
+      "text": "基本属性",
+      "desc": "提供设置组件能达到展示效果的基本属性设置信息",
+      "children": [
+        {
+          "type": "radio",
+          "layoutType": "inline",
+          "text": "响应方式",
+          "desc": "用于设置组件高度的响应方式，如果是适应容器 配置的容器高度则不会生效",
+          "bindKey": "heightType",
+          "dictionary": [
+            {
+              "label": "固定值",
+              "value": "fixed"
+            },
+            {
+              "label": "适应容器",
+              "value": "adaptive"
+            }
+          ],
+          "default": "fixed"
+        },
+        {
+          "type": "switch",
+          "layoutType": "inline",
+          "text": "显示标题",
+          "bindKey": "showTitle",
+          "default": true
+        },
+        {
+          "type": "radio",
+          "layoutType": "inline",
+          "text": "响应内容",
+          "desc": "用于显示内容提供两种方式、1：容器 2：固定内容",
+          "bindKey": "resContent",
+          "dictionary": [
+            {
+              "label": "固定内容",
+              "value": "static"
+            },
+            {
+              "label": "容器",
+              "value": "drag"
+            }
+          ],
+          "default": "static"
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "text": "Tab数据源",
+      "desc": "提供设置组件的悬浮容器属性设置信息",
+      "children": [
+        {
+          "type": "radio",
+          "layoutType": "inline",
+          "text": "tab数据",
+          "desc": "tab数据来源提供两种方式：1、请求数据源 2：通过静态配置",
+          "bindKey": "tabData",
+          "dictionary": [
+            {
+              "label": "静态配置",
+              "value": "static"
+            },
+            {
+              "label": "数据源",
+              "value": "dataSource"
+            }
+          ],
+          "default": "static"
+        },
+        {
+          "type": "actionSelect",
+          "layoutType": "block",
+          "text": "接口参数",
+          "desc": "接口参数：自定义函数参数：{_this: this}",
+          "bindKey": "handleParamsFunc",
+          "multiple": false,
+          "display": "@[tabData=='dataSource']"
+        },
+        {
+          "type": "dataSourceSelect",
+          "layoutType": "inline",
+          "text": "数据源",
+          "desc": "用于选择数据源",
+          "bindKey": "tabDataSource",
+          "display": "@[tabData=='dataSource']"
+        },
+        {
+          "type": "table",
+          "text": "",
+          "bindKey": "tabList",
+          "tabText": "索引[index]",
+          "display": "@[tabData=='static']",
+          "children": [
+            {
+              "type": "input",
+              "layoutType": "inline",
+              "text": "value",
+              "desc": "索引: value",
+              "bindKey": "value",
+              "default": "1"
+            },
+            {
+              "type": "input",
+              "layoutType": "inline",
+              "text": "名称",
+              "desc": "tab名称:label",
+              "bindKey": "label",
+              "default": "名称"
+            },
+            {
+              "type": "switch",
+              "layoutType": "inline",
+              "text": "默认选中",
+              "desc": "默认选中该项，如果全部没有选择 则默认选择第一个",
+              "bindKey": "showTab",
+              "default": false
+            }
+          ],
+          "default": [
+            {
+              "value": "1",
+              "label": "名称",
+              "showTab": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "text": "Tab容器样式",
+      "desc": "点击?查看样式设置用法指南",
+      "children": [
+        {
+          "type": "inlineGroup",
+          "text": "宽高",
+          "children": [
+            {
+              "type": "input",
+              "layoutType": "inline",
+              "text": "宽",
+              "desc": "填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",
+              "bindKey": "tabwidth",
+              "width": "60px",
+              "default": "100%"
+            },
+            {
+              "type": "input",
+              "layoutType": "inline",
+              "text": "高",
+              "desc": "填写auto则为自适应，或者使用px、%、vh等单位，比如100%、100px、100vh等等",
+              "bindKey": "tabheight",
+              "width": "60px",
+              "default": "48px"
+            }
+          ]
+        },
+        {
+          "type": "input",
+          "layoutType": "block",
+          "text": "标题间距",
+          "desc": "标题左右间距，填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",
+          "bindKey": "tabRightLeftDis",
+          "default": "10px"
+        },
+        {
+          "type": "group",
+          "text": "分割线属性设置",
+          "desc": "点击？查看X轴属性设置用法指南",
+          "helpUrl": "",
+          "children": [
+            {
+              "type": "input",
+              "layoutType": "inline",
+              "text": "宽",
+              "desc": "填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",
+              "bindKey": "splitWidth",
+              "default": "1px"
+            },
+            {
+              "type": "input",
+              "layoutType": "inline",
+              "text": "高",
+              "desc": "填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",
+              "bindKey": "splitHeight",
+              "default": "40%"
+            },
+            {
+              "type": "input",
+              "layoutType": "inline",
+              "text": "右边距",
+              "desc": "填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",
+              "bindKey": "splitRight",
+              "default": "-10px"
+            },
+            {
+              "type": "colorPicker",
+              "layoutType": "inline",
+              "text": "分割线颜色",
+              "desc": "分割线颜色",
+              "bindKey": "splitColor",
+              "default": {
+                "hex": "#ddd",
+                "hex8": "#ddd"
+              }
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "text": "下划线属性设置",
+          "desc": "点击？查看X轴属性设置用法指南",
+          "helpUrl": "",
+          "children": [
+            {
+              "type": "switch",
+              "layoutType": "inline",
+              "text": "选中下划",
+              "desc": "配置是否显示标题的下划线",
+              "bindKey": "showLine",
+              "default": true
+            },
+            {
+              "type": "colorPicker",
+              "layoutType": "inline",
+              "text": "选中颜色下划",
+              "desc": "选中下划颜色",
+              "bindKey": "lineColor",
+              "display": "@[showLine]"
+            },
+            {
+              "type": "inputNumber",
+              "layoutType": "inline",
+              "text": "下划粗细",
+              "bindKey": "lineSize",
+              "display": "@[showLine]",
+              "default": 2
+            }
+          ]
+        },
+        {
+          "type": "font",
+          "layoutType": "block",
+          "text": "标题文字",
+          "desc": "标题文字样式设置",
+          "bindKey": "titleFont",
+          "default": {
+            "fontColors": {
+              "hex": "#333333",
+              "hex8": "#333333FF"
+            },
+            "fontLineHeight": 48,
+            "fontLineHeightUnit": "px",
+            "fontSize": 14,
+            "fontSizeUnit": "px"
+          }
+        },
+        {
+          "type": "font",
+          "layoutType": "block",
+          "text": "选中文字",
+          "desc": "标题文字样式设置",
+          "bindKey": "chooseTitleFont",
+          "default": {
+            "fontColors": {
+              "hex": "#025FB2",
+              "hex8": "#025FB2FF"
+            },
+            "fontSize": 14,
+            "fontSizeUnit": "px",
+            "fontWeight": "600"
+          }
+        },
+        {
+          "type": "box",
+          "layoutType": "block",
+          "text": "内外边距",
+          "bindKey": "tabBox"
+        },
+        {
+          "type": "border",
+          "layoutType": "block",
+          "text": "边框",
+          "bindKey": "tabBorder",
+          "default": {
+            "border": {
+              "top": {
+                  "style": "solid",
+                  "width": 0,
+                  "widthUnit": "px",
+                  "colors": {
+                    "hex8": ""
+                  }
+              },
+              "right": {
+                  "style": "solid",
+                  "width": 0,
+                  "widthUnit": "px",
+                  "colors": {
+                    "hex8": ""
+                  }
+              },
+              "bottom": {
+                  "style": "solid",
+                  "width": 1,
+                  "widthUnit": "px",
+                  "colors": {
+                    "hex8": "#ddd"
+                  }
+              },
+              "left": {
+                  "style": "solid",
+                  "width": 0,
+                  "widthUnit": "px",
+                  "colors": {
+                    "hex8": ""
+                  }
+              }
+          },
+            "radius": {
+                "leftTop": {
+                    "radius": 0,
+                    "radiusUnit": "px"
+                },
+                "rightTop": {
+                    "radius": 0,
+                    "radiusUnit": "px"
+                },
+                "leftBottom": {
+                    "radius": 0,
+                    "radiusUnit": "px"
+                },
+                "rightBottom": {
+                    "radius": 0,
+                    "radiusUnit": "px"
+                }
+              }
+            }
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "text": "内容样式",
+      "desc": "点击？查看样式设置用法指南",
+      "helpUrl": "",
+      "children": [
+        {
+          "type": "box",
+          "layoutType": "block",
+          "text": "内外边距",
+          "bindKey": "contentBox",
+          "default": {
+            "marginTopVal": "",
+            "marginRightVal": "",
+            "marginBottomVal": "",
+            "marginLeftVal": "",
+            "paddingTopVal": "15px",
+            "paddingRightVal": "",
+            "paddingBottomVal": "",
+            "paddingLeftVal": ""
+          }
+        },
+        {
+          "type": "input",
+          "layoutType": "block",
+          "text": "高",
+          "desc": "填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",
+          "bindKey": "contentEchartsHeight",
+          "default": "300px"
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "text": "悬浮容器属性",
+      "desc": "提供设置组件的悬浮容器属性设置信息",
+      "children": [
+        {
+          "type": "switch",
+          "layoutType": "inline",
+          "text": "悬浮容器",
+          "desc": "是否使用悬浮容器",
+          "bindKey": "showDragContainer",
+          "default": false
+        },
+        {
+          "type": "input",
+          "layoutType": "inline",
+          "text": "左侧距离",
+          "desc": "对应left属性，以组件左上角为起点，可填%，px",
+          "bindKey": "dragContainerLeft"
+        },
+        {
+          "type": "input",
+          "layoutType": "inline",
+          "text": "顶部距离",
+          "desc": "对应top属性，以组件左上角为起点，可填%，px",
+          "bindKey": "dragContainerTop",
+          "default": "8px"
+        },
+        {
+          "type": "input",
+          "layoutType": "inline",
+          "text": "右侧距离",
+          "desc": "对应right属性，以组件左上角为起点，可填%，px",
+          "bindKey": "dragContainerRight",
+          "default": "20px"
+        },
+        {
+          "type": "input",
+          "layoutType": "inline",
+          "text": "底部距离",
+          "desc": "对应bottom属性，以组件左上角为起点，可填%，px",
+          "bindKey": "dragContainerBottom"
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "text": "外层样式",
+      "desc": "点击？查看样式设置用法指南",
+      "helpUrl": "",
+      "children": [
+          {
+            "type": "inlineGroup",
+            "text": "宽高",
+            "children": [
+              {
+                "type": "input",
+                "layoutType": "block",
+                "text": "宽",
+                "desc": "填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",
+                "bindKey": "width",
+                "width": "60px",
+                "default": "100%"
+              },
+              {
+                "type": "input",
+                "layoutType": "block",
+                "text": "高",
+                "desc": "填写auto则为自适应，或者使用px、%、vh等单位，比如100%、100px、100vh等等",
+                "bindKey": "height",
+                "width": "60px",
+                "default": "300px"
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layoutType": "block",
+            "text": "内外边距",
+            "bindKey": "ulbox",
+            "default": {
+              "marginTopVal": "",
+              "marginRightVal": "",
+              "marginBottomVal": "",
+              "marginLeftVal": "",
+              "paddingTopVal": "",
+              "paddingRightVal": "20px",
+              "paddingBottomVal": "0",
+              "paddingLeftVal": "20px"
+            }
+          },
+          {
+            "type": "colorPicker",
+            "layoutType": "inline",
+            "text": "背景色",
+            "bindKey": "bgColor",
+            "placeholder": "请选择颜色",
+            "default": {
+                "hex": "#ffffff",
+                "hex8": "#ffffff"
+            }
+          },
+          {
+            "type": "input",
+            "layoutType": "inline",
+            "text": "容器阴影",
+            "bindKey": "boxShadow",
+            "default": "0px 2px 12px 0px rgba(0,0,0,0.07)"
+          },
+          {
+            "type": "border",
+            "layoutType": "block",
+            "text": "边框",
+            "bindKey": "boxborder",
+            "default": {
+            "border": {
+              "top": {
+                  "style": "solid",
+                  "width": 1,
+                  "widthUnit": "px",
+                  "colors": {
+                    "hex8": "#e6e6e6"
+                  }
+              },
+              "right": {
+                  "style": "solid",
+                  "width": 1,
+                  "widthUnit": "px",
+                  "colors": {
+                    "hex8": "#e6e6e6"
+                  }
+              },
+              "bottom": {
+                  "style": "solid",
+                  "width": 1,
+                  "widthUnit": "px",
+                  "colors": {
+                    "hex8": "#e6e6e6"
+                  }
+              },
+              "left": {
+                  "style": "solid",
+                  "width": 1,
+                  "widthUnit": "px",
+                  "colors": {
+                    "hex8": "#e6e6e6"
+                  }
+              }
+          },
+            "radius": {
+                "leftTop": {
+                    "radius": 0,
+                    "radiusUnit": "px"
+                },
+                "rightTop": {
+                    "radius": 0,
+                    "radiusUnit": "px"
+                },
+                "leftBottom": {
+                    "radius": 0,
+                    "radiusUnit": "px"
+                },
+                "rightBottom": {
+                    "radius": 0,
+                    "radiusUnit": "px"
+                }
+              }
+            }
+          }
+      ]
+    },
+    {
+      "type": "group",
+      "text": "高级",
+      "desc": "点击？查看样式设置用法指南",
+      "helpUrl": "",
+      "children": [
+        {
+          "type": "radio",
+          "layoutType": "inline",
+          "text": "请求方式",
+          "desc": "内容请求方式：提供两种方式 1：使用tab数据源返回的字段Url 2：数据源",
+          "bindKey": "reqMethod",
+          "dictionary": [
+            {
+              "label": "tab数据源返回字段Url",
+              "value": "fixed"
+            },
+            {
+              "label": "数据源",
+              "value": "dataSource"
+            }
+          ],
+          "default": "dataSource"
+        },
+        {
+          "type": "actionSelect",
+          "layoutType": "block",
+          "text": "接口参数",
+          "desc": "接口参数：自定义函数参数：{_this: this}",
+          "bindKey": "handleDataSource",
+          "multiple": false,
+          "display": "@[reqMethod=='dataSource']"
+        },
+        {
+          "type": "dataSourceSelect",
+          "layoutType": "inline",
+          "text": "数据源",
+          "desc": "内容数据源",
+          "bindKey": "contentDataSource",
+          "display": "@[reqMethod=='dataSource']"
+        },
+        {
+          "type": "actionSelect",
+          "layoutType": "block",
+          "text": "图表配置自定义函数",
+          "desc": "请返回echarts图表需要的配置项，参数为{_this: this, params: 接口参数, data: 接口数据, type: 类型}",
+          "bindKey": "handleEcharts",
+          "multiple": false
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "text": "字段设置",
+      "desc": "页面数据绑定",
+      "children": [
+        {
+          "type": "dataSourceFiledSelect",
+          "layoutType": "inline",
+          "text": "tab名称",
+          "bindKey": "tabLable",
+          "default": "label"
+        },
+        {
+          "type": "dataSourceFiledSelect",
+          "layoutType": "inline",
+          "text": "tab调用url",
+          "bindKey": "tabReqUrl",
+          "default": "url"
+        }
+      ]
+    }
+  ]
+}

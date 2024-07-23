@@ -31,6 +31,13 @@
       "className": "ITreeSelectUnit",
       "comType": "common",
       "comLangue": "vue"
+    },
+    {
+      "classId": "idm.componet.exchange.imodulehead",
+      "comName": "模块头部",
+      "className": "ImoduleHead",
+      "comType": "common",
+      "comLangue": "vue"
     }
   ]
 }
