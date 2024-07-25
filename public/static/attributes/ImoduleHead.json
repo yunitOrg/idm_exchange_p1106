@@ -106,7 +106,7 @@
         },
         {
           "type": "table",
-          "text": "",
+          "text": "tab静态数据配置",
           "bindKey": "tabList",
           "tabText": "索引[index]",
           "display": "@[tabData=='static']",
@@ -177,7 +177,7 @@
         },
         {
           "type": "input",
-          "layoutType": "block",
+          "layoutType": "inline",
           "text": "标题间距",
           "desc": "标题左右间距，填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",
           "bindKey": "tabRightLeftDis",
@@ -246,7 +246,11 @@
               "text": "选中颜色下划",
               "desc": "选中下划颜色",
               "bindKey": "lineColor",
-              "display": "@[showLine]"
+              "display": "@[showLine]",
+              "default": {
+                "hex": "#025FB2",
+                "hex8": "#025FB2"
+              }
             },
             {
               "type": "inputNumber",
