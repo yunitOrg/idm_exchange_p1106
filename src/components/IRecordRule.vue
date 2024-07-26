@@ -30,8 +30,8 @@
           <div class="record-head pd10">
             <span>变量</span>
             <div>
-              <a-button @click="handleDel">删除变量</a-button>
-              <a-button class="ml10" @click="hanldeAddField">新增自定义变量</a-button>
+              <a-button @click="handleDel" v-if="propData.deleteBtn">删除变量</a-button>
+              <a-button class="ml10" v-if="propData.addBtn" @click="hanldeAddField">新增自定义变量</a-button>
             </div>
           </div>
           <div class="record-tree pdall">
@@ -141,6 +141,8 @@ export default {
       sureObj: {},
       moduleObject: {},
       propData: this.$root.propData.compositeAttr || {
+        deleteBtn: true,
+        addBtn: true,
         ulbox: {
           marginTopVal: "",
           marginRightVal: "",
