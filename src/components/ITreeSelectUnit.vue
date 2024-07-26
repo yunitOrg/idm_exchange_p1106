@@ -501,10 +501,10 @@ export default {
     // 附件数据
     handleFileListData(data) {
       if (data && data.length > 0) {
-        let { selectAtt } = this.handleParamsFunc();
+        let { selectAttvalue } = this.handleParamsFunc();
         // selectAtt = '0,1,3;0,1,2,4,3';
-        if (selectAtt) {
-          let split = selectAtt.split(';');
+        if (selectAttvalue) {
+          let split = selectAttvalue.split(';');
           let chooseCheckbox = split[0].split(',')
           data.forEach(item => {
             item.checkboxItem = chooseCheckbox.includes(`${item.attValue}`);
