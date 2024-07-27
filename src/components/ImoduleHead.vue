@@ -278,7 +278,8 @@ export default {
         }
         return window[name] && window[name].call(this, {
           _this: this,
-          chooseTab: this.chooseTab,
+          itemChooseTab: this.chooseTab,
+          type: this.timeCompare,
           timeObj: [startTime, endTime],
           urlparams: this.handleParamsFunc(),
         });
@@ -358,74 +359,7 @@ export default {
     },
     // 设置折线图
     handleSetLine(data) {
-      let option = {
-        legend: {
-          data: ['调用次数'],
-          itemWidth: 10,
-          itemHeight: 10,
-          bottom: '20px',
-          icon: 'circle',
-          itemStyle: {
-            color: '#6DD400',
-          },
-          textStyle: {
-            color: '#333',
-            fontSize: '14'
-          }
-        },
-        grid: {
-          left: '3%',
-          right: '6%',
-          bottom: 80
-        },
-        xAxis: {
-          type: 'category',
-          data: [
-            {
-            value: 'Mon',
-            textStyle: {
-                padding: [5,0]
-              }
-            },
-            {
-            value: 'Tue',
-            textStyle: {
-                padding: [5,0]
-              }
-            },
-            {
-            value: 'Wed',
-            textStyle: {
-                padding: [5,0]
-              }
-            },
-          ],
-          axisTick: {
-            length: 1,
-            alignWithLabel: true,
-            lineStyle: {
-              type: 'dotted',
-              color: '#6DD400',
-              width: 10,
-              cap: 'round'
-            }
-          }
-        },
-        yAxis: {
-          type: 'value'
-        },
-        series: [
-          {
-            name: '调用次数',
-            data: [150, 230, 224, 218, 135, 147, 260],
-            type: 'line',
-            symbol: 'none',
-            lineStyle: {
-              color: '#0091FF'
-            }
-          }
-        ]
-      };
+      let option = {};
       if (this.propData.handleEcharts && this.propData.handleEcharts.length > 0) {
         let name = this.propData.handleEcharts[0].name
         let params = this.handleRequireparams();
@@ -435,9 +369,81 @@ export default {
           data: data,
           type: this.timeCompare
         });
+      } else {
+        // option = {
+        //   legend: {
+        //     data: ['调用次数'],
+        //     itemWidth: 10,
+        //     itemHeight: 10,
+        //     bottom: '20px',
+        //     icon: 'circle',
+        //     itemStyle: {
+        //       color: '#6DD400',
+        //     },
+        //     textStyle: {
+        //       color: '#333',
+        //       fontSize: '14'
+        //     }
+        //   },
+        //   grid: {
+        //     left: '3%',
+        //     right: '6%',
+        //     bottom: 80
+        //   },
+        //   xAxis: {
+        //     type: 'category',
+        //     data: [
+        //       {
+        //       value: 'Mon',
+        //       textStyle: {
+        //           padding: [5,0]
+        //         }
+        //       },
+        //       {
+        //       value: 'Tue',
+        //       textStyle: {
+        //           padding: [5,0]
+        //         }
+        //       },
+        //       {
+        //       value: 'Wed',
+        //       textStyle: {
+        //           padding: [5,0]
+        //         }
+        //       },
+        //     ],
+        //     axisTick: {
+        //       length: 1,
+        //       alignWithLabel: true,
+        //       lineStyle: {
+        //         type: 'dotted',
+        //         color: '#6DD400',
+        //         width: 10,
+        //         cap: 'round'
+        //       }
+        //     }
+        //   },
+        //   yAxis: {
+        //     type: 'value'
+        //   },
+        //   series: [
+        //     {
+        //       name: '调用次数',
+        //       data: [150, 230, 224, 218, 135, 147, 260],
+        //       type: 'line',
+        //       symbol: 'none',
+        //       lineStyle: {
+        //         color: '#0091FF'
+        //       }
+        //     }
+        //   ]
+        // };
       }
       let myChart = this.$echarts.init(this.$refs.line1);
       myChart.setOption(option);
+    },
+    sendBroadcastMessage(object) {
+      window.IDM.broadcast && window.IDM.broadcast.send(object);
     },
     // 内容调用接口
     requireDataContent() {
@@ -446,18 +452,27 @@ export default {
         return
       }
       let params = this.handleRequireparams();
+      // 发送消息
+      this.sendBroadcastMessage({
+        type: "linkageDemand",
+        message: {
+          ...params
+        }
+      });
+      
       if (this.propData.reqMethod == 'fixed') {
-        window.IDM.http.post(this.chooseTab[this.propData.tabReqUrl], params, {
+        window.IDM.http.get(this.chooseTab[this.propData.tabReqUrl], params, {
             headers: {
             'Content-Type': 'application/json'
             },
         }).then(res => {
-          if (res.code === '200') {
-            this.handleSetLine(res.data)
+          let data = res.data || {};
+          if (data.code === '200') {
+            this.handleSetLine(data.data)
           }
         })
       } else if (this.propData.reqMethod == 'dataSource') {
-        IDM.datasource.request(this.propData.contentDataSource[0]?.id, {
+        this.propData.contentDataSource && IDM.datasource.request(this.propData.contentDataSource[0]?.id, {
           moduleObject: this.moduleObject,
           ...params,
           }, (data) => {

@@ -573,7 +573,7 @@
       "helpUrl": "",
       "children": [
         {
-          "type": "radio",
+          "type": "select",
           "layoutType": "inline",
           "text": "请求方式",
           "desc": "内容请求方式：提供两种方式 1：使用tab数据源返回的字段Url 2：数据源",
@@ -594,10 +594,9 @@
           "type": "actionSelect",
           "layoutType": "block",
           "text": "接口参数",
-          "desc": "接口参数：自定义函数参数：{_this: this}",
+          "desc": "接口参数：调用接口必须填写 自定义函数参数：{_this: this, itemChooseTab: chooseTab, type: 切换状态, timeObj: timeObj, urlparams: urlparams}",
           "bindKey": "handleDataSource",
-          "multiple": false,
-          "display": "@[reqMethod=='dataSource']"
+          "multiple": false
         },
         {
           "type": "dataSourceSelect",
