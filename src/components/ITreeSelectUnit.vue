@@ -493,7 +493,7 @@ export default {
         let name = this.propData.handleParamsFunc[0].name
         return window[name] && window[name].call(this, {
           _this: this,
-        });
+        }) || {};
       } else {
         return IDM.url.queryObject()
       }
