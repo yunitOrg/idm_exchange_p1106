@@ -47,7 +47,7 @@
               <div class="show" @click="groupTtype=!groupTtype"></div>
               <span >常用组</span>
               <div>
-                <a-checkbox @change="hadnleGroutChoose">
+                <a-checkbox v-model="groupCheck" @change="hadnleGroutChoose">
                   全选
                 </a-checkbox>
               </div>
@@ -233,8 +233,8 @@ export default {
       fileLib: [],
       // 所有数据
       treeData: {
-        org: {},
-        zsdwGroup: {}
+        org: [],
+        zsdwGroup: []
       },
       // 总拼音数据
       pinyinAryAll: [],
@@ -255,6 +255,11 @@ export default {
           paddingLeftVal: "18px"
         }
       },
+    }
+  },
+  computed: {
+    groupCheck() {
+      return this.treeData.zsdwGroup && this.treeData.zsdwGroup.filter(item => item.check).length == this.treeData.zsdwGroup.length || false
     }
   },
   mounted() {
@@ -403,13 +408,16 @@ export default {
     },
     // 更新按钮
     handleUpdateGroup() {
-      let alyChoose = this.getTreeCheckData(this.treeData.zsdwGroup)
+      let alyChoose = this.treeData.zsdwGroup.filter(item => item.check);
       if (alyChoose.length <= 0) {
         message.error('请选择小组')
         return
       } else if (alyChoose.length == 1) {
-        let current = alyChoose[0]
-        this.handleUpdate(current.id, current.children)
+        let current = alyChoose[0];
+        let ary = this.getTreeCheckData(this.treeData.org);
+        this.handleUpdate(current.id, ary, () => {
+          this.handleGetGroupData();
+        });
       } else {
         this.dialogGroup.groupary = alyChoose
         this.dialogGroup.value = alyChoose[0].id
@@ -430,7 +438,7 @@ export default {
       }
       let res  = await API.ApiUpdateGroup(obj)
       if (res.code == '200') {
-        message.success(res.message)
+        message.success(res.message);
         fn && fn()
       } else {
         message.success(res.message)
@@ -459,8 +467,9 @@ export default {
     },
     // 选择常用组弹框
     handleChooseGroup() {
-      let obj = this.dialogGroup.groupary.find(item => item.id == this.dialogGroup.value)
-      this.handleUpdate(this.dialogGroup.value, obj.children, () => {
+      let ary = this.getTreeCheckData(this.treeData.org);
+      this.handleUpdate(this.dialogGroup.value, ary, () => {
+        this.handleGetGroupData();
         this.dialogGroup.visible = false;
       })
     },
@@ -606,9 +615,13 @@ export default {
     // 全选单位
     handleAllCheck(e, item) {
       if (item.children?.length > 0) {
-        item.children.forEach(item => item.check = e.target.checked)
-        item.chooseNum = e.target.checked ? item.children.length : 0
-        this.defaultChooseUnit()
+        item.children.forEach(item => item.check = e.target.checked);
+        item.chooseNum = e.target.checked ? item.children.length : 0;
+
+        // 选中常用组
+        this.handleTreeAddTreeData(this.treeData.zsdwGroup, {check: e.target.checked});
+
+        this.defaultChooseUnit();
       }
     },
     // 选中单位
@@ -781,11 +794,11 @@ export default {
       }
 
       if (this.moduleObject.env !== 'production') {
-        let params = {
-          ids: ",230729190259ierAg1NWmdClVxayyGG,2304241611407jknbFQF0TF9WWP2e98,2307291902598W4QioooBGNlWFOQzTL",
-          text: ",市政府办公厅,市经济信息化委,市科委"
-        }
-        this.hanldeReply(params)
+        // let params = {
+        //   ids: ",230729190259ierAg1NWmdClVxayyGG,2304241611407jknbFQF0TF9WWP2e98,2307291902598W4QioooBGNlWFOQzTL",
+        //   text: ",市政府办公厅,市经济信息化委,市科委"
+        // }
+        // this.hanldeReply(params)
         return
       }
       let params = this.handleParamsFunc();
