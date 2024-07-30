@@ -7,13 +7,13 @@
     <div class="table-head mb10">
       <div></div>
       <div>
-        <a-button class="h40 super-btn" type="primary" @click="handleSearch">检索</a-button>
+        <!-- <a-button class="h40 super-btn" type="primary" @click="handleSearch">检索</a-button> -->
         <!-- <a-button class="h40 super-btn">导出</a-button> -->
       </div>
     </div>
     <!--搜索-->
     <div class="table-search">
-      <div class="super-middle" style="width: 25%;">
+      <div class="super-middle" style="width: 20%;">
         <span class="super-mr10">数据来源</span>
         <a-select v-model="search.archiveState" allowClear style="width: 50%">
           <a-select-option :value="item.value" v-for="(item, index) in selectData.archiveStageList" :key="index">
@@ -21,7 +21,7 @@
           </a-select-option>
         </a-select>
       </div>
-      <div class="super-middle" style="width: 25%;">
+      <div class="super-middle" style="width: 20%;">
         <span class="super-mr10">保管期限</span>
         <a-select v-model="search.archicvePeriod" allowClear style="width: 50%">
           <a-select-option :value="item.value" v-for="(item, index) in selectData.arvhivePeriodList" :key="index">
@@ -29,7 +29,7 @@
           </a-select-option>
         </a-select>
       </div>
-      <div class="super-middle" style="width: 25%;">
+      <div class="super-middle" style="width: 20%;">
         <span class="super-mr10">开放程度</span>
         <a-select v-model="search.archiveOpenStatus" allowClear style="width: 50%">
           <a-select-option :value="item.value" v-for="(item, index) in selectData.archiveOpenTypeList" :key="index">
@@ -37,7 +37,7 @@
           </a-select-option>
         </a-select>
       </div>
-      <div class="super-middle" style="width: 25%;">
+      <div class="super-middle" style="width: 20%;">
         <span class="super-mr10">年度</span>
         <a-config-provider :locale="locale">
           <a-date-picker
@@ -49,6 +49,9 @@
             @openChange="openChangeOne"
             @panelChange="panelChangeOne"/>
         </a-config-provider>
+      </div>
+      <div style="width: 20%;">
+        <a-button class="h40 super-btn" type="primary"  @click="handleSearch">检索</a-button>
       </div>
     </div>
     <div class="echartsBox" ref="line1"></div>

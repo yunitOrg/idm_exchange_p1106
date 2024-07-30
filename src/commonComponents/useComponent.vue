@@ -7,7 +7,7 @@
     <div class="table-head mb10">
       <div></div>
       <div>
-        <a-button class="h40 super-btn" type="primary" @click="handleSearch">检索</a-button>
+        <!-- <a-button class="h40 super-btn" type="primary" @click="handleSearch">检索</a-button> -->
         <!-- <a-button class="h40 super-btn">导出</a-button> -->
       </div>
     </div>
@@ -33,6 +33,9 @@
             @openChange="openChangeOne"
             @panelChange="panelChangeOne"/>
         </a-config-provider>
+      </div>
+      <div style="width: 25%;">
+        <a-button class="h40 super-btn" type="primary" @click="handleSearch">检索</a-button>
       </div>
     </div>
     <div class="echartsBox" ref="line1"></div>

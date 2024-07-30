@@ -11,11 +11,11 @@
     :idm-ctrl-id="moduleObject.id"
   >
     <div class="archiveStat">
-      <div class="tab mb10">
+      <!-- <div class="tab mb10">
         <div class="tab-li" v-for="(item, index) in tablist" :key="index"
           :class="{'activity': item.value == current}"
           @click="handleTab(item)">{{ item.lable }}</div>
-      </div>
+      </div> -->
       <template v-if="current == 1">
         <ArchiveComponent
           ref="archiveComponent"
@@ -45,7 +45,7 @@ export default {
   },
   data() {
     return {
-      current: 1,
+      current: 0,
       tablist: [
         {
           value: 1,
@@ -78,7 +78,7 @@ export default {
   },
   mounted() {
     this.moduleObject = this.$root.moduleObject;
-    this.requireMount();
+    // this.requireMount();
     this.init();
   },
   methods: {
@@ -86,16 +86,23 @@ export default {
       this.propData = propData.compositeAttr || {};
       this.init()
     },
+    // 接口参数
+    handleParamsFunc() {
+      return IDM.url.queryObject()
+    },
     // tab选项
     handleTab(item) {
-      if (item.value == this.current) return
+      // if (item.value == this.current) return
       this.current = item.value;
       this.$nextTick(() => {
         if(this.current == 1) {
           this.requireMount();
+          this.$refs.archiveComponent.hanldeSelectData(this.selectData)
         } else if (this.current == 2) {
+          this.requireMount();
           this.$refs.readComponent.hanldeSelectData(this.selectData)
         } else if (this.current == 3) {
+          this.requireMount();
           this.$refs.useComponent.hanldeSelectData(this.selectData)
         }
       })
@@ -161,10 +168,20 @@ export default {
       let res = await API.ApiQuerySource();
       if (res.code == '200') {
         this.selectData = res.data
-        this.$refs.archiveComponent.hanldeSelectData(this.selectData)
+      }
+    },
+    handleTabUrl() {
+      let urlparams = this.handleParamsFunc();
+      if (urlparams.type == 1) {
+        this.handleTab({value: 1})
+      } else if (urlparams.type == 2) {
+        this.handleTab({value: 2})
+      } else if (urlparams.type == 3) {
+        this.handleTab({value: 3})
       }
     },
     init() {
+      this.handleTabUrl();
       this.handleStyle();
       this.convertThemeListAttrToStyleObject()
     }
