@@ -821,11 +821,11 @@ export default {
       }
 
       if (this.moduleObject.env !== 'production') {
-        // let params = {
-        //   ids: ",230729190259ierAg1NWmdClVxayyGG,2304241611407jknbFQF0TF9WWP2e98,2307291902598W4QioooBGNlWFOQzTL",
-        //   text: ",市政府办公厅,市经济信息化委,市科委"
-        // }
-        // this.hanldeReply(params)
+        let params = {
+          ids: ",240731110840PTk2JTLwzybbuVXjXif,230729190259ierAg1NWmdClVxayyGG,2304241611407jknbFQF0TF9WWP2e98,230714204031AGEhhsBI44lSCp2wsql",
+          text: ",市政府办公厅,市经济信息化委,市科委"
+        }
+        this.hanldeReply(params)
         return
       }
       let params = this.handleParamsFunc();
@@ -834,17 +834,49 @@ export default {
     hanldeReply(data) {
       if (data && data.ids) {
         let chooseIdAry = data.ids.split(',')
-        // 选中单位复选框
+
+        // 先回显常用组
+        this.handleBackGroup(chooseIdAry);
+
+        // // 选中单位复选框
         this.handleTreeChoose(this.treeData.org, chooseIdAry, true);
-        // 检查单位全选和选中条数
+        // // 检查单位全选和选中条数
         this.handleFatherChoose(this.treeData.org)
 
-        // 检查常用组选中
+        // // 检查常用组选中
         this.handleTreeChoose(this.treeData.zsdwGroup, chooseIdAry, true)
         this.handleCheckGroupChoose(this.treeData.zsdwGroup)
         
         this.defaultChooseUnit()
       }
+    },
+    // 回显常用组
+    handleBackGroup(chooseIdAry) {
+      this.treeData.zsdwGroup.forEach(item => {
+        if (chooseIdAry.includes(item.id)) {
+          item.check = true;
+          item.children.forEach(k => k.check = true);
+          let chooseIdAry = item.children.map(item => item.id);
+          // 选中单位复选框
+          this.handleTreeChoose(this.treeData.org, chooseIdAry, true);
+          this.handleFatherChoose(this.treeData.org)
+        }
+      })
+      console.log(this.treeData.zsdwGroup, chooseIdAry, 99)
+
+      // if (item.children?.length > 0) {
+      //   item.children.forEach(k => k.check = true)
+      //   let chooseIdAry = item.children.map(item => item.id)
+      //   // 选中单位复选框
+      //   this.handleTreeChoose(this.treeData.org, chooseIdAry, e.target.checked);
+      //   // 检查单位全选和选中条数
+      //   this.handleFatherChoose(this.treeData.org);
+      //   // 检查常用组其他是否选中
+      //   this.handleTreeChoose(this.treeData.zsdwGroup, chooseIdAry, e.target.checked);
+      //   this.handleCheckGroupChoose(this.treeData.zsdwGroup)
+        
+      //   this.defaultChooseUnit()
+      // }
     },
     async initData() {
       // if (this.moduleObject.env !== 'production') {
@@ -854,14 +886,6 @@ export default {
 
       // 获取单位和常用组
       const params = this.handleParamsFunc()
-      // if (this.propData.dataSourceForm) {
-      //   IDM.datasource.request(this.propData.dataSourceForm[0]?.id, {
-      //     moduleObject: this.moduleObject,
-      //     ...params,
-      //     }, (data) => {
-      //       this.hanldeData(data)
-      //   })
-      // }
       this.handleGetGroupData();
       // 附件
       let res = await API.ApiUnitExchangeList(params)

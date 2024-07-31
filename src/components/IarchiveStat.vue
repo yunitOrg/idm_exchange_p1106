@@ -45,7 +45,7 @@ export default {
   },
   data() {
     return {
-      current: 1,
+      current: 0,
       tablist: [
         {
           value: 1,
@@ -63,7 +63,7 @@ export default {
       selectData: {},
       moduleObject: {},
       propData: this.$root.propData.compositeAttr || {
-        defaultPageIndex: 3,
+        defaultPageIndex: 2,
         ulbox: {
           marginTopVal: "",
           marginRightVal: "",

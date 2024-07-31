@@ -203,8 +203,9 @@ export default {
           show: true,
           trigger: 'item',
           formatter: function (params) {
+            let val = data.find(item => item.archiveTypeText == params.name);
             let circle = `<span style="display:inline-block;margin-right:5px;border-radius:50%;width:10px;height:10px;background-color:${params.color}"></span>`
-            return `${circle} ${params.name}  ${params.data.value}%`
+            return `${circle} ${params.name}  ${val.archiveCount}`
           }
         },
         series: [
