@@ -35,10 +35,23 @@
       </div>
       <div class="select-content" :style="setHeight()">
         <div class="select-ul" v-if="chooseUnit.length>0">
-          <div class="select-label" v-for="(item, index) in chooseUnit" :key="index">
-            {{ item.name }}
-            <div class="select-delete"><img src="../assets/delete.png" alt="" @click="hadnleDelectUnit(item, index)"></div>
-          </div>
+          <draggable
+            class="select-drag"
+            tag="div"
+            chosen-class="iprint-ghost"
+            force-fallback="true"
+            v-model="chooseUnit"
+            animation="300"
+            draggable=".item"
+            handle=".defaultTypeTag"
+            @start="dragStart"
+            @end="dragEnd"
+          >
+            <div class="select-label item" v-for="(item, index) in chooseUnit" :key="index">
+              <span class="defaultTypeTag">{{ item.name }}</span>
+              <div class="select-delete"><img src="../assets/delete.png" alt="" @click="hadnleDelectUnit(item, index)"></div>
+            </div>
+          </draggable>
         </div>
         <!--常用组-->
         <div class="select-common select-border mbl10">
@@ -267,6 +280,18 @@ export default {
     this.init();
   },
   methods: {
+    /**
+     * @Desc 拖拽开始
+     */
+     dragStart(env) {
+      env.item.classList.add('columnborder')
+    },
+    /**
+     * @Desc 拖拽结束
+     */
+    dragEnd(env) {
+      env.item.classList.remove('columnborder')
+    },
     setHeight() {
       let flag = this.handleParamsFunc().recordId;
       return  {
@@ -615,7 +640,9 @@ export default {
     // 全选单位
     handleAllCheck(e, item) {
       if (item.children?.length > 0) {
-        item.children.forEach(item => item.check = e.target.checked);
+        item.children.forEach(item => {
+          !item.attrs.noselect && (item.check = e.target.checked)
+        });
         item.chooseNum = e.target.checked ? item.children.length : 0;
 
         // 选中常用组
@@ -645,7 +672,7 @@ export default {
     getTreeCheckData(tree, select=[]) {
       if (tree && tree.length>0) {
         tree.forEach(item => {
-          (item.check && item.children.length==0) && select.push(item)
+          (item.check && item.children?.length==0) && select.push(item)
           if (item.children?.length > 0) {
             return this.getTreeCheckData(item.children, select)
           }
@@ -1043,7 +1070,12 @@ export default {
       margin-bottom: 10px;
       background-color: #eee;
       border: 1px solid #cccccc;
+      .select-drag{
+        display: flex;
+        flex-wrap: wrap;
+      }
       .select-label{
+        cursor: pointer;
         display: flex;
         align-items: center;
         height: 24px;

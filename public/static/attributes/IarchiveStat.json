@@ -18,7 +18,16 @@
       "type": "group",
       "text": "基本属性",
       "desc": "提供设置组件能达到展示效果的基本属性设置信息",
-      "children": []
+      "children": [
+        {
+          "type": "input",
+          "layoutType": "block",
+          "text": "显示页面",
+          "desc": "tab有三个就有三个页面 1:档案数量统计 2:档案借阅统计 3:档案利用统计",
+          "bindKey": "defaultPageIndex",
+          "default": "1"
+        }
+      ]
     },
     {
       "type": "group",

@@ -45,7 +45,7 @@ export default {
   },
   data() {
     return {
-      current: 0,
+      current: 1,
       tablist: [
         {
           value: 1,
@@ -63,6 +63,7 @@ export default {
       selectData: {},
       moduleObject: {},
       propData: this.$root.propData.compositeAttr || {
+        defaultPageIndex: 3,
         ulbox: {
           marginTopVal: "",
           marginRightVal: "",
@@ -96,14 +97,17 @@ export default {
       this.current = item.value;
       this.$nextTick(() => {
         if(this.current == 1) {
-          this.requireMount();
-          this.$refs.archiveComponent.hanldeSelectData(this.selectData)
+          this.requireMount(() => {
+            this.$refs.archiveComponent.hanldeSelectData(this.selectData)
+          });
         } else if (this.current == 2) {
-          this.requireMount();
-          this.$refs.readComponent.hanldeSelectData(this.selectData)
+          this.requireMount(() => {
+            this.$refs.readComponent.hanldeSelectData(this.selectData)
+          });
         } else if (this.current == 3) {
-          this.requireMount();
-          this.$refs.useComponent.hanldeSelectData(this.selectData)
+          this.requireMount(() => {
+            this.$refs.useComponent.hanldeSelectData(this.selectData)
+          });
         }
       })
     },
@@ -164,21 +168,16 @@ export default {
       }
     },
     // 获取下拉数据
-    async requireMount() {
+    async requireMount(fn) {
       let res = await API.ApiQuerySource();
       if (res.code == '200') {
-        this.selectData = res.data
+        this.selectData = res.data;
+        fn && fn()
       }
     },
     handleTabUrl() {
-      let urlparams = this.handleParamsFunc();
-      if (urlparams.type == 1) {
-        this.handleTab({value: 1})
-      } else if (urlparams.type == 2) {
-        this.handleTab({value: 2})
-      } else if (urlparams.type == 3) {
-        this.handleTab({value: 3})
-      }
+      let urlparams = this.propData.defaultPageIndex;
+      this.handleTab({value: parseInt(urlparams)})
     },
     init() {
       this.handleTabUrl();

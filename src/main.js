@@ -7,6 +7,9 @@ import config from '../public/static/config.json';
 import '@/icons' // icon
 import '@/plugins/echarts';
 
+import draggable from 'vuedraggable'
+Vue.use(draggable)
+
 new VueRegister(config)
 const requireComponent = require.context(
   // 其组件目录的相对路径

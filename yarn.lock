@@ -9192,6 +9192,11 @@
   dependencies:
     "is-plain-obj" "^1.0.0"
 
+"sortablejs@1.10.2":
+  "integrity" "sha512-YkPGufevysvfwn5rfdlGyrGjt7/CRHwvRPogD/lC+TnvcN29jDpCifKP+rBqf+LRldfXSTh+0CGLcSg0VIxq3A=="
+  "resolved" "https://registry.npmmirror.com/sortablejs/-/sortablejs-1.10.2.tgz"
+  "version" "1.10.2"
+
 "source-list-map@^2.0.0":
   "integrity" "sha512-qnQ7gVMxGNxsiL4lEuJwe/To8UnK7fAnmbGEEH8RpLouuKbeEm0lhbQVFIrNSuB+G7tVrAlVsZgETT5nljf+Iw=="
   "resolved" "https://registry.npmmirror.com/source-list-map/-/source-list-map-2.0.1.tgz"
@@ -10357,6 +10362,13 @@
   dependencies:
     "@vue/compiler-sfc" "2.7.16"
     "csstype" "^3.1.0"
+
+"vuedraggable@^2.24.3":
+  "integrity" "sha512-6/HDXi92GzB+Hcs9fC6PAAozK1RLt1ewPTLjK0anTYguXLAeySDmcnqE8IC0xa7shvSzRjQXq3/+dsZ7ETGF3g=="
+  "resolved" "https://registry.npmmirror.com/vuedraggable/-/vuedraggable-2.24.3.tgz"
+  "version" "2.24.3"
+  dependencies:
+    "sortablejs" "1.10.2"
 
 "warning@^4.0.0":
   "integrity" "sha512-rpJyN222KWIvHJ/F53XSZv0Zl/accqHR8et1kpaMTD/fLCRxtV8iX8czMzY7sVZupTI3zcUTg8eycS2kNF9l6w=="
