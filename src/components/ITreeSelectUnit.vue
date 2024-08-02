@@ -215,7 +215,12 @@ export default {
         if (item.id == chooseId) {
           return item
         } else {
-          return item.children?.length > 0 && this.handleTreeGetChooseId(item.children, chooseId)
+          if (item.children) {
+            let node = this.handleTreeGetChooseId(item.children, chooseId);
+            if (node) {
+              return node
+            }
+          }
         }
       }
     },

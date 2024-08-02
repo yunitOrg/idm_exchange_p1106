@@ -725,7 +725,7 @@ export default {
             }
             item.chooseNum = 0;
           }
-          item.children?.length > 0 && this.handleTreeAddTreeData(item.children, params)
+          item.children && this.handleTreeAddTreeData(item.children, params)
         })
       }
     },
@@ -736,7 +736,12 @@ export default {
         if (item.id == chooseId) {
           return item
         } else {
-          return item.children?.length > 0 && this.handleTreeGetChooseId(item.children, chooseId)
+          if (item.children) {
+            let node = this.handleTreeGetChooseId(item.children, chooseId);
+            if (node) {
+              return node
+            }
+          }
         }
       }
     },
