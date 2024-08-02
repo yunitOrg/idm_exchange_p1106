@@ -57,7 +57,7 @@
             </div>
             <div v-show="showSearchDialog">
               <div class="searchul" v-if="pinyinAryAll.length> 0">
-                <div v-for="(item, index) in pinyinAryAll" :key="index" @click="handleClick(item)">{{ item.name }}</div>
+                <div v-for="(item, index) in pinyinAryAll" :key="index" @click="handleChoose(item)">{{ item.name }}</div>
               </div>
               <div v-else>
                 <span>无数据</span>
@@ -208,22 +208,16 @@ export default {
       let key = this.getFileIcon(item.fileName);
       return `${IDM.url.getURLRoot()}p1135/190313143112jfLuUxrc19Dchhv4BPU/images/${key}.svg`;
     },
-    // 点击item
-    handleClick(item) {
-      let flag = !item.check
-      // if (item.children && item.children.length > 0) {
-      //   item.children.forEach(item => item.check = flag)
-      // }
-      item.check = flag;
-      // if (item.children?.length > 0) {
-      //   let chooseIdAry = item.children.map(item => item.id)
-      //   // 选中单位复选框
-      //   this.handleTreeChoose(this.unitTree, chooseIdAry, flag);
-      // }
-      // 检查单位全选和选中条数
-      this.handleTreeAddTreeData(this.unitTree, {chooseId: item.id, targetflag: flag })
-      this.handleFatherChoose(this.unitTree)
-      this.defaultChooseUnit()
+    // 获取id 对应数据
+    handleTreeGetChooseId(tree, chooseId) {
+      for(let i=0; i<tree.length; i++) {
+        let item = tree[i];
+        if (item.id == chooseId) {
+          return item
+        } else {
+          return item.children?.length > 0 && this.handleTreeGetChooseId(item.children, chooseId)
+        }
+      }
     },
     // 查询拼音数据
     searchGroupUnit(key) {
@@ -303,6 +297,11 @@ export default {
         })
       }
     },
+    // 检查常用组全选
+    checkGroupAllChoose() {
+      let group = this.comGroup[0].children || [];
+      this.comGroup[0].check = group.length && (group.filter(item => item.check).length == group.length);
+    },
     // 常用组全选下级
     chooseGroup(item) {
       item.check = !item.check;
@@ -363,6 +362,8 @@ export default {
       item.check = false;
       this.chooseUnit.splice(index, 1);
       this.updateChooseNum(this.chooseUnit);
+
+      this.handleChoose(item)
     },
     hadnleTreeCheck(tree, flag) {
       if (tree && tree.length>0) {
@@ -378,6 +379,10 @@ export default {
       if (item.children?.length > 0) {
         this.hadnleTreeCheck([item], item.check)
         item.chooseNum = item.check ? item.children.length : 0
+        
+        // 选中常用组
+        this.handleTreeAddTreeData(this.comGroup, {check: item.check});
+
         this.defaultChooseUnit()
       }
     },
@@ -457,18 +462,31 @@ export default {
       }
       window.IDM.setStyleToPageHead(this.moduleObject.id + " .itreeselectunit", styleObject);
     },
-    // 选中复选框
-    handleAddGroup(e, item) {
-      if (item.children?.length > 0) {
-        item.children.forEach(k => k.check = true)
-        let chooseIdAry = item.children.map(item => item.id);
+    // 选中常用组复选框
+    handleAddGroup(e, subitem) {
+      if (subitem.children?.length > 0) {
+        subitem.check = e.target.checked;
+        subitem.children.forEach(k => k.check = e.target.checked)
+        let chooseIdAry = subitem.children.map(subitem => subitem.id);
+        this.checkGroupAllChoose()
         // 选中单位复选框
         this.handleTreeChoose(this.unitTree, chooseIdAry, e.target.checked);
-
         this.defaultChooseUnit()
       }
     },
+    // 选择单位
     handleChoose(item) {
+      let flag = item.check
+      let fatherobj = this.handleTreeGetChooseId(this.unitTree, item.pid)
+      let chooseTrueCheck = fatherobj.children.filter(item => item.check)
+      fatherobj.check = fatherobj.children.length == chooseTrueCheck.length
+
+      // 检查常用组选中
+      this.handleTreeAddTreeData(this.comGroup, {chooseId: item.id, targetflag: flag })
+      this.handleCheckGroupChoose(this.comGroup)
+      // 检查常用组全选
+      this.checkGroupAllChoose();
+
       this.defaultChooseUnit()
     },
     // org 选中数据
@@ -554,20 +572,54 @@ export default {
         this.loading = false;
       }
     },
+    // 检查常用组选中
+    handleCheckGroupChoose(tree) {
+      if (tree && tree.length>0) {
+        tree.forEach(item => {
+          if (item.children.length != 0) {
+            item.check = (item.children.filter(k => k.check).length == item.children.length);
+          }
+          item.children?.length > 0 && this.handleCheckGroupChoose(item.children)
+        })
+      }
+    },
     hanldeReply(data) {
       if (data && data.ids) {
         let chooseIdAry = data.ids.split(',')
-        // 选中单位复选框
-        this.handleTreeChoose(this.unitTree, chooseIdAry, true);
+        // 如果包括常用组则拼接常用组的所有单位 然后回显单位 常用组
+        this.handleBackGroup(chooseIdAry, (chooseIdAry) => {
+          
+          // 选中单位复选框
+          this.handleTreeChoose(this.unitTree, chooseIdAry, true);
 
-        this.defaultChooseUnit()
+          // 检查常用组选中
+          this.handleTreeChoose(this.comGroup, chooseIdAry, true)
+          this.handleCheckGroupChoose(this.comGroup)
+          // 检查常用组全选
+          this.checkGroupAllChoose();
+
+          this.defaultChooseUnit()
+        });
       }
+    },
+    // 回显常用组
+    handleBackGroup(chooseIdAry, fn) {
+      let group = this.comGroup[0]?.children
+      group && group.length && group.forEach(item => {
+        if (chooseIdAry.includes(item.id)) {
+          item.check = true;
+          item.children.forEach(k => k.check = true);
+          let groupchooseIdAry = item.children.map(item => item.id);
+          chooseIdAry = chooseIdAry.concat(groupchooseIdAry);
+        }
+      })
+      fn && fn(chooseIdAry);
     },
     // 回显数据
     handleDataBack() {
       if (this.moduleObject.env !== 'production') {
         let params = {
-          ids: ",230729190259ierAg1NWmdClVxayyGG,2304241611407jknbFQF0TF9WWP2e98,2307291902598W4QioooBGNlWFOQzTL",
+          ids: ",2408021437127YZlFRQxke5Qoi3pYWX,230729190259ierAg1NWmdClVxayyGG,2304241611407jknbFQF0TF9WWP2e98,2307291902598W4QioooBGNlWFOQzTL",
           text: ",市政府办公厅,市经济信息化委,市科委"
         }
         this.hanldeReply(params)
@@ -576,6 +628,7 @@ export default {
       let params = this.handleParamsFunc();
       this.hanldeReply(params.initData)
     },
+    // copycop：份数 page1-page2：编号
     defaultChooseUnit() {
       this.chooseUnit = this.getTreeCheckData(this.unitTree);
       this.chooseUnit.forEach(item => {

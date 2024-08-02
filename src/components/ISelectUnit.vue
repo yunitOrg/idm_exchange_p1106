@@ -77,11 +77,12 @@
             </div>
           </div>
           <div class="select-unit-content" v-show="groupTtype">
-            <div class="select-item" v-for="(item, index) in treeData.zsdwGroup" :key="index">
+            <div class="select-item selectgroup" v-for="(item, index) in treeData.zsdwGroup" :key="index">
               <a-checkbox v-model="item.check" class="select-check-common" @change="(e) => handleAddGroup(e, item)">
                 <span class="select-item-name">{{ item.name }}</span>
               </a-checkbox>
               <div class="select-show-more" @click.stop="handleShowDialog(item)"></div>
+              <div class="select-delete deletegroup"><img src="../assets/delete.png" alt="" @click="deleteGroup(item, index)"></div>
             </div>
           </div>
         </div>
@@ -202,6 +203,16 @@
         />
       </div>
     </a-modal>
+    <!--删除组-->
+    <a-modal v-model="deleteDialog.visible"
+      title="信息"
+      centered="true"
+      width="300px"
+      cancelText="取消"
+      okText="确定"
+      @ok="handleDelteGroup">
+      <p>确定要删除?</p>
+    </a-modal>
   </div>
 </template>
 
@@ -222,6 +233,11 @@ export default {
       dingban: true,
       loading: false,
       moduleObject: {},
+      deleteDialog: {
+        visible: false,
+        delteid: "",
+        deleteindex: ''
+      },
       dialog: {
         title: '',
         visible: false,
@@ -272,7 +288,7 @@ export default {
   },
   computed: {
     groupCheck() {
-      return this.treeData.zsdwGroup && this.treeData.zsdwGroup.filter(item => item.check).length == this.treeData.zsdwGroup.length || false
+      return this.treeData.zsdwGroup && this.treeData.zsdwGroup.length && this.treeData.zsdwGroup.filter(item => item.check).length == this.treeData.zsdwGroup.length || false
     }
   },
   mounted() {
@@ -280,6 +296,20 @@ export default {
     this.init();
   },
   methods: {
+    async handleDelteGroup() {
+      let res = await API.ApiDeleteGroup({groupId: this.deleteDialog.delteid});
+      if (res.code == "200") {
+        // this.treeData.zsdwGroup.splice(index, 1);
+        this.deleteDialog.visible = false;
+        this.handleGetGroupData();
+      }
+    },
+    // 删除组
+    deleteGroup(item, index) {
+      this.deleteDialog.delteid = item.id;
+      this.deleteDialog.deleteindex = index;
+      this.deleteDialog.visible = true;
+    },
     /**
      * @Desc 拖拽开始
      */
@@ -609,7 +639,6 @@ export default {
           item.children?.length > 0 && this.handleCheckGroupChoose(item.children)
         })
       }
-      
     },
     // 检查 父级查看选中个数
     handleFatherChoose(tree) {
@@ -702,16 +731,14 @@ export default {
     },
     // 获取id 对应数据
     handleTreeGetChooseId(tree, chooseId) {
-      let chooseobj = {}
-      if (tree && tree.length>0) {
-        tree.forEach(item => {
-          if (chooseId == item.id) {
-            chooseobj = item
-          }
+      for(let i=0; i<tree.length; i++) {
+        let item = tree[i];
+        if (item.id == chooseId) {
+          return item
+        } else {
           return item.children?.length > 0 && this.handleTreeGetChooseId(item.children, chooseId)
-        })
+        }
       }
-      return chooseobj
     },
     // 确定按钮
     handleSure() {
@@ -822,7 +849,7 @@ export default {
 
       if (this.moduleObject.env !== 'production') {
         let params = {
-          ids: ",240731110840PTk2JTLwzybbuVXjXif,230729190259ierAg1NWmdClVxayyGG,2304241611407jknbFQF0TF9WWP2e98,230714204031AGEhhsBI44lSCp2wsql",
+          ids: ",2408021437127YZlFRQxke5Qoi3pYWX,230729190259ierAg1NWmdClVxayyGG,2304241611407jknbFQF0TF9WWP2e98,230714204031AGEhhsBI44lSCp2wsql",
           text: ",市政府办公厅,市经济信息化委,市科委"
         }
         this.hanldeReply(params)
@@ -835,48 +862,32 @@ export default {
       if (data && data.ids) {
         let chooseIdAry = data.ids.split(',')
 
-        // 先回显常用组
-        this.handleBackGroup(chooseIdAry);
+        // 如果包括常用组则拼接常用组的所有单位 然后回显单位 常用组
+        this.handleBackGroup(chooseIdAry, (chooseIdAry) => {
+          // 选中单位复选框
+          this.handleTreeChoose(this.treeData.org, chooseIdAry, true);
+          // 检查单位全选和选中条数
+          this.handleFatherChoose(this.treeData.org)
 
-        // // 选中单位复选框
-        this.handleTreeChoose(this.treeData.org, chooseIdAry, true);
-        // // 检查单位全选和选中条数
-        this.handleFatherChoose(this.treeData.org)
-
-        // // 检查常用组选中
-        this.handleTreeChoose(this.treeData.zsdwGroup, chooseIdAry, true)
-        this.handleCheckGroupChoose(this.treeData.zsdwGroup)
-        
-        this.defaultChooseUnit()
+          // 检查常用组选中
+          this.handleTreeChoose(this.treeData.zsdwGroup, chooseIdAry, true)
+          this.handleCheckGroupChoose(this.treeData.zsdwGroup)
+          
+          this.defaultChooseUnit()
+        });
       }
     },
     // 回显常用组
-    handleBackGroup(chooseIdAry) {
+    handleBackGroup(chooseIdAry, fn) {
       this.treeData.zsdwGroup.forEach(item => {
         if (chooseIdAry.includes(item.id)) {
           item.check = true;
           item.children.forEach(k => k.check = true);
-          let chooseIdAry = item.children.map(item => item.id);
-          // 选中单位复选框
-          this.handleTreeChoose(this.treeData.org, chooseIdAry, true);
-          this.handleFatherChoose(this.treeData.org)
+          let groupchooseIdAry = item.children.map(item => item.id);
+          chooseIdAry = chooseIdAry.concat(groupchooseIdAry);
         }
       })
-      console.log(this.treeData.zsdwGroup, chooseIdAry, 99)
-
-      // if (item.children?.length > 0) {
-      //   item.children.forEach(k => k.check = true)
-      //   let chooseIdAry = item.children.map(item => item.id)
-      //   // 选中单位复选框
-      //   this.handleTreeChoose(this.treeData.org, chooseIdAry, e.target.checked);
-      //   // 检查单位全选和选中条数
-      //   this.handleFatherChoose(this.treeData.org);
-      //   // 检查常用组其他是否选中
-      //   this.handleTreeChoose(this.treeData.zsdwGroup, chooseIdAry, e.target.checked);
-      //   this.handleCheckGroupChoose(this.treeData.zsdwGroup)
-        
-      //   this.defaultChooseUnit()
-      // }
+      fn && fn(chooseIdAry);
     },
     async initData() {
       // if (this.moduleObject.env !== 'production') {
@@ -1082,7 +1093,24 @@ export default {
       cursor: pointer;
     }
   }
-  
+  .select-delete{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    width: 23px;
+    height: 100%;
+    color: #999;
+  }
+  .deletegroup{
+    display: none;
+    margin-left: 3px;
+  }
+  .selectgroup:hover{
+    .deletegroup{
+      display: block;
+    }
+  }
   .select-content{
     overflow-y: auto;
     padding-right: 3px;
@@ -1114,15 +1142,7 @@ export default {
         color: #333333;
         box-sizing: border-box;
       }
-      .select-delete{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        width: 23px;
-        height: 100%;
-        color: #999;
-      }
+      
     }
     .select-show-more{
       display: inline-block;

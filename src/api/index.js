@@ -87,6 +87,21 @@ export default {
         })
         return data
     },
+     /**
+    * @Desc 单位选择-删除组
+    * @Author hjp
+    */
+     async ApiDeleteGroup({groupId}) {
+        let formdata = new FormData();
+        formdata.append('groupId', groupId)
+        const { data } = await window.IDM.http.post('ctrl/remoteZsdw/delZsdwGroup', formdata, {
+            headers: {
+            'Content-Type': 'application/json'
+            },
+        })
+        return data
+    },
+    
 
     /**
     * @Desc 树形-单位选择-常用组
