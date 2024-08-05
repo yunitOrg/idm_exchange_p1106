@@ -91,7 +91,7 @@
               </div>
               <div class="w20 choosepage">
                 <template v-if="tablelist.enablePage==1">
-                  <a-input-number :min="1" disabled v-model="item.page1"></a-input-number>
+                  <a-input-number :min="0" disabled v-model="item.page1"></a-input-number>
                   <span>-</span>
                   <a-input-number :min="1" disabled v-model="item.page2"></a-input-number>
                 </template>
@@ -324,7 +324,7 @@ export default {
     // 更新已选的数字
     updateChooseNum(ary) {
       if (ary?.length <= 0) return
-      ary[0].page1 = 1;
+      ary[0].page1 = 0;
       ary[0].page2 = ary[0].copycop;
       let defaultCopy = ary[0].copycop, defaultPage1 = ary[0].page1, defaultPage2 = ary[0].page2;
       ary.forEach((k, i) => {
@@ -623,25 +623,39 @@ export default {
     // 回显数据
     handleDataBack() {
       if (this.moduleObject.env !== 'production') {
-        let params = {
-          ids: ",2408021437127YZlFRQxke5Qoi3pYWX,230729190259ierAg1NWmdClVxayyGG,2304241611407jknbFQF0TF9WWP2e98,2307291902598W4QioooBGNlWFOQzTL",
-          text: ",市政府办公厅,市经济信息化委,市科委"
-        }
-        this.hanldeReply(params)
+        // let params = {
+        //   ids: ",2408021437127YZlFRQxke5Qoi3pYWX,230729190259ierAg1NWmdClVxayyGG,2304241611407jknbFQF0TF9WWP2e98,2307291902598W4QioooBGNlWFOQzTL",
+        //   text: ",市政府办公厅,市经济信息化委,市科委"
+        // }
+        // this.hanldeReply(params)
         return
       }
       let params = this.handleParamsFunc();
       this.hanldeReply(params.initData)
     },
+    getDefaultCopycop() {
+      let val = 1;
+      try{
+        if(top.DSF.isXForm()) {
+          val = top.DSF.getElementValueByKey("B0014")
+        }
+      }catch(e) {
+        console.log(e)
+      }
+      return val
+    },
     // copycop：份数 page1-page2：编号
     defaultChooseUnit() {
       this.chooseUnit = this.getTreeCheckData(this.unitTree);
+      let num = this.getDefaultCopycop();
       this.chooseUnit.forEach(item => {
-        this.tablelist.enableCopy==1 && this.$set(item, 'copycop', 3);
+        if (this.tablelist.enableCopy==1) {
+          (!item.copycop || item.copycop == "") && this.$set(item, 'copycop', num);
+        }
         if (this.tablelist.enablePage==1) {
-          this.$set(item, 'copycop', 3)
-          item.page1 = 1;
-          item.page2 = 1;
+          (!item.copycop || item.copycop == "") && this.$set(item, 'copycop', num);
+          (!item.page1 || item.page1 == "") && (item.page1 = 0);
+          (!item.page2 || item.page2 == "") && (item.page2 = 1);
         }
         this.tablelist.enableDown==1 && (item.down = '');
       })
