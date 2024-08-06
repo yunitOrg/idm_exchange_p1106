@@ -109,7 +109,7 @@
         </div>
       </div>
       <!--附件-->
-      <div class="select-filecontainer" v-if="!handleParamsFunc().recordId &&fileLib.length">
+      <div class="select-filecontainer" v-if="!handleParamsFunc().recordId &&fileLib.length" data="附件">
         <div class="boxx" v-for="(item, index) in fileLib" :key="index">
           <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
           <div class="text">
@@ -124,11 +124,11 @@
         </div>
       </div>
       <!--文件-->
-      <div class="select-filecontainer" v-if="!handleParamsFunc().recordId && chooseFile.length">
+      <div class="select-filecontainer mt10" v-if="!handleParamsFunc().recordId && chooseFile.length" data="文件">
         <div class="boxx" v-for="(item, index) in chooseFile" :key="index">
           <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
           <div class="text">
-            <template v-if="this.getFileIcon(item.fileName) == 'common'">
+            <template v-if="getFileIcon(item.fileName) == 'common'">
               <svg-icon iconClass="common" class="treesvg"></svg-icon>
             </template>
             <template v-else>
@@ -324,7 +324,7 @@ export default {
     // 更新已选的数字
     updateChooseNum(ary) {
       if (ary?.length <= 0) return
-      ary[0].page1 = 0;
+      ary[0].page1 = 1;
       ary[0].page2 = ary[0].copycop;
       let defaultCopy = ary[0].copycop, defaultPage1 = ary[0].page1, defaultPage2 = ary[0].page2;
       ary.forEach((k, i) => {
@@ -539,9 +539,15 @@ export default {
     // 文件数据
     handleDataFile(data) {
       if (data && data.length > 0) {
-        data.forEach(item => {
-          item.checkboxItem = false
-        })
+        let { selectFileRelationValue } = this.handleParamsFunc();
+        if (selectFileRelationValue) {
+          // selectFileRelationValue = "0,1;0,1,2";
+          let split = selectFileRelationValue.split(';');
+          let chooseCheckbox = split[0].split(',');
+          data.forEach(item => {
+            item.checkboxItem = chooseCheckbox.includes(`${item.relaType}`);
+          })
+        }
         this.chooseFile = data
       }
     },
@@ -654,7 +660,7 @@ export default {
         }
         if (this.tablelist.enablePage==1) {
           (!item.copycop || item.copycop == "") && this.$set(item, 'copycop', num);
-          (!item.page1 || item.page1 == "") && (item.page1 = 0);
+          (!item.page1 || item.page1 == "") && (item.page1 = 1);
           (!item.page2 || item.page2 == "") && (item.page2 = 1);
         }
         this.tablelist.enableDown==1 && (item.down = '');
@@ -703,9 +709,9 @@ export default {
         // 单位
         chooseUnit: this.chooseUnit,
         // 文件
-        chooseFile: this.chooseFile.filter(item => item.checkboxItem),
+        chooseFile: this.fileLib.filter(item => item.checkboxItem),
         // 附件
-        chooseRelationFile: this.fileLib.filter(item => item.checkboxItem)
+        chooseRelationFile: this.chooseFile.filter(item => item.checkboxItem)
       }
       console.log('最终数据', params);
       if (this.propData.handleSureBtnFunc && this.propData.handleSureBtnFunc.length > 0) {
@@ -777,6 +783,9 @@ $bgColor: #efeff2;
     display: inline-block;
     width: 20%;
     margin-right: 10px;
+  }
+  .mt10{
+    margin-top: 10px;
   }
   .namecol{
     margin-left: 5px;

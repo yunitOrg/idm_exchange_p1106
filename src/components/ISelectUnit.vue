@@ -756,9 +756,9 @@ export default {
         // 单位
         chooseUnit: this.chooseUnit,
         // 文件
-        chooseFile: this.chooseFile.filter(item => item.checkboxItem),
+        chooseFile: this.fileLib.filter(item => item.checkboxItem),
         // 附件
-        chooseRelationFile: this.fileLib.filter(item => item.checkboxItem)
+        chooseRelationFile: this.chooseFile.filter(item => item.checkboxItem)
       }
       console.log('最终数据', params);
       if (this.propData.handleSureBtnFunc && this.propData.handleSureBtnFunc.length > 0) {
@@ -796,9 +796,15 @@ export default {
     // 文件数据
     handleDataFile(data) {
       if (data && data.length > 0) {
-        data.forEach(item => {
-          item.checkboxItem = false
-        })
+        let { selectFileRelationValue } = this.handleParamsFunc();
+        if (selectFileRelationValue) {
+          // selectFileRelationValue = "0,1;0,1,2";
+          let split = selectFileRelationValue.split(';');
+          let chooseCheckbox = split[0].split(',');
+          data.forEach(item => {
+            item.checkboxItem = chooseCheckbox.includes(`${item.relaType}`);
+          })
+        }
         this.chooseFile = data
       }
     },
