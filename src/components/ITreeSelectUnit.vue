@@ -682,7 +682,10 @@ export default {
       let val = 1;
       try{
         if(top.DSF.isXForm()) {
-          val = top.DSF.getElementValueByKey("B0014")
+          val = top.DSF.getElementValueByKey("B0014");
+          if (val == "" || val == null || val == undefined) {
+            val = this.defaultPrintNum;
+          }
         }
       }catch(e) {
         val = this.defaultPrintNum;

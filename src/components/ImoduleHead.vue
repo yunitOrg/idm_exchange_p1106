@@ -57,7 +57,12 @@
           <div class="echartsLine" :style="{height: propData.contentEchartsHeight}" ref="line1"></div>
         </template>
         <template v-if="propData.resContent == 'drag'">
-          <div class="drag_container" idm-ctrl-inner :idm-ctrl-id="moduleObject.id" idm-container-index="headcontent"></div>
+          <div
+            class="drag_container dragContent"
+            idm-ctrl-inner
+            :idm-ctrl-id="moduleObject.id"
+            idm-container-index="headcontent"
+          ></div>
         </template>
       </div>
       <!--悬浮容器-->
@@ -178,6 +183,7 @@ export default {
      handleStyle() {
       let styleObject = {},
         tabStyleObject = {},
+        dragObject = {},
         splitObject = {},
         showlineObject = {},
         contentObject = {},
@@ -243,6 +249,18 @@ export default {
             case 'contentBox':
               IDM.style.setBoxStyle(contentObject, element);
               break
+            case 'contentWidth':
+              contentObject['width'] = element;
+              break
+            case 'contentHeight':
+              contentObject['height'] = element;
+              break
+            case 'dragWidth':
+              dragObject['width'] = element;
+              break
+            case 'dragHeight':
+              dragObject['height'] = element;
+              break
           }
         }
       }
@@ -252,6 +270,7 @@ export default {
       window.IDM.setStyleToPageHead(this.moduleObject.id + " .imodulehead .tab-ul .activetab:before", showlineObject);
       window.IDM.setStyleToPageHead(this.moduleObject.id + " .imodulehead .tab-ul span:after", splitObject);
       window.IDM.setStyleToPageHead(this.moduleObject.id + " .imodulehead .haed-content", contentObject);
+      window.IDM.setStyleToPageHead(this.moduleObject.id + " .imodulehead .haed-content .dragContent", dragObject);
     },
     // tab数据处理
     handleTab(ary) {

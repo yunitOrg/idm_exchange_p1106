@@ -370,6 +370,22 @@
       "helpUrl": "",
       "children": [
         {
+          "type": "input",
+          "layoutType": "inline",
+          "text": "内容宽",
+          "desc": "填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",
+          "bindKey": "contentWidth",
+          "default": "100%"
+        },
+        {
+          "type": "input",
+          "layoutType": "inline",
+          "text": "内容高",
+          "desc": "填写auto则为自适应，或者使用px、%、vh等单位，比如100%、100px、100vh等等",
+          "bindKey": "contentHeight",
+          "default": "auto"
+        },
+        {
           "type": "box",
           "layoutType": "block",
           "text": "内外边距",
@@ -387,11 +403,34 @@
         },
         {
           "type": "input",
-          "layoutType": "block",
-          "text": "高",
-          "desc": "填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",
+          "layoutType": "inline",
+          "text": "图表高",
+          "desc": "响应内容是固定内容，这个高度是固定内容的图表高度",
           "bindKey": "contentEchartsHeight",
           "default": "300px"
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "text": "内容容器样式",
+      "desc": "提供设置组件的属性设置信息",
+      "children": [
+        {
+          "type": "input",
+          "layoutType": "inline",
+          "text": "容器宽",
+          "desc": "填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",
+          "bindKey": "dragWidth",
+          "default": "auto"
+        },
+        {
+          "type": "input",
+          "layoutType": "inline",
+          "text": "容器高",
+          "desc": "填写auto则为自适应，或者使用px、%、vh等单位，比如100%、100px、100vh等等",
+          "bindKey": "dragHeight",
+          "default": "100%"
         }
       ]
     },
