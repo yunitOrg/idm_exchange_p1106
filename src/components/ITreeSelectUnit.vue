@@ -161,6 +161,7 @@ export default {
   },
   data() {
     return {
+      defaultPrintNum: 1,
       loading: false,
       // 总数据
       tablelist: {},
@@ -606,6 +607,7 @@ export default {
       if (unitRes.code == '200') {
         this.loading = false;
         let obj = unitRes.data || {};
+        this.defaultPrintNum = obj.defaultPrintNum;
         this.tablelist = obj;
         let { codeList } = obj;
         let group = codeList.filter(item => item.id == 'zsdwRootGroup');
@@ -683,6 +685,7 @@ export default {
           val = top.DSF.getElementValueByKey("B0014")
         }
       }catch(e) {
+        val = this.defaultPrintNum;
         console.log(e)
       }
       return val
