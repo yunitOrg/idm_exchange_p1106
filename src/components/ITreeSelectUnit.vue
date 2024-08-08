@@ -47,7 +47,7 @@
                 <div class="unit-name">
                   <a-icon class="jiaicon mr5" :type="item.shrink ? 'minus' : 'plus'" @click="item.shrink = !item.shrink" />
                   <span>{{ item.name }}</span>
-                  <span class="namecol" @click=hadnleNextAllChoose(item)>(全选下级)</span>
+                  <span class="namecol" @click=hadnleAllChoose(item)>(全选下级)</span>
                 </div>
                 <treeSelectUnit
                   :item="item"
@@ -57,7 +57,7 @@
             </div>
             <div v-show="showSearchDialog">
               <div class="searchul" v-if="pinyinAryAll.length> 0">
-                <div v-for="(item, index) in pinyinAryAll" :key="index" @click="handleChoose(item)">{{ item.name }}</div>
+                <div v-for="(item, index) in pinyinAryAll" :key="index" :class="item.check?'activehui':''" @click="hadnleSearchChoose(item)">{{ item.name }}</div>
               </div>
               <div v-else>
                 <span>无数据</span>
@@ -229,11 +229,11 @@ export default {
       const searchGroup = (tree, key) => {
         if (tree && tree.length>0) {
           tree.forEach(item => {
-            if (item.children?.length == 0) {
+            // if (item.children?.length == 0) {
               if (item.name.includes(key) || item.name.includes(key) && item.children?.length <= 0) {
                 !this.pinyinAryAll.map(k => k.id).includes(item.id) && this.pinyinAryAll.push(item)
               }
-            }
+            // }
             item.children?.length > 0 && searchGroup(item.children, key)
           })
         }
@@ -248,8 +248,8 @@ export default {
           })
         }
       }
-      searchGroup(this.comGroup, key);
       searchUnit(this.unitTree, key);
+      searchGroup(this.comGroup, key);
     },
     // 搜索框
     handleInput() {
@@ -265,7 +265,7 @@ export default {
     getGroupAllId(tree, allId=[]) {
       if (tree && tree.length>0) {
         tree.forEach(item => {
-          allId.push(item.id)
+          item.children.length == 0 && allId.push(item.id)
           return item.children?.length > 0 && this.getGroupAllId(item.children, allId)
         })
       }
@@ -312,7 +312,6 @@ export default {
       item.check = !item.check;
       this.handleTreeAddTreeData(this.comGroup, {check: item.check});
       let chooseIdAry = this.getGroupAllId(this.comGroup)
-      
       // 选中单位复选框
       this.handleTreeChoose(this.unitTree, chooseIdAry, item.check);
       // 检查单位全选和选中条数
@@ -378,17 +377,34 @@ export default {
         })
       }
     },
+    // 全选所有下级
+    hadnleAllChoose(item) {
+      item.check = !item.check;
+      if (item.children?.length > 0) {
+        this.hadnleTreeCheck([item], item.check)
+        item.chooseNum = item.check ? item.children.length : 0
+        // 选中常用组
+        this.handleTreeAddTreeData(this.comGroup, {check: item.check});
+        this.defaultChooseUnit()
+      }
+    },
     // 全选下级
     hadnleNextAllChoose(item) {
       item.check = !item.check;
       if (item.children?.length > 0) {
         this.hadnleTreeCheck([item], item.check)
-        item.chooseNum = item.check ? item.children.length : 0
         
-        // 选中常用组
-        this.handleTreeAddTreeData(this.comGroup, {check: item.check});
+        // 查找item的所有元素
+        let chooseIdAry = this.getGroupAllId([item]);
+        this.handleTreeChoose(this.comGroup, chooseIdAry, item.check);
+        this.handleCheckGroupChoose(this.comGroup)
+          // 检查常用组全选
+          this.checkGroupAllChoose();
 
-        this.defaultChooseUnit()
+          this.defaultChooseUnit()
+        // 选中常用组
+        // this.handleTreeAddTreeData(this.comGroup, {check: item.check});
+        // this.defaultChooseUnit()
       }
     },
     isImage(ext) {
@@ -479,10 +495,31 @@ export default {
         this.defaultChooseUnit()
       }
     },
+    // 搜索内容点击
+    hadnleSearchChoose(item) {
+      let flag = !item.check
+      item.check = flag;
+      if (item.children && item.children.length > 0) {
+        item.children.forEach(item => item.check = flag);
+        let chooseIdAry = item.children.map(item => item.id)
+        // 选中单位复选框
+        this.handleTreeChoose(this.unitTree, chooseIdAry, flag);
+
+        // 检查常用组选中
+        this.handleTreeAddTreeData(this.comGroup, {chooseId: item.id, targetflag: flag })
+        this.handleCheckGroupChoose(this.comGroup)
+        // 检查常用组全选
+        this.checkGroupAllChoose();
+
+        this.defaultChooseUnit()
+      } else {
+        this.handleChoose(item)
+      }
+    },
     // 选择单位
     handleChoose(item) {
       let flag = item.check
-      let fatherobj = this.handleTreeGetChooseId(this.unitTree, item.pid)
+      let fatherobj = this.handleTreeGetChooseId(this.unitTree, item.pid);
       let chooseTrueCheck = fatherobj.children.filter(item => item.check)
       fatherobj.check = fatherobj.children.length == chooseTrueCheck.length
 
@@ -769,6 +806,9 @@ $bgColor: #efeff2;
       line-height: 28px;
       cursor: pointer;
     }
+  }
+  .activehui{
+    color: #ccc;
   }
   .treesvg{
     font-size: 16px;
