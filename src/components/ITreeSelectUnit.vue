@@ -11,7 +11,9 @@
     :idm-ctrl-id="moduleObject.id"
   >
     <div class="itreeselectunit">
-      <div class="treeselect-top" :class="{
+      <div class="treeselect-top"
+        ref="treeselectTop"
+        :class="{
         'treeborder': handleParamsFunc().recordId
       }">
         <div class="treeselect-left">
@@ -57,7 +59,10 @@
             </div>
             <div v-show="showSearchDialog">
               <div class="searchul" v-if="pinyinAryAll.length> 0">
-                <div v-for="(item, index) in pinyinAryAll" :key="index" :class="item.check?'activehui':''" @click="hadnleSearchChoose(item)">{{ item.name }}</div>
+                <div v-for="(item, index) in pinyinAryAll" :key="index" :class="{
+                  activehui: item.check,
+                  disabledselect: item.attrs.noselect
+                }" @click="hadnleSearchChoose(item)">{{ item.name }}</div>
               </div>
               <div v-else>
                 <span>无数据</span>
@@ -109,7 +114,7 @@
         </div>
       </div>
       <!--附件-->
-      <div class="select-filecontainer" v-if="!handleParamsFunc().recordId &&fileLib.length" data="附件">
+      <div class="select-filecontainer" ref="selectLibItem" v-if="!handleParamsFunc().recordId && fileLib.length" data="附件">
         <div class="boxx" v-for="(item, index) in fileLib" :key="index">
           <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
           <div class="text">
@@ -124,7 +129,7 @@
         </div>
       </div>
       <!--文件-->
-      <div class="select-filecontainer mt10" v-if="!handleParamsFunc().recordId && chooseFile.length" data="文件">
+      <div class="select-filecontainer mt10" ref="selectFileItem" v-if="!handleParamsFunc().recordId && chooseFile.length" data="文件">
         <div class="boxx" v-for="(item, index) in chooseFile" :key="index">
           <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
           <div class="text">
@@ -373,7 +378,10 @@ export default {
     hadnleTreeCheck(tree, flag) {
       if (tree && tree.length>0) {
         tree.forEach(item => {
-          item.check = flag;
+          if (item.attrs.noselect && item.children?.length==0) {
+          } else {
+            item.check = flag;
+          }
           item.children?.length > 0 && this.hadnleTreeCheck(item.children, flag);
         })
       }
@@ -403,9 +411,6 @@ export default {
           this.checkGroupAllChoose();
 
           this.defaultChooseUnit()
-        // 选中常用组
-        // this.handleTreeAddTreeData(this.comGroup, {check: item.check});
-        // this.defaultChooseUnit()
       }
     },
     isImage(ext) {
@@ -498,6 +503,7 @@ export default {
     },
     // 搜索内容点击
     hadnleSearchChoose(item) {
+      if (item.attrs.noselect) return
       let flag = !item.check
       item.check = flag;
       if (item.children && item.children.length > 0) {
@@ -780,6 +786,17 @@ export default {
         let data = fileres.data;
         this.handleDataFile(data)
       }
+      this.$nextTick(() => {
+        const selectTopHeight = this.$refs.treeselectTop?.offsetHeight || 0;
+        const selectLibItem = this.$refs.selectLibItem?.offsetHeight || 0;
+        const selectFileItem = this.$refs.selectFileItem?.offsetHeight || 0;
+        const realyHeight = selectTopHeight + selectLibItem + selectFileItem + 55 + 20;
+        try{
+          top.setRemoteSendRangeViewHeight (realyHeight);
+        }catch(e) {
+          console.log("设置高度", e)
+        }
+      })
     },
     init() {
       this.handleStyle()
@@ -815,6 +832,9 @@ $bgColor: #efeff2;
   }
   .activehui{
     color: #ccc;
+  }
+  .disabledselect{
+    cursor: not-allowed !important;
   }
   .treesvg{
     font-size: 16px;

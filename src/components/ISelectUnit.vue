@@ -33,7 +33,7 @@
           <div class="btn" @click="handleReset">重置</div>
         </div>
       </div>
-      <div class="select-content" :style="setHeight()">
+      <div class="select-content" ref="selectContent" :style="setHeight()">
         <div class="select-ul" v-if="chooseUnit.length>0">
           <draggable
             class="select-drag"
@@ -905,7 +905,6 @@ export default {
       //   this.getMockData()
       //   return
       // }
-
       // 获取单位和常用组
       const params = this.handleParamsFunc()
       this.handleGetGroupData();
@@ -921,6 +920,15 @@ export default {
         let data = fileres.data;
         this.handleDataFile(data)
       }
+      this.$nextTick(() => {
+        const selectTopHeight = this.$refs.selectContent?.offsetHeight;
+        const realyHeight = selectTopHeight + 70 + 40 + 20;
+        try{
+          top.setRemoteSendRangeViewHeight (realyHeight);
+        }catch(e) {
+          console.log("设置高度", e)
+        }
+      })
     },
     init() {
       this.handleStyle()
