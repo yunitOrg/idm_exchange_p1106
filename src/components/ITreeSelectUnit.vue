@@ -76,33 +76,33 @@
             <span style="color:#0086d9;cursor: pointer;" @click="handleClear">清空</span>
           </div>
           <div class="treeselect-choose">
-            <span class="w20">已选机构</span>
-            <span class="w20">
+            <span class="w40">已选机构</span>
+            <span class="w10">
               <span v-if="tablelist.enableCopy==1">份数</span>
             </span>
             <span class="w20">
               <span v-if="tablelist.enablePage==1">编号</span>
             </span>
-            <span class="w20">
+            <span class="w10">
               <span v-if="tablelist.enableDown==1">下载次数</span>
             </span>
           </div>
           <div class="chooseAly" :style="setHeight()">
             <div class="choose-line" v-for="(item, index) in chooseUnit" :key="index">
-              <span class="w20">{{ item.name }}</span>
-              <div class="w20 choosecopy" >
-                <a-input-number :min="1" v-if="tablelist.enableCopy==1" v-model="item.copycop" @change="(val) => inputChange(val, item)"></a-input-number>
-                <a-input-number :min="1" v-if="tablelist.enableCopy!=1 && tablelist.enablePage==1" v-model="item.copycop" @change="(val) => inputChange(val, item)"></a-input-number>
+              <span class="w40">{{ item.name }}</span>
+              <div class="w10 choosecopy" >
+                <a-input-number style="width: 60px" :min="1" v-if="tablelist.enableCopy==1" v-model="item.copycop" @change="(val) => inputChange(val, item)"></a-input-number>
+                <a-input-number style="width: 60px" :min="1" v-if="tablelist.enableCopy!=1 && tablelist.enablePage==1" v-model="item.copycop" @change="(val) => inputChange(val, item)"></a-input-number>
               </div>
               <div class="w20 choosepage">
                 <template v-if="tablelist.enablePage==1">
-                  <a-input-number :min="0" disabled v-model="item.page1"></a-input-number>
+                  <a-input-number :min="1" disabled v-model="item.page1"></a-input-number>
                   <span>-</span>
                   <a-input-number :min="1" disabled v-model="item.page2"></a-input-number>
                 </template>
               </div>
-              <div class="w20 choosedown" >
-                <a-input-number :min="1" v-if="tablelist.enableDown==1" v-model="item.down"></a-input-number>
+              <div class="w10 choosedown" >
+                <a-input-number style="width:50px;" :min="1" v-if="tablelist.enableDown==1" v-model="item.down"></a-input-number>
               </div>
               <data value="w20">
                 <i class="icon-op icon-up-arrow" @click="handleMoveUp(index)" :class="index>0 && 'op'"></i>
@@ -344,6 +344,10 @@ export default {
     },
     // 输入框监听
     inputChange(value, item) {
+      if (!value) {
+        item.copycop = 1;
+        value = 1
+      }
       item.page2 = value
       this.updateChooseNum(this.chooseUnit);
     },
@@ -712,7 +716,7 @@ export default {
           (!item.page1 || item.page1 == "") && (item.page1 = 1);
           (!item.page2 || item.page2 == "") && (item.page2 = 1);
         }
-        this.tablelist.enableDown==1 && (item.down = '');
+        this.tablelist.enableDown==1 && (this.$set(item, 'down', 1));
       })
       this.updateChooseNum(this.chooseUnit);
     },
@@ -845,6 +849,21 @@ $bgColor: #efeff2;
     left: 50%;
     top: 50%;
   }
+  .w40{
+    width: 40%;
+    display: inline-block;
+    margin-right: 10px;
+  }
+  .w30{
+    width: 30%;
+    display: inline-block;
+    margin-right: 10px;
+  }
+  .w10{
+    display: inline-block;
+    width: 10%;
+    margin-right: 10px;
+  }
   .w20{
     display: inline-block;
     width: 20%;
@@ -974,7 +993,7 @@ $bgColor: #efeff2;
     border: 1px solid #e6e6e6;
     padding: 0px 16px 0px 16px;
     .boxx-checkbox{
-      width: 10%;
+      width: 15%;
       margin-right: 10px;
       cursor: pointer;
       ::v-deep .ant-checkbox-inner{

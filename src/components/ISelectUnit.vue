@@ -1288,7 +1288,7 @@ export default {
     border: 1px solid #e6e6e6;
     padding: 0px 16px 0px 16px;
     .boxx-checkbox{
-      width: 10%;
+      width: 15%;
       margin-right: 10px;
       cursor: pointer;
     }
