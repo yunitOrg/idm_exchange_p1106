@@ -657,7 +657,7 @@
           "type": "dataSourceSelect",
           "layoutType": "inline",
           "text": "数据源",
-          "desc": "内容数据源",
+          "desc": "内容数据源，如果没有内容则不用选择",
           "bindKey": "contentDataSource",
           "display": "@[reqMethod=='dataSource']"
         },
