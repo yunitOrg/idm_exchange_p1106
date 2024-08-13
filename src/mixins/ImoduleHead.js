@@ -8,12 +8,14 @@ export default {
         tabwidth: '100%',
         heightType: 'fixed',
         contentEchartsHeight: '350px',
-        resContent: 'static',
+        resContent: 'drag',
         tabheight: '48px',
         tabRightLeftDis: '10px',
         splitWidth: '1px',
         splitHeight: '40%',
         showLine: true,
+        firstShow: true,
+        lineBottom: "0px",
         splitRight: '-10px',
         boxShadow: "0px 2px 12px 0px rgba(0,0,0,0.07)",
         boxborder:{
@@ -117,6 +119,7 @@ export default {
           {
             value: '2',
             label: '次数调用',
+            showTab: true
           },
           {
             value: '3',

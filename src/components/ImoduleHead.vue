@@ -130,6 +130,9 @@ export default {
     },
     // 点击tab
     handleClick(item) {
+      if ((item[this.propData.tabLable] || item.label) == (this.chooseTab[this.propData.tabLable] || this.chooseTab['label'])) {
+        return
+      }
       this.tabList.forEach(item => this.$set(item, 'showTab', false));
       item.showTab = true;
       this.requireDataContent()
@@ -185,6 +188,7 @@ export default {
         tabStyleObject = {},
         dragObject = {},
         splitObject = {},
+        tabStyleFontObject = {},
         showlineObject = {},
         contentObject = {},
         chooseObject = {};
@@ -214,7 +218,7 @@ export default {
               IDM.style.setBorderStyle(styleObject, element);
               break
             case 'titleFont':
-              IDM.style.setFontStyle(tabStyleObject, element);
+              IDM.style.setFontStyle(tabStyleFontObject, element);
               break
             case 'tabBox':
               IDM.style.setBoxStyle(tabStyleObject, element);
@@ -233,6 +237,9 @@ export default {
               break
             case 'lineSize':
               showlineObject['height'] = element + 'px';
+              break
+            case 'lineBottom':
+              showlineObject['bottom'] = element
               break
             case 'splitColor':
               splitObject['background-color'] = element && element.hex8;
@@ -266,6 +273,7 @@ export default {
       }
       window.IDM.setStyleToPageHead(this.moduleObject.id + " .imodulehead", styleObject);
       window.IDM.setStyleToPageHead(this.moduleObject.id + " .imodulehead .tab-ul", tabStyleObject);
+      window.IDM.setStyleToPageHead(this.moduleObject.id + " .imodulehead .tab-ul span", tabStyleFontObject);
       window.IDM.setStyleToPageHead(this.moduleObject.id + " .imodulehead .tab-ul .activetab", chooseObject);
       window.IDM.setStyleToPageHead(this.moduleObject.id + " .imodulehead .tab-ul .activetab:before", showlineObject);
       window.IDM.setStyleToPageHead(this.moduleObject.id + " .imodulehead .tab-ul span:after", splitObject);
@@ -279,8 +287,13 @@ export default {
         !num && (this.$set(ary[0], 'showTab', true));
         this.tabList = ary;
       }
-      if (this.propData.resContent == 'static') {
+      switch(this.propData.resContent) {
+        case 'static':
         this.handleSetTime(0)
+          break
+        case 'drag':
+          this.propData.firstShow && this.requireDataContent()
+          break
       }
     },
     // 接口参数
@@ -302,6 +315,11 @@ export default {
           timeObj: [startTime, endTime],
           urlparams: this.handleParamsFunc(),
         });
+      } else {
+        return {
+          itemChooseTab: this.chooseTab,
+          urlparams: this.handleParamsFunc(),
+        }
       }
     },
     getMockData() {
@@ -373,8 +391,10 @@ export default {
           }
         ]
       };
-      let myChart = this.$echarts.init(this.$refs.line1);
-      myChart.setOption(option);
+      if (this.$refs.line1) {
+        let myChart = this.$echarts.init(this.$refs.line1);
+        myChart.setOption(option);
+      }
     },
     // 设置折线图
     handleSetLine(data) {
@@ -471,6 +491,17 @@ export default {
         return
       }
       let params = this.handleRequireparams();
+      // 如果是容器
+      if (this.propData.resContent == 'drag') {
+        // 发送消息
+        this.sendBroadcastMessage({
+          type: "linkageResult",
+          message: {
+            ...params
+          }
+        });
+        return
+      }
       // 发送消息
       this.sendBroadcastMessage({
         type: "linkageDemand",
@@ -478,7 +509,6 @@ export default {
           ...params
         }
       });
-      
       if (this.propData.reqMethod == 'fixed') {
         window.IDM.http.get(this.chooseTab[this.propData.tabReqUrl], params, {
             headers: {

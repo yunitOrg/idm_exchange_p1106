@@ -70,6 +70,14 @@
       "desc": "提供设置组件的悬浮容器属性设置信息",
       "children": [
         {
+          "type": "switch",
+          "layoutType": "inline",
+          "text": "首次触发",
+          "desc": "首次会发送消息",
+          "bindKey": "firstShow",
+          "default": false
+        },
+        {
           "type": "radio",
           "layoutType": "inline",
           "text": "tab数据",
@@ -100,7 +108,7 @@
           "type": "dataSourceSelect",
           "layoutType": "inline",
           "text": "数据源",
-          "desc": "用于选择数据源",
+          "desc": "用于选择数据源：返回格式：[{value: 1, label: 'xxx', showTab: true}]",
           "bindKey": "tabDataSource",
           "display": "@[tabData=='dataSource']"
         },
@@ -259,6 +267,14 @@
               "bindKey": "lineSize",
               "display": "@[showLine]",
               "default": 2
+            },
+            {
+              "type": "input",
+              "layoutType": "inline",
+              "text": "bottom",
+              "bindKey": "lineBottom",
+              "display": "@[showLine]",
+              "default": "0px"
             }
           ]
         },
