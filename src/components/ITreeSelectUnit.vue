@@ -81,7 +81,7 @@
               <span v-if="tablelist.enableCopy==1">份数</span>
             </span>
             <span class="w20">
-              <span v-if="tablelist.enablePage==1">编号</span>
+              <span v-if="tablelist.enablePage==1">份号</span>
             </span>
             <span class="w10">
               <span v-if="tablelist.enableDown==1">下载次数</span>
@@ -96,9 +96,9 @@
               </div>
               <div class="w20 choosepage">
                 <template v-if="tablelist.enablePage==1">
-                  <a-input-number :min="1" disabled v-model="item.page1"></a-input-number>
+                  <a-input-number :min="1" v-model="item.page1"></a-input-number>
                   <span>-</span>
-                  <a-input-number :min="1" disabled v-model="item.page2"></a-input-number>
+                  <a-input-number :min="1" v-model="item.page2"></a-input-number>
                 </template>
               </div>
               <div class="w10 choosedown" >
@@ -713,8 +713,8 @@ export default {
         }
         if (this.tablelist.enablePage==1) {
           (!item.copycop || item.copycop == "") && this.$set(item, 'copycop', num);
-          (!item.page1 || item.page1 == "") && (item.page1 = 1);
-          (!item.page2 || item.page2 == "") && (item.page2 = 1);
+          (!item.page1 || item.page1 == "") && (this.$set(item, 'page1', 1));
+          (!item.page2 || item.page2 == "") && (this.$set(item, 'page2', 1));
         }
         this.tablelist.enableDown==1 && (this.$set(item, 'down', 1));
       })
