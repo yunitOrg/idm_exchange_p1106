@@ -14,7 +14,7 @@
       :style="propData.heightType == 'adaptive' ? { height: moduleHeight + 'px' } : {}">
       <!--头部-->
       <div class="head-wrap" v-if="propData.showTitle">
-        <div class="tab-ul" :style="{width: propData.tabwidth, height: propData.tabheight}" >
+        <div class="tab-ul" :class="this.propData.tabStyle == 'static' ? 'tabulstatic' : 'tabulgrid'" :style="{width: propData.tabwidth, height: propData.tabheight}" >
           <span
             :style="{marginLeft: propData.tabRightLeftDis, marginRight: propData.tabRightLeftDis}"
             v-for="(tab, tabindex) in tabList"
@@ -587,11 +587,6 @@ export default {
       top: 50%;
       transform: translateY(-50%);
     }
-    span:last-child{
-      &::after{
-        display: none;
-      }
-    }
     .activetab{
       &::before{
         content: "";
@@ -599,6 +594,18 @@ export default {
         position: absolute;
         bottom: 0;
       }
+    }
+  }
+  .tabulstatic{
+    span:last-child{
+      &::after{
+        display: none;
+      }
+    }
+  }
+  .tabulgrid{
+    span::after{
+     height: 100% !important;
     }
   }
   .head-contenttime{

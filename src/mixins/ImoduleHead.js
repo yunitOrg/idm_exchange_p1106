@@ -6,6 +6,7 @@ export default {
         tabData: 'static',
         height: '489px',
         tabwidth: '100%',
+        tabStyle: 'static',
         heightType: 'fixed',
         contentEchartsHeight: '350px',
         resContent: 'drag',

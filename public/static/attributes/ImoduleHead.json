@@ -80,6 +80,24 @@
         {
           "type": "radio",
           "layoutType": "inline",
+          "text": "tab风格",
+          "desc": "tab数据来源提供两种方式：1、常规 2：网格",
+          "bindKey": "tabStyle",
+          "dictionary": [
+            {
+              "label": "常规",
+              "value": "static"
+            },
+            {
+              "label": "网格",
+              "value": "grid"
+            }
+          ],
+          "default": "static"
+        },
+        {
+          "type": "radio",
+          "layoutType": "inline",
           "text": "tab数据",
           "desc": "tab数据来源提供两种方式：1、请求数据源 2：通过静态配置",
           "bindKey": "tabData",
