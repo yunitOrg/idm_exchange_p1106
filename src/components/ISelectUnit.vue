@@ -859,11 +859,11 @@ export default {
       }
 
       if (this.moduleObject.env !== 'production') {
-        let params = {
-          ids: ",2408021437127YZlFRQxke5Qoi3pYWX,230729190259ierAg1NWmdClVxayyGG,2304241611407jknbFQF0TF9WWP2e98,230714204031AGEhhsBI44lSCp2wsql",
-          text: ",市政府办公厅,市经济信息化委,市科委"
-        }
-        this.hanldeReply(params)
+        // let params = {
+        //   ids: ",2408021437127YZlFRQxke5Qoi3pYWX,230729190259ierAg1NWmdClVxayyGG,2304241611407jknbFQF0TF9WWP2e98,230714204031AGEhhsBI44lSCp2wsql",
+        //   text: ",市政府办公厅,市经济信息化委,市科委"
+        // }
+        // this.hanldeReply(params)
         return
       }
       let params = this.handleParamsFunc();

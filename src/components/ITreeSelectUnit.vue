@@ -32,14 +32,42 @@
             <div class="comgroup-box" v-show="!showSearchDialog">
               <div v-for="(item, index) in comGroup" :key="index">
                 <div class="group-name">
-                  <a-icon class="jiaicon mr5"  :type="item.shrink ? 'minus' : 'plus'" @click="item.shrink = !item.shrink" />
-                  <span>{{ item.name }}</span>
-                  <span class="namecol" @click="chooseGroup(item)">(全选下级)</span>
+                  <div class="flex">
+                    <a-icon class="jiaicon mr5"  :type="item.shrink ? 'minus' : 'plus'" @click="handleAddKeys(item)" />
+                    <span>{{ item.name }}</span>
+                    <span class="namecol" @click="chooseGroup(item)">(全选下级)</span>
+                  </div>
+                  <div class="group-right">
+                    <div class="flex">
+                      <div class="renew flex" @click="handleUpdateGroup">
+                        <div class="renew-img renew-img1"></div>
+                        更新组
+                      </div>
+                      <div class="flex" @click="handleNewGroup">
+                        <div class="renew-img renew-img2"></div>
+                        创建组
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div class="group-children" v-show="item.shrink" v-for="(subitem, subindex) in item.children" :key="subindex">
-                  <a-checkbox v-model="subitem.check" @click="(e) => handleAddGroup(e, subitem)">
-                    <span>{{ subitem.name }}</span>
-                  </a-checkbox>
+                  <div class="flex" :data="subitem.shrink">
+                    <a-icon class="jiaicon mr5"  :type="subitem.shrink ? 'minus' : 'plus'" @click="handleAddKeys(subitem)" />
+                    <a-checkbox v-model="subitem.check" @click="(e) => handleAddGroup(e, subitem, 'group')">
+                      <span>{{ subitem.name }}</span>
+                    </a-checkbox>
+                    <!--删除组-->
+                    <div class="select-delete"><img src="../assets/delete.png" alt="" @click="hadnleDelectUnit(subitem, index)"></div>
+                  </div>
+                  <!--删除组的单位-->
+                  <div class="group-ul" v-show="subitem.shrink">
+                    <div class="flex group-ulchild" v-for="(child, childindex) in subitem.children" :key="childindex">
+                      <!-- <a-checkbox v-model="child.check" @click="(e) => handleAddGroup(e, child, 'single')" :disabled="child.attrs.noselect"> -->
+                        <span>{{ child.name }}</span>
+                        <div class="select-deletechild"><img src="../assets/delete.png" alt="" @click="handleDeleteSingleUnit(subitem, child, childindex)"></div>
+                      <!-- </a-checkbox> -->
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -47,7 +75,7 @@
             <div class="unit-list" v-show="!showSearchDialog">
               <div v-for="(item, index) in unitTree" :key="index">
                 <div class="unit-name">
-                  <a-icon class="jiaicon mr5" :type="item.shrink ? 'minus' : 'plus'" @click="item.shrink = !item.shrink" />
+                  <a-icon class="jiaicon mr5" :type="item.shrink ? 'minus' : 'plus'" @click="handleAddKeys(item)" />
                   <span>{{ item.name }}</span>
                   <span class="namecol" @click=hadnleAllChoose(item)>(全选下级)</span>
                 </div>
@@ -149,6 +177,52 @@
         <a-button @click="hanldeNone">取消</a-button>
       </div>
     </div>
+    <!--请选择常用组-->
+    <a-modal
+      title="请选择常用组"
+      :visible="dialogGroup.visible"
+      centered="true"
+      width="300px"
+      @ok="handleChooseGroup"
+      cancelText="取消"
+      okText="确定"
+      @cancel="dialogGroup.visible=false"
+    >
+      <div class="dialog-choose-ul">
+        <a-radio-group v-model="dialogGroup.value">
+          <a-radio v-for="(item, index) in dialogGroup.groupary" :key="index" :value="item.id" class="dialog-radio">{{ item.name }}</a-radio>
+        </a-radio-group>
+      </div>
+    </a-modal>
+    <!--创建组-->
+    <a-modal
+      title="创建组"
+      :visible="dialogCreategroup.visible"
+      centered="true"
+      width="300px"
+      @ok="handleCreateSure"
+      cancelText="取消"
+      okText="确定"
+      @cancel="dialogCreategroup.visible=false"
+    >
+      <div class="dialog-create-center">
+        <a-textarea
+          v-model="dialogCreategroup.value"
+          placeholder="请填写组名称"
+          :auto-size="{ minRows: 3, maxRows: 5 }"
+        />
+      </div>
+    </a-modal>
+    <!--删除组-->
+    <a-modal v-model="deleteDialog.visible"
+      title="信息"
+      centered="true"
+      width="300px"
+      cancelText="取消"
+      okText="确定"
+      @ok="handleDelteGroup">
+      <p>确定要删除?</p>
+    </a-modal>
   </div>
 </template>
 
@@ -170,6 +244,8 @@ export default {
       loading: false,
       // 总数据
       tablelist: {},
+      // 默认展开
+      defaultTreeKeys: [],
       showSearchDialog: false,
       // 搜索内容
       searchName: '',
@@ -186,6 +262,22 @@ export default {
       // 总拼音数据
       pinyinAryAll: [],
       moduleObject: {},
+      dialogGroup: {
+        value: '',
+        visible: false,
+        groupary: []
+      },
+      dialogCreategroup: {
+        visible: false,
+        value: '',
+        chooseAry: []
+      },
+      deleteDialog: {
+        visible: false,
+        flag: "",
+        delteid: "",
+        deleteindex: ''
+      },
       propData: this.$root.propData.compositeAttr || {
         height: '100vh',
         footBottom: '0px',
@@ -204,6 +296,129 @@ export default {
     this.init()
   },
   methods: {
+    // 添加默认展开key
+    handleAddKeys(item) {
+      item.shrink = !item.shrink;
+      if(item.shrink) {
+        !this.defaultTreeKeys.includes(item.id) && this.defaultTreeKeys.push(item.id);
+      } else {
+        this.defaultTreeKeys.includes(item.id) && (this.defaultTreeKeys = this.defaultTreeKeys.filter(k => k != item.id));
+      }
+    },
+    // 选择常用组弹框
+    handleChooseGroup() {
+      let ary = this.getTreeCheckData(this.unitTree);
+      this.handleUpdate(this.dialogGroup.value, ary, () => {
+        this.handleGetGroupData();
+        this.dialogGroup.visible = false;
+      })
+    },
+    // 更新按钮
+    handleUpdateGroup() {
+      let alyChoose = []
+      this.comGroup.forEach(item => {
+        item.children && item.children.forEach(k => {
+          k.check && alyChoose.push(k)
+        })
+      })
+      if (alyChoose.length <= 0) {
+        message.error('请选择小组')
+        return
+      } else if (alyChoose.length == 1) {
+        let current = alyChoose[0];
+        let ary = this.getTreeCheckData(this.unitTree);
+        this.handleUpdate(current.id, ary, () => {
+          this.handleGetGroupData();
+        });
+      } else {
+        this.dialogGroup.groupary = alyChoose
+        this.dialogGroup.value = alyChoose[0].id
+        this.dialogGroup.visible = true
+      }
+    },
+    // 创建组
+    handleNewGroup() {
+      let chooseData = this.getTreeCheckData(this.unitTree)
+      if (chooseData.length <= 0) {
+        message.error('请选择单位')
+        return
+      }
+      this.dialogCreategroup.value = '';
+      this.dialogCreategroup.chooseAry = chooseData;
+      this.dialogCreategroup.visible = true;
+    },
+    // 创建组弹框
+    async handleCreateSure() {
+      let ids = '', texts = '';
+      this.dialogCreategroup.chooseAry.forEach(item => {
+        ids += `,${item.id}`;
+        texts += `,${item.name}`
+      })
+      let obj = {
+        name: this.dialogCreategroup.value,
+        ids: ids.slice(1),
+        texts: texts.slice(1)
+      }
+      let res = await API.ApiSaveGroup(obj)
+      if (res.code == '200') {
+        message.success(res.message);
+        this.dialogCreategroup.visible = false;
+        this.handleGetGroupData();
+      } else {
+        this.dialogCreategroup.visible = false;
+        message.success(res.message)
+      }
+    },
+    // 更新组
+    async handleUpdate(groupId, targetAry, fn) {
+      let ids = '', texts = '';
+      targetAry.forEach(item => {
+        ids += `,${item.id}`;
+        texts += `,${item.name}`
+      })
+      let obj = {
+        groupId: groupId,
+        ids: ids.slice(1),
+        texts: texts.slice(1)
+      }
+      let res  = await API.ApiUpdateGroup(obj)
+      if (res.code == '200') {
+        message.success(res.message);
+        fn && fn()
+      } else {
+        message.success(res.message)
+      }
+    },
+    // 删除组确定
+    async handleDelteGroup() {
+      if (this.deleteDialog.flag == "unit") {
+        this.handleUpdate(this.deleteDialog.delteid, this.deleteDialog.groupary, () => {
+          this.deleteDialog.visible = false;
+          this.handleGetGroupData()
+        })
+      } else if (this.deleteDialog.flag == "group") {
+        let res = await API.ApiDeleteGroup({groupId: this.deleteDialog.delteid});
+        if (res.code == "200") {
+          this.deleteDialog.visible = false;
+          this.handleGetGroupData();
+        }
+      }
+    },
+    // 删除组里的单位
+    handleDeleteSingleUnit(father, item, index) {
+      let updateAry = father.children.filter(k => k.id != item.id);
+      this.deleteDialog.groupary = updateAry
+      this.deleteDialog.delteid = father.id;
+      this.deleteDialog.flag = "unit";
+      this.deleteDialog.visible = true;
+    },
+    // 删除已选单位
+    hadnleDelectUnit(item, index) {
+      this.deleteDialog.delteid = item.id;
+      this.deleteDialog.flag = "group";
+      this.deleteDialog.deleteindex = index;
+      this.deleteDialog.visible = true;
+    },
     setHeight() {
       let flag = this.handleParamsFunc().recordId;
       return  {
@@ -294,7 +509,7 @@ export default {
       if (tree && tree.length>0) {
         tree.forEach(item => {
           if (chooseId) {
-            if (chooseId == item.id) {
+            if (chooseId == item.id && !item.attrs.noselect) {
               item.check = targetflag
               return
             }
@@ -321,7 +536,7 @@ export default {
       // 选中单位复选框
       this.handleTreeChoose(this.unitTree, chooseIdAry, item.check);
       // 检查单位全选和选中条数
-      this.handleFatherChoose(this.unitTree)
+      // this.handleFatherChoose(this.unitTree)
       
 
       this.defaultChooseUnit()
@@ -494,15 +709,29 @@ export default {
       window.IDM.setStyleToPageHead(this.moduleObject.id + " .itreeselectunit", styleObject);
     },
     // 选中常用组复选框
-    handleAddGroup(e, subitem) {
-      if (subitem.children?.length > 0) {
-        subitem.check = e.target.checked;
-        subitem.children.forEach(k => k.check = e.target.checked)
-        let chooseIdAry = subitem.children.map(subitem => subitem.id);
-        this.checkGroupAllChoose()
-        // 选中单位复选框
-        this.handleTreeChoose(this.unitTree, chooseIdAry, e.target.checked);
-        this.defaultChooseUnit()
+    handleAddGroup(e, subitem, type) {
+      if (type == 'group') {
+        if (subitem.children?.length > 0) {
+          subitem.check = e.target.checked;
+          subitem.children.forEach(k => k.check = e.target.checked)
+          let chooseIdAry = subitem.children.map(subitem => subitem.id);
+          // 选中单位复选框
+          this.handleTreeChoose(this.unitTree, chooseIdAry, e.target.checked);
+          // 检查单位全选和选中条数 有可能父级选中只是父级
+          // this.handleFatherChoose(this.unitTree)
+          // 检查常用组其他是否选中
+          this.handleTreeChoose(this.comGroup, chooseIdAry, e.target.checked);
+          this.handleCheckGroupChoose(this.comGroup)
+
+          this.checkGroupAllChoose()
+
+          this.defaultChooseUnit()
+        }
+      } else {
+        // let flag = e.target.checked
+        // console.log(subitem, 9)
+        // this.handleTreeAddTreeData(this.unitTree, {chooseId: subitem.id, targetflag: flag });
+        // this.defaultChooseUnit()
       }
     },
     // 搜索内容点击
@@ -527,6 +756,17 @@ export default {
         this.handleChoose(item)
       }
     },
+    // 根上有复选框
+    handleFirstGen(item) {
+      const flag = item.check;
+      // 检查常用组选中
+      this.handleTreeAddTreeData(this.comGroup, {chooseId: item.id, targetflag: flag })
+      this.handleCheckGroupChoose(this.comGroup)
+      // 检查常用组全选
+      this.checkGroupAllChoose();
+
+      this.defaultChooseUnit()
+    },
     // 选择单位
     handleChoose(item) {
       let flag = item.check
@@ -547,7 +787,9 @@ export default {
       if (tree && tree.length>0) {
         tree.forEach(item => {
           if (chooseIdAry.includes(item.id)) {
-            if(!item.attrs.noselect) {
+            if(item.attrs.noselect) {
+              
+            } else {
               item.check = chooseType
             }
           }
@@ -599,13 +841,13 @@ export default {
         this.chooseFile = data
       }
     },
-    hanldeAddField(tree, flag) {
+    hanldeAddField(tree, defaultAry) {
       if (tree && tree.length>0) {
         tree.forEach(item => {
-          this.$set(item, 'shrink', flag)
+          this.$set(item, 'shrink', defaultAry.includes(item.id))
           this.$set(item, 'check', false)
           item.chooseNum = 0;
-          item.children?.length > 0 && this.hanldeAddField(item.children, false)
+          item.children?.length > 0 && this.hanldeAddField(item.children, defaultAry)
         })
       }
     },
@@ -620,12 +862,18 @@ export default {
         this.defaultPrintNum = obj.defaultPrintNum;
         this.tablelist = obj;
         let { codeList } = obj;
+
         let group = codeList.filter(item => item.id == 'zsdwRootGroup');
-        this.hanldeAddField(group, false)
+
+        this.hanldeAddField(group, this.defaultTreeKeys)
         group.forEach(item => item.shrink = true);
         this.comGroup = group;
+
         let unit = codeList.filter(item => item.id !== 'zsdwRootGroup');
-        this.hanldeAddField(unit, true)
+        if (this.defaultTreeKeys.length == 0) {
+          this.defaultTreeKeys.push(unit[0]?.id)
+        }
+        this.hanldeAddField(unit, this.defaultTreeKeys)
         this.unitTree = unit;
         this.handleDataBack()
       } else {
@@ -677,6 +925,19 @@ export default {
     },
     // 回显数据
     handleDataBack() {
+      if (this.chooseUnit?.length > 0) {
+        let chooseIdAry = this.chooseUnit.map(item => item.id);
+        // // 选中单位复选框
+        this.handleTreeChoose(this.unitTree, chooseIdAry, true);
+        // // 检查单位全选和选中条数
+        // this.handleFatherChoose(this.treeData.org)
+
+        // 检查常用组选中
+        this.handleTreeChoose(this.comGroup, chooseIdAry, true)
+        this.handleCheckGroupChoose(this.comGroup)
+        
+        this.defaultChooseUnit()
+      }
       if (this.moduleObject.env !== 'production') {
         // let params = {
         //   ids: ",2408021437127YZlFRQxke5Qoi3pYWX,230729190259ierAg1NWmdClVxayyGG,2304241611407jknbFQF0TF9WWP2e98,2307291902598W4QioooBGNlWFOQzTL",
@@ -699,7 +960,6 @@ export default {
         }
       }catch(e) {
         val = this.defaultPrintNum;
-        console.log(e)
       }
       return val
     },
@@ -724,7 +984,12 @@ export default {
     getTreeCheckData(tree, select=[]) {
       if (tree && tree.length>0) {
         tree.forEach(item => {
-          (item.children.length==0 && item.check) && select.push(item)
+          // (item.children.length==0 && item.check) && select.push(item)
+          if (item.attrs.noselect) {
+
+          } else {
+            (item.check) && select.push(item)
+          }
           if (item.children?.length > 0) {
             return this.getTreeCheckData(item.children, select)
           }
@@ -880,6 +1145,10 @@ $bgColor: #efeff2;
     cursor: pointer;
     display: none !important;
   }
+  .flex{
+    display: flex;
+    align-items: center;
+  }
   .icon-close{
     display: inline-block;
     width: 16px;
@@ -1028,23 +1297,41 @@ $bgColor: #efeff2;
         .namecol{
           display: block !important;
         }
+        .group-right{
+          display: block;
+        }
       }
       .group-name{
         user-select: none;
         display: flex;
+        justify-content: space-between;
         align-items: center;
         span{
           font-size: 16px;
         }
       }
       .group-children{
-        height: 32px;
+        // height: 32px;
         line-height: 32px;
-        padding-left: 40px;
+        padding-left: 20px;
+        // display: flex;
+        &:hover{
+          .select-delete{
+            display: block
+          }
+        }
         ::v-deep .ant-checkbox-inner{
           width: 18px;
           height: 18px;
         }
+      }
+      .group-ulchild:hover{
+        .select-deletechild{
+          display: block;
+        }
+      }
+      .group-ul{
+        padding-left: 40px;
       }
       span{
         font-size: 14px;
@@ -1055,6 +1342,45 @@ $bgColor: #efeff2;
         vertical-align: middle;
         overflow: hidden;
         text-overflow: ellipsis;
+      }
+      .select-delete{
+        display: none;
+        cursor: pointer;
+        width: 23px;
+        height: 100%;
+        color: #999;
+      }
+      .select-deletechild{
+        display: none;
+        cursor: pointer;
+        width: 23px;
+        height: 100%;
+        color: #999;
+        margin-left: 5px;
+      }
+    }
+    .group-right{
+      display: none;
+      font-size: 14px;
+      div{
+        cursor: pointer;
+      }
+      .renew{
+        margin-right: 30px;
+
+      }
+      .renew-img{
+        width: 16px;
+        height: 16px;
+        margin-right: 5px;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+      }
+      .renew-img1{
+        background-image: url('../assets/new.png');
+      }
+      .renew-img2{
+        background-image: url('../assets/create.png');
       }
     }
   }

@@ -4,8 +4,15 @@
       <div v-for="(res, index) in item.children" :key="index">
         <div class="unit-name">
           <template v-if="res.children.length > 0">
-            <a-icon class="jiaicon mr5" :type="res.shrink ? 'minus' : 'plus'" @click="res.shrink = !res.shrink" />
-            <span>{{ res.name }}</span>
+            <a-icon class="jiaicon mr5" :type="res.shrink ? 'minus' : 'plus'" @click="handleShrink(res)" />
+            <template v-if="res.attrs.noselect">
+              <span>{{ res.name }}</span>
+            </template>
+            <template v-else>
+              <a-checkbox v-model="res.check" @change="(e) => handleFirstGen(res)">
+                <span>{{ res.name }}</span>
+              </a-checkbox>
+            </template>
             <span class="namecol" @click="handleChooseALL(res)">(全选下级)</span>
           </template>
           <template v-else>
@@ -44,9 +51,15 @@ export default {
     handleChoose(item) {
       this.fatherRef.handleChoose(item)
     },
+    handleFirstGen(item) {
+      this.fatherRef.handleFirstGen(item)
+    },
     // 全选下级
     handleChooseALL(item) {
       this.fatherRef.hadnleNextAllChoose(item)
+    },
+    handleShrink(item) {
+      this.fatherRef.handleAddKeys(item)
     }
   }
 }
