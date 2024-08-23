@@ -26,7 +26,7 @@
             <span class="selecttip-icon"></span>
             <span>选择机构</span>
           </div>
-          <div class="unit-box" :style="setHeight()">
+          <div class="unit-box" :style="setHeight">
             <a-spin class="select-loading" :spinning="loading"></a-spin>
             <!--常用组-->
             <div class="comgroup-box" v-show="!showSearchDialog">
@@ -115,7 +115,7 @@
               <span v-if="tablelist.enableDown==1">下载次数</span>
             </span>
           </div>
-          <div class="chooseAly" :style="setHeight()">
+          <div class="chooseAly" :style="setHeight">
             <div class="choose-line" v-for="(item, index) in chooseUnit" :key="index">
               <span class="w40">{{ item.name }}</span>
               <div class="w10 choosecopy" >
@@ -142,35 +142,39 @@
         </div>
       </div>
       <!--附件-->
-      <div class="select-filecontainer" ref="selectLibItem" v-if="!handleParamsFunc().recordId && fileLib.length" data="附件">
-        <div class="boxx" v-for="(item, index) in fileLib" :key="index">
-          <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
-          <div class="text">
-            <template v-if="getFileIcon(item.fileName) == 'common'">
-              <svg-icon iconClass="common" class="treesvg"></svg-icon>
-            </template>
-            <template v-else>
-              <img :src="handleGetImg(item)" alt="">
-            </template>
-            <span>{{ item.fileName }}</span>
+      <template v-if="showFilefujian">
+        <div class="select-filecontainer" ref="selectLibItem" v-if="!handleParamsFunc().recordId && fileLib.length" data="附件">
+          <div class="boxx" v-for="(item, index) in fileLib" :key="index">
+            <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
+            <div class="text">
+              <template v-if="getFileIcon(item.fileName) == 'common'">
+                <svg-icon iconClass="common" class="treesvg"></svg-icon>
+              </template>
+              <template v-else>
+                <img :src="handleGetImg(item)" alt="">
+              </template>
+              <span>{{ item.fileName }}</span>
+            </div>
           </div>
         </div>
-      </div>
+      </template>
       <!--文件-->
-      <div class="select-filecontainer mt10" ref="selectFileItem" v-if="!handleParamsFunc().recordId && chooseFile.length" data="文件">
-        <div class="boxx" v-for="(item, index) in chooseFile" :key="index">
-          <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
-          <div class="text">
-            <template v-if="getFileIcon(item.fileName) == 'common'">
-              <svg-icon iconClass="common" class="treesvg"></svg-icon>
-            </template>
-            <template v-else>
-              <img :src="handleGetImg(item)" alt="">
-            </template>
-            <span>{{ item.fileName }}</span>
+      <template v-if="showFilejian">
+        <div class="select-filecontainer mt10" ref="selectFileItem" v-if="!handleParamsFunc().recordId && chooseFile.length" data="文件">
+          <div class="boxx" v-for="(item, index) in chooseFile" :key="index">
+            <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
+            <div class="text">
+              <template v-if="getFileIcon(item.fileName) == 'common'">
+                <svg-icon iconClass="common" class="treesvg"></svg-icon>
+              </template>
+              <template v-else>
+                <img :src="handleGetImg(item)" alt="">
+              </template>
+              <span>{{ item.fileName }}</span>
+            </div>
           </div>
         </div>
-      </div>
+      </template>
       <!--顶部按钮-->
       <div class="treeselect-foot" :style="`bottom:${propData.footBottom}`">
         <a-button type="primary" @click="handleSure">确定</a-button>
@@ -240,6 +244,9 @@ export default {
   },
   data() {
     return {
+      showFilefujian: false,
+      showFilejian: false,
+      setHeight: {},
       defaultPrintNum: 1,
       loading: false,
       // 总数据
@@ -282,7 +289,6 @@ export default {
         height: '100vh',
         footBottom: '0px',
         unitHeight: '436px',
-        unitNoFileHeight: "500px"
       }
     }
   },
@@ -294,6 +300,7 @@ export default {
   mounted() {
     this.moduleObject = this.$root.moduleObject;
     this.init()
+    this.setHeight = { "height": document.body.offsetHeight + 'px' }
   },
   methods: {
     // 添加默认展开key
@@ -419,11 +426,28 @@ export default {
       this.deleteDialog.deleteindex = index;
       this.deleteDialog.visible = true;
     },
-    setHeight() {
-      let flag = this.handleParamsFunc().recordId;
-      return  {
-        "height": flag ? this.propData.unitNoFileHeight : this.propData.unitHeight
+    handleSetHeight() {
+      let flag = this.handleParamsFunc().recordId; // fileLib 附件 // chooseFile 文件
+      let bodyHeight = document.body.offsetHeight,
+        contentHeight = bodyHeight - 132;
+      let height = this.propData.unitHeight;
+
+      if ((flag || this.chooseFile.length <= 0) && (flag || this.fileLib.length <= 0)) {
+        height = contentHeight
+        this.setHeight = { "height": height + 'px' }
       }
+      if ((flag || this.chooseFile.length <= 0) && (!flag && this.fileLib.length)) {
+        height = contentHeight - (this.$refs.selectLibItem?.offsetHeight || 0);
+        this.setHeight = { "height": height + 'px' }
+      }
+      if ((flag || this.fileLib.length <= 0) && (!flag && this.chooseFile.length)) {
+        height = contentHeight - this.$refs.selectFileItem?.offsetHeight || 0;
+        this.setHeight = { "height": height + 'px' }
+      }
+      this.$nextTick(() => {
+        this.showFilefujian = true;
+        this.showFilejian = true;
+      })
     },
     handleGetImg(item) {
       let key = this.getFileIcon(item.fileName);
@@ -988,7 +1012,9 @@ export default {
           if (item.attrs.noselect) {
 
           } else {
-            (item.check) && select.push(item)
+            if (item.check) {
+              !select.map(k => k.id).includes(item.id) && select.push(item)
+            }
           }
           if (item.children?.length > 0) {
             return this.getTreeCheckData(item.children, select)
@@ -1048,24 +1074,26 @@ export default {
       if (res.code == '200') {
         let data = res.data;
         this.handleFileListData(data)
+        this.handleSetHeight()
       }
       // 文件
       let fileres = await API.ApiUnitFileList(params)
       if (fileres.code == '200') {
         let data = fileres.data;
         this.handleDataFile(data)
+        this.handleSetHeight()
       }
-      this.$nextTick(() => {
-        const selectTopHeight = this.$refs.treeselectTop?.offsetHeight || 0;
-        const selectLibItem = this.$refs.selectLibItem?.offsetHeight || 0;
-        const selectFileItem = this.$refs.selectFileItem?.offsetHeight || 0;
-        const realyHeight = selectTopHeight + selectLibItem + selectFileItem + 55 + 20;
-        try{
-          top.setRemoteSendRangeViewHeight (realyHeight);
-        }catch(e) {
-          console.log("设置高度", e)
-        }
-      })
+      // this.$nextTick(() => {
+      //   const selectTopHeight = this.$refs.treeselectTop?.offsetHeight || 0;
+      //   const selectLibItem = this.$refs.selectLibItem?.offsetHeight || 0;
+      //   const selectFileItem = this.$refs.selectFileItem?.offsetHeight || 0;
+      //   const realyHeight = selectTopHeight + selectLibItem + selectFileItem + 55 + 20;
+      //   try{
+      //     top.setRemoteSendRangeViewHeight (realyHeight);
+      //   }catch(e) {
+      //     console.log("设置高度", e)
+      //   }
+      // })
     },
     init() {
       this.handleStyle()
@@ -1241,7 +1269,7 @@ $bgColor: #efeff2;
       color: #333;
     }
     .chooseAly{
-      height: 436px;
+      // height: 436px;
       overflow-y: auto;
       padding: 0 12px 0 17px;
       color: #333;
@@ -1284,7 +1312,7 @@ $bgColor: #efeff2;
   .unit-box{
     position: relative;
     padding: 10px 20px;
-    height: 436px;
+    // height: 350px;
     overflow-y: auto;
     font-size: 16px;
     color: #333;

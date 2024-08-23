@@ -63,7 +63,7 @@ export default {
       selectData: {},
       moduleObject: {},
       propData: this.$root.propData.compositeAttr || {
-        defaultPageIndex: 2,
+        defaultPageIndex: 1,
         ulbox: {
           marginTopVal: "",
           marginRightVal: "",

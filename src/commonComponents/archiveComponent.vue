@@ -67,7 +67,7 @@
         <tr v-for="(item, index) in archiveGridList" :key="index">
           <td :rowspan="item.firstRow+1" v-if="item.firstRow+1 > 0">{{ item.archiveStageText }}</td>
           <td :rowspan="item.secondRow+1" v-if="item.secondRow+1 > 0">{{ item.archiveTypeText }}</td>
-          <td>{{ item.archiveSubTypeText }}</td>
+          <td v-if="item.archiveSubTypeText">{{ item.archiveSubTypeText }}</td>
           <td>{{ item.archiveCount }}</td>
         </tr>
       </tbody>

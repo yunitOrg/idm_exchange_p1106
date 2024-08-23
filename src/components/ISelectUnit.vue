@@ -617,7 +617,7 @@ export default {
     handleAddGroup(e, item) {
       if (item.children?.length > 0) {
         item.children.forEach(k => k.check = true)
-        let chooseIdAry = item.children.map(item => item.id)
+        let chooseIdAry = item.children.map(item => item.id);
         // 选中单位复选框
         this.handleTreeChoose(this.treeData.org, chooseIdAry, e.target.checked);
         // 检查单位全选和选中条数
@@ -625,7 +625,6 @@ export default {
         // 检查常用组其他是否选中
         this.handleTreeChoose(this.treeData.zsdwGroup, chooseIdAry, e.target.checked);
         this.handleCheckGroupChoose(this.treeData.zsdwGroup)
-        
         this.defaultChooseUnit()
       }
     },
@@ -701,7 +700,12 @@ export default {
     getTreeCheckData(tree, select=[]) {
       if (tree && tree.length>0) {
         tree.forEach(item => {
-          (item.check && item.children?.length==0) && select.push(item)
+          if (item.attrs.noselect) {
+          } else {
+            if (item.check) {
+              !select.map(k => k.id).includes(item.id) && select.push(item)
+            }
+          }
           if (item.children?.length > 0) {
             return this.getTreeCheckData(item.children, select)
           }

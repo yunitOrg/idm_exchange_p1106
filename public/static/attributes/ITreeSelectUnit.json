@@ -21,25 +21,17 @@
       "children": [
         {
           "type": "input",
-          "layoutType": "block",
+          "layoutType": "inline",
           "text": "单位有附件高度",
-          "desc": "填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",
+          "desc": "填写auto则为自适应，单位px",
           "bindKey": "unitHeight",
-          "default": "436px"
-        },
-        {
-          "type": "input",
-          "layoutType": "block",
-          "text": "单位无附件高度",
-          "desc": "填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",
-          "bindKey": "unitNoFileHeight",
-          "default": "500px"
+          "default": "350px"
         },
         {
           "type": "input",
           "layoutType": "inline",
           "text": "底部Y",
-          "desc": "填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",
+          "desc": "底部栏目 固定底部 填写auto则为自适应，或者使用px、%、vw等单位，比如100%、100px、100vw等等",
           "bindKey": "footBottom",
           "default": "0px"
         }
