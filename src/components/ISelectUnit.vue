@@ -33,7 +33,7 @@
           <div class="btn" @click="handleReset">重置</div>
         </div>
       </div>
-      <div class="select-content" ref="selectContent" :style="setHeight()">
+      <div class="select-content" ref="selectContent" :style="setHeight">
         <div class="select-ul" v-if="chooseUnit.length>0">
           <draggable
             class="select-drag"
@@ -114,35 +114,39 @@
         </div>
       </div>
       <!--附件-->
-      <div class="select-filecontainer" v-if="!handleParamsFunc().recordId && fileLib.length">
-        <div class="boxx" v-for="(item, index) in fileLib" :key="index">
-          <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
-          <div class="text">
-            <template v-if="getFileIcon(item.fileName) == 'common'">
-              <svg-icon iconClass="common" class="treesvg"></svg-icon>
-            </template>
-            <template v-else>
-              <img :src="handleGetImg(item)" alt="">
-            </template>
-            <span>{{ item.fileName }}</span>
+      <template v-if="showFilefujian">
+        <div class="select-filecontainer" ref="selectLibItem" v-if="!handleParamsFunc().recordId && fileLib.length">
+          <div class="boxx" v-for="(item, index) in fileLib" :key="index">
+            <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
+            <div class="text">
+              <template v-if="getFileIcon(item.fileName) == 'common'">
+                <svg-icon iconClass="common" class="treesvg"></svg-icon>
+              </template>
+              <template v-else>
+                <img :src="handleGetImg(item)" alt="">
+              </template>
+              <span>{{ item.fileName }}</span>
+            </div>
           </div>
         </div>
-      </div>
+      </template>
       <!--文件-->
-      <div class="select-filecontainer" v-if="!handleParamsFunc().recordId && chooseFile.length">
-        <div class="boxx" v-for="(item, index) in chooseFile" :key="index">
-          <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
-          <div class="text">
-            <template v-if="getFileIcon(item.fileName) == 'common'">
-              <svg-icon iconClass="common" class="treesvg"></svg-icon>
-            </template>
-            <template v-else>
-              <img :src="handleGetImg(item)" alt="">
-            </template>
-            <span>{{ item.fileName }}</span>
+      <template v-if="showFilejian">
+        <div class="select-filecontainer" ref="selectFileItem" v-if="!handleParamsFunc().recordId && chooseFile.length">
+          <div class="boxx" v-for="(item, index) in chooseFile" :key="index">
+            <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
+            <div class="text">
+              <template v-if="getFileIcon(item.fileName) == 'common'">
+                <svg-icon iconClass="common" class="treesvg"></svg-icon>
+              </template>
+              <template v-else>
+                <img :src="handleGetImg(item)" alt="">
+              </template>
+              <span>{{ item.fileName }}</span>
+            </div>
           </div>
         </div>
-      </div>
+      </template>
       <div class="select-btnall" :style="`bottom:${propData.footBottom};right:${propData.footRight}`" v-if="treeData.org.length > 0">
         <a-button @click="handleChooseAll">选择全部</a-button>
         <a-button @click="handleDeleteAll">清除已选</a-button>
@@ -227,6 +231,9 @@ export default {
   name: 'ISelectUnit',
   data() {
     return {
+      setHeight: {},
+      showFilefujian: false,
+      showFilejian: false,
       groupTtype: true,
       searchInput: '',
       chooseUnit: [],
@@ -269,8 +276,7 @@ export default {
       pinyinAryAll: [],
       propData: this.$root.propData.compositeAttr || {
         height: '100vh',
-        contentHeight: 'calc(100vh - 330px)',
-        noFileHeigt: 'calc(100vh - 260px)',
+        contentHeight: '350px',
         footBottom: '30px',
         footRight: '20px',
         ulbox: {
@@ -294,6 +300,7 @@ export default {
   mounted() {
     this.moduleObject = this.$root.moduleObject;
     this.init();
+    this.setHeight = { "height": document.body.offsetHeight + 'px' }
   },
   methods: {
     async handleDelteGroup() {
@@ -321,12 +328,6 @@ export default {
      */
     dragEnd(env) {
       env.item.classList.remove('columnborder')
-    },
-    setHeight() {
-      let flag = this.handleParamsFunc().recordId;
-      return  {
-        "height": flag ? this.propData.noFileHeigt : this.propData.contentHeight
-      }
     },
     handleGetImg(item) {
       let key = this.getFileIcon(item.fileName);
@@ -904,6 +905,29 @@ export default {
       })
       fn && fn(chooseIdAry);
     },
+    handleSetHeight() {
+      let flag = this.handleParamsFunc().recordId; // fileLib 附件 // chooseFile 文件
+      let bodyHeight = document.body.offsetHeight,
+        contentHeight = bodyHeight - 130 - parseInt(this.propData.footBottom);
+      let height = this.propData.contentHeight;
+
+      if ((flag || this.chooseFile.length <= 0) && (flag || this.fileLib.length <= 0)) {
+        height = contentHeight
+        this.setHeight = { "height": height + 'px' }
+      }
+      if ((flag || this.chooseFile.length <= 0) && (!flag && this.fileLib.length)) {
+        height = contentHeight - (this.$refs.selectLibItem?.offsetHeight || 0);
+        this.setHeight = { "height": height + 'px' }
+      }
+      if ((flag || this.fileLib.length <= 0) && (!flag && this.chooseFile.length)) {
+        height = contentHeight - this.$refs.selectFileItem?.offsetHeight || 0;
+        this.setHeight = { "height": height + 'px' }
+      }
+      this.$nextTick(() => {
+        this.showFilefujian = true;
+        this.showFilejian = true;
+      })
+    },
     async initData() {
       // if (this.moduleObject.env !== 'production') {
       //   this.getMockData()
@@ -917,22 +941,24 @@ export default {
       if (res.code == '200') {
         let data = res.data;
         this.handleFileListData(data)
+        this.handleSetHeight()
       }
       // 文件
       let fileres = await API.ApiUnitFileList(params)
       if (fileres.code == '200') {
         let data = fileres.data;
         this.handleDataFile(data)
+        this.handleSetHeight()
       }
-      this.$nextTick(() => {
-        const selectTopHeight = this.$refs.selectContent?.offsetHeight;
-        const realyHeight = selectTopHeight + 70 + 40 + 20;
-        try{
-          top.setRemoteSendRangeViewHeight (realyHeight);
-        }catch(e) {
-          console.log("设置高度", e)
-        }
-      })
+      // this.$nextTick(() => {
+      //   const selectTopHeight = this.$refs.selectContent?.offsetHeight;
+      //   const realyHeight = selectTopHeight + 70 + 40 + 20;
+      //   try{
+      //     top.setRemoteSendRangeViewHeight (realyHeight);
+      //   }catch(e) {
+      //     console.log("设置高度", e)
+      //   }
+      // })
     },
     init() {
       this.handleStyle()

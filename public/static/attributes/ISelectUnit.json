@@ -23,15 +23,9 @@
           "type": "input",
           "layoutType": "inline",
           "text": "内容高度",
+          "desc": "单位px",
           "bindKey": "contentHeight",
-          "default": "calc(100% - 204px)"
-        },
-        {
-          "type": "input",
-          "layoutType": "block",
-          "text": "无附件内容高度",
-          "bindKey": "noFileHeigt",
-          "default": "calc(100% - 204px)"
+          "default": "350px"
         },
         {
           "type": "input",

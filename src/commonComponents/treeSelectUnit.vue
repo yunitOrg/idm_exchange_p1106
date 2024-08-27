@@ -7,10 +7,12 @@
             <a-icon class="jiaicon mr5" :type="res.shrink ? 'minus' : 'plus'" @click="handleShrink(res)" />
             <template v-if="res.attrs.noselect">
               <span>{{ res.name }}</span>
+              <span class="issend" v-if="res.attrs.isSent == 1">(已发送)</span>
             </template>
             <template v-else>
               <a-checkbox v-model="res.check" @change="(e) => handleFirstGen(res)">
                 <span>{{ res.name }}</span>
+                <span class="issend" v-if="res.attrs.isSent == 1">(已发送)</span>
               </a-checkbox>
             </template>
             <span class="namecol" @click="handleChooseALL(res)">(全选下级)</span>
@@ -18,6 +20,7 @@
           <template v-else>
             <a-checkbox v-model="res.check" @change="(e) => handleChoose(res)" :disabled="res.attrs.noselect">
               <span :class="res.attrs.noselect&&'select-item-nameno'">{{ res.name }}</span>
+              <span class="issend" v-if="res.attrs.isSent == 1">(已发送)</span>
             </a-checkbox>
           </template>
         </div>
@@ -106,6 +109,9 @@ export default {
   .select-item-nameno{
     color: #999;
     cursor: not-allowed;
+  }
+  .issend{
+    color: #ff0909;
   }
 }
 </style>

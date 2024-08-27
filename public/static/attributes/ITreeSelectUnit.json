@@ -22,8 +22,8 @@
         {
           "type": "input",
           "layoutType": "inline",
-          "text": "单位有附件高度",
-          "desc": "填写auto则为自适应，单位px",
+          "text": "单位高度",
+          "desc": "单位px",
           "bindKey": "unitHeight",
           "default": "350px"
         },
