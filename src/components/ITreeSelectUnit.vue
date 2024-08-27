@@ -142,7 +142,6 @@
         </div>
       </div>
       <!--附件-->
-      <template v-if="showFilefujian">
         <div class="select-filecontainer" ref="selectLibItem" v-if="!handleParamsFunc().recordId && fileLib.length" data="附件">
           <div class="boxx" v-for="(item, index) in fileLib" :key="index">
             <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
@@ -157,9 +156,7 @@
             </div>
           </div>
         </div>
-      </template>
       <!--文件-->
-      <template v-if="showFilejian">
         <div class="select-filecontainer mt10" ref="selectFileItem" v-if="!handleParamsFunc().recordId && chooseFile.length" data="文件">
           <div class="boxx" v-for="(item, index) in chooseFile" :key="index">
             <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
@@ -174,7 +171,6 @@
             </div>
           </div>
         </div>
-      </template>
       <!--顶部按钮-->
       <div class="treeselect-foot" :style="`bottom:${propData.footBottom}`">
         <a-button type="primary" @click="handleSure">确定</a-button>
@@ -244,8 +240,6 @@ export default {
   },
   data() {
     return {
-      showFilefujian: false,
-      showFilejian: false,
       setHeight: {},
       defaultPrintNum: 1,
       loading: false,
@@ -444,10 +438,10 @@ export default {
         height = contentHeight - this.$refs.selectFileItem?.offsetHeight || 0;
         this.setHeight = { "height": height + 'px' }
       }
-      this.$nextTick(() => {
-        this.showFilefujian = true;
-        this.showFilejian = true;
-      })
+      if ((!flag || this.fileLib.length) && (!flag && this.chooseFile.length)) {
+        height = contentHeight - (this.$refs.selectLibItem?.offsetHeight || 0) - (this.$refs.selectFileItem?.offsetHeight || 0);
+        this.setHeight = { "height": height + 'px' }
+      }
     },
     handleGetImg(item) {
       let key = this.getFileIcon(item.fileName);
@@ -1074,14 +1068,18 @@ export default {
       if (res.code == '200') {
         let data = res.data;
         this.handleFileListData(data)
-        this.handleSetHeight()
+        this.$nextTick(() => {
+          this.handleSetHeight()
+        })
       }
       // 文件
       let fileres = await API.ApiUnitFileList(params)
       if (fileres.code == '200') {
         let data = fileres.data;
         this.handleDataFile(data)
-        this.handleSetHeight()
+        this.$nextTick(() => {
+          this.handleSetHeight()
+        })
       }
       // this.$nextTick(() => {
       //   const selectTopHeight = this.$refs.treeselectTop?.offsetHeight || 0;

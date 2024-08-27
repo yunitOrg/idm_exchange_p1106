@@ -114,7 +114,6 @@
         </div>
       </div>
       <!--附件-->
-      <template v-if="showFilefujian">
         <div class="select-filecontainer" ref="selectLibItem" v-if="!handleParamsFunc().recordId && fileLib.length">
           <div class="boxx" v-for="(item, index) in fileLib" :key="index">
             <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
@@ -129,9 +128,7 @@
             </div>
           </div>
         </div>
-      </template>
       <!--文件-->
-      <template v-if="showFilejian">
         <div class="select-filecontainer" ref="selectFileItem" v-if="!handleParamsFunc().recordId && chooseFile.length">
           <div class="boxx" v-for="(item, index) in chooseFile" :key="index">
             <div class="boxx-checkbox"><a-checkbox v-model="item.checkboxItem">{{ item.attValueText }}</a-checkbox></div>
@@ -146,7 +143,6 @@
             </div>
           </div>
         </div>
-      </template>
       <div class="select-btnall" :style="`bottom:${propData.footBottom};right:${propData.footRight}`" v-if="treeData.org.length > 0">
         <a-button @click="handleChooseAll">选择全部</a-button>
         <a-button @click="handleDeleteAll">清除已选</a-button>
@@ -232,8 +228,6 @@ export default {
   data() {
     return {
       setHeight: {},
-      showFilefujian: false,
-      showFilejian: false,
       groupTtype: true,
       searchInput: '',
       chooseUnit: [],
@@ -908,7 +902,7 @@ export default {
     handleSetHeight() {
       let flag = this.handleParamsFunc().recordId; // fileLib 附件 // chooseFile 文件
       let bodyHeight = document.body.offsetHeight,
-        contentHeight = bodyHeight - 130 - parseInt(this.propData.footBottom);
+        contentHeight = bodyHeight - 150 - parseInt(this.propData.footBottom);
       let height = this.propData.contentHeight;
 
       if ((flag || this.chooseFile.length <= 0) && (flag || this.fileLib.length <= 0)) {
@@ -923,10 +917,10 @@ export default {
         height = contentHeight - this.$refs.selectFileItem?.offsetHeight || 0;
         this.setHeight = { "height": height + 'px' }
       }
-      this.$nextTick(() => {
-        this.showFilefujian = true;
-        this.showFilejian = true;
-      })
+      if ((!flag || this.fileLib.length) && (!flag && this.chooseFile.length)) {
+        height = contentHeight - (this.$refs.selectLibItem?.offsetHeight || 0) - (this.$refs.selectFileItem?.offsetHeight || 0);
+        this.setHeight = { "height": height + 'px' }
+      }
     },
     async initData() {
       // if (this.moduleObject.env !== 'production') {
@@ -941,14 +935,18 @@ export default {
       if (res.code == '200') {
         let data = res.data;
         this.handleFileListData(data)
-        this.handleSetHeight()
+        this.$nextTick(() => {
+          this.handleSetHeight()
+        })
       }
       // 文件
       let fileres = await API.ApiUnitFileList(params)
       if (fileres.code == '200') {
         let data = fileres.data;
         this.handleDataFile(data)
-        this.handleSetHeight()
+        this.$nextTick(() => {
+          this.handleSetHeight()
+        })
       }
       // this.$nextTick(() => {
       //   const selectTopHeight = this.$refs.selectContent?.offsetHeight;
