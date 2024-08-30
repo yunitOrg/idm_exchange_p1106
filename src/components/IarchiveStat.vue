@@ -64,6 +64,17 @@ export default {
       moduleObject: {},
       propData: this.$root.propData.compositeAttr || {
         defaultPageIndex: 1,
+        archiveNumList: [
+          {
+            key: 2,
+            name: "投保期限",
+            show: true
+          },
+          {
+            key: 3,
+            show: false
+          }
+        ],
         ulbox: {
           marginTopVal: "",
           marginRightVal: "",
@@ -75,6 +86,11 @@ export default {
           paddingLeftVal: "20px"
         }
       }
+    }
+  },
+  provide () {
+    return {
+      propData: this.propData
     }
   },
   mounted() {

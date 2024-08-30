@@ -13,7 +13,45 @@
     </div>
     <!--搜索-->
     <div class="table-search">
-      <div class="super-middle" style="width: 20%;">
+      <template  v-for="(item, index) in searchList" >
+      <div class="super-middle" style="width: 20%;" v-if="item.show" :key="index">
+        <span class="super-mr10">{{ item.name }}</span>
+        <template v-if="item.key == 1">
+          <a-select v-model="search.archiveState" allowClear style="width: 50%">
+            <a-select-option :value="item.value" v-for="(item, index) in selectData.archiveStageList" :key="index">
+              {{ item.text }}
+            </a-select-option>
+          </a-select>
+        </template>
+        <template v-if="item.key == 2">
+          <a-select v-model="search.archicvePeriod" allowClear style="width: 50%">
+            <a-select-option :value="item.value" v-for="(item, index) in selectData.arvhivePeriodList" :key="index">
+              {{ item.text }}
+            </a-select-option>
+          </a-select>
+        </template>
+        <template v-if="item.key == 3">
+          <a-select v-model="search.archiveOpenStatus" allowClear style="width: 50%">
+            <a-select-option :value="item.value" v-for="(item, index) in selectData.archiveOpenTypeList" :key="index">
+              {{ item.text }}
+            </a-select-option>
+          </a-select>
+        </template>
+        <template v-if="item.key == 4">
+          <a-config-provider :locale="locale">
+            <a-date-picker
+              v-model="search.archiveYear"
+              placeholder="请选择年份"
+              mode="year"
+              format='YYYY'
+              :open='yearShowOne'
+              @openChange="openChangeOne"
+              @panelChange="panelChangeOne"/>
+          </a-config-provider>
+        </template>
+        </div>
+      </template>
+      <!-- <div class="super-middle" style="width: 20%;">
         <span class="super-mr10">数据来源</span>
         <a-select v-model="search.archiveState" allowClear style="width: 50%">
           <a-select-option :value="item.value" v-for="(item, index) in selectData.archiveStageList" :key="index">
@@ -49,7 +87,7 @@
             @openChange="openChangeOne"
             @panelChange="panelChangeOne"/>
         </a-config-provider>
-      </div>
+      </div> -->
       <div style="width: 20%;">
         <a-button class="h40 super-btn" type="primary"  @click="handleSearch">检索</a-button>
       </div>
@@ -83,6 +121,28 @@ export default {
   data() {
     return {
       locale,
+      searchList: [
+        {
+          name: "数据来源",
+          key: 1,
+          show: true
+        },
+        {
+          name: "保管期限",
+          key: 2,
+          show: true
+        },
+        {
+          name: "开放程度",
+          key: 3,
+          show: true
+        },
+        {
+          name: "年度",
+          key: 4,
+          show: true
+        }
+      ],
       // 表格数据
       archiveGridList: [],
       yearShowOne: false,
@@ -97,7 +157,15 @@ export default {
       },
     }
   },
+  inject: ['propData'],
   mounted() {
+    if (this.propData.archiveNumList && this.propData.archiveNumList.length > 0) {
+      this.propData.archiveNumList.forEach(item => {
+        if (item.key && this.searchList.map(i => i.key).includes(parseInt(item.key))) {
+          this.searchList[item.key - 1] = item;
+        }
+      })
+    }
     this.handleRequireList()
   },
   methods: {

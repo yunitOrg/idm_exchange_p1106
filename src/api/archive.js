@@ -12,7 +12,12 @@ export default {
    * @Author hjp
    */
   async ApiQueryCountData({archiveState, archicvePeriod, archiveYear, archiveOpenStatus}) {
-    const { data } = await window.IDM.http.get('ctrl/archive/statistics/getArchiveStatisticsCountData', {archiveState, archicvePeriod, archiveYear, archiveOpenStatus})
+    let obj = {}
+    archiveState && (obj.archiveState = archiveState)
+    archicvePeriod && (obj.archicvePeriod = archicvePeriod)
+    archiveYear && (obj.archiveYear = archiveYear)
+    archiveOpenStatus && (obj.archiveOpenStatus = archiveOpenStatus)
+    const { data } = await window.IDM.http.get('ctrl/archive/statistics/getArchiveStatisticsCountData', obj)
     return data
   },
   /**

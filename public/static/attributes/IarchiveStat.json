@@ -21,11 +21,42 @@
       "children": [
         {
           "type": "input",
-          "layoutType": "block",
+          "layoutType": "inline",
           "text": "显示页面",
           "desc": "tab有三个就有三个页面 1:档案数量统计 2:档案借阅统计 3:档案利用统计",
           "bindKey": "defaultPageIndex",
           "default": "1"
+        },
+        {
+          "type": "table",
+          "text": "档案数量统计",
+          "desc": "可以显示隐藏筛选项，修改名字, 索引是：1、2、3、4",
+          "bindKey": "archiveNumList",
+          "tabText": "索引[index]",
+          "children": [
+            {
+              "type": "input",
+              "layoutType": "inline",
+              "text": "索引",
+              "desc": "根据索引修改对象元素",
+              "bindKey": "key"
+            },
+            {
+              "type": "input",
+              "layoutType": "inline",
+              "text": "名称",
+              "desc": "搜索名称",
+              "bindKey": "name"
+            },
+            {
+              "type": "switch",
+              "layoutType": "inline",
+              "text": "是否显示",
+              "desc": "是否显示该索索项",
+              "bindKey": "show",
+              "default": true
+            }
+          ]
         }
       ]
     },
