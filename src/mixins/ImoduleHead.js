@@ -10,6 +10,7 @@ export default {
         heightType: 'fixed',
         contentEchartsHeight: '350px',
         resContent: 'drag',
+        dragSplit: true,
         tabheight: '48px',
         tabRightLeftDis: '10px',
         splitWidth: '1px',

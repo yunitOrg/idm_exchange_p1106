@@ -61,6 +61,15 @@
             }
           ],
           "default": "static"
+        },
+        {
+          "type": "switch",
+          "layoutType": "inline",
+          "text": "容器分离",
+          "desc": "响应内容 如果是容器 点击切换 true:多个容器  false:一个容器",
+          "bindKey": "dragSplit",
+          "display": "@[resContent=='drag']",
+          "default": false
         }
       ]
     },

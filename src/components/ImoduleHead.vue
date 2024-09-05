@@ -57,12 +57,26 @@
           <div class="echartsLine" :style="{height: propData.contentEchartsHeight}" ref="line1"></div>
         </template>
         <template v-if="propData.resContent == 'drag'">
-          <div
-            class="drag_container dragContent"
-            idm-ctrl-inner
-            :idm-ctrl-id="moduleObject.id"
-            idm-container-index="headcontent"
-          ></div>
+          <template v-if="propData.dragSplit">
+            <div
+              v-for="(tab, index) in tabList"
+              v-show="tab.showTab"
+              :key="index"
+              class="drag_container dragContent"
+              :class="`dragContent-${index}`"
+              idm-ctrl-inner
+              :idm-ctrl-id="moduleObject.id"
+              :idm-container-index="`headcontent${index}`"
+            ></div>
+          </template>
+          <template v-else>
+            <div
+              class="drag_container dragContent"
+              idm-ctrl-inner
+              :idm-ctrl-id="moduleObject.id"
+              idm-container-index="headcontent"
+            ></div>
+          </template>
         </template>
       </div>
       <!--悬浮容器-->
