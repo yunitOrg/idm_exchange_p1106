@@ -101,6 +101,17 @@
         <div class="treeselect-right">
           <div class="treeselect-allnum search-combg">
             <span>已选择数量：<span>{{ chooseUnit.length }}</span></span>
+            <div class="flex" v-if="tablelist.enableCopy==1 || (tablelist.enableCopy!=1 && tablelist.enablePage==1)">
+              <a-input-search
+              v-model="numValue"
+              placeholder="请输入"
+              @search="onSearch"
+              >
+                <template #enterButton>
+                  <a-button>批量修改份数</a-button>
+                </template>
+              </a-input-search>
+            </div>
             <span style="color:#0086d9;cursor: pointer;" @click="handleClear">清空</span>
           </div>
           <div class="treeselect-choose">
@@ -240,6 +251,7 @@ export default {
   },
   data() {
     return {
+      numValue: '',
       setHeight: {},
       defaultPrintNum: 1,
       loading: false,
@@ -297,6 +309,13 @@ export default {
     this.setHeight = { "height": document.body.offsetHeight + 'px' }
   },
   methods: {
+    // 批量修改
+    onSearch() {
+      if (this.chooseUnit && this.chooseUnit.length > 0) {
+        this.chooseUnit.forEach(item => item.copycop = this.numValue)
+        this.updateChooseNum(this.chooseUnit);
+      }
+    },
     // 添加默认展开key
     handleAddKeys(item) {
       item.shrink = !item.shrink;
