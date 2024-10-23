@@ -1006,10 +1006,10 @@ export default {
       let num = this.getDefaultCopycop();
       this.chooseUnit.forEach(item => {
         if (this.tablelist.enableCopy==1) {
-          (!item.copycop || item.copycop == "") && this.$set(item, 'copycop', num);
+          (!item.copycop || item.copycop == "") && this.$set(item, 'copycop', this.numValue || num);
         }
         if (this.tablelist.enablePage==1) {
-          (!item.copycop || item.copycop == "") && this.$set(item, 'copycop', num);
+          (!item.copycop || item.copycop == "") && this.$set(item, 'copycop', this.numValue || num);
           (!item.page1 || item.page1 == "") && (this.$set(item, 'page1', 1));
           (!item.page2 || item.page2 == "") && (this.$set(item, 'page2', 1));
         }
@@ -1038,6 +1038,8 @@ export default {
     },
     // 清空
     handleClear() {
+      this.numValue = "";
+      this.chooseUnit.forEach(item => item.copycop = this.numValue)
       this.handleTreeAddTreeData(this.comGroup, {check: false});
 
       this.handleTreeAddTreeData(this.chooseUnit, {check: false})
