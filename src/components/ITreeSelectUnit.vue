@@ -62,10 +62,12 @@
                   <!--删除组的单位-->
                   <div class="group-ul" v-show="subitem.shrink">
                     <div class="flex group-ulchild" v-for="(child, childindex) in subitem.children" :key="childindex">
-                      <!-- <a-checkbox v-model="child.check" @click="(e) => handleAddGroup(e, child, 'single')" :disabled="child.attrs.noselect"> -->
-                        <span>{{ child.name }}</span>
-                        <div class="select-deletechild"><img src="../assets/delete.png" alt="" @click="handleDeleteSingleUnit(subitem, child, childindex)"></div>
-                      <!-- </a-checkbox> -->
+                      <a-checkbox v-model="child.check" @click="(e) => handleAddGroup(e, child, 'single', subitem)" :disabled="child.attrs.noselect" class="groupcheckbox">
+                        <div class="groupcheckbox">
+                          <span>{{ child.name }}</span>
+                        </div>
+                      </a-checkbox>
+                      <div class="select-deletechild"><img src="../assets/delete.png" alt="" @click="handleDeleteSingleUnit(subitem, child, childindex)"></div>
                     </div>
                   </div>
                 </div>
@@ -746,11 +748,17 @@ export default {
       window.IDM.setStyleToPageHead(this.moduleObject.id + " .itreeselectunit", styleObject);
     },
     // 选中常用组复选框
-    handleAddGroup(e, subitem, type) {
+    handleAddGroup(e, subitem, type, father) {
       if (type == 'group') {
         if (subitem.children?.length > 0) {
           subitem.check = e.target.checked;
-          subitem.children.forEach(k => k.check = e.target.checked)
+          subitem.children.forEach(k => {
+            if (k.attrs.noselect) {
+
+            } else {
+              k.check = e.target.checked
+            }
+          })
           let chooseIdAry = subitem.children.map(subitem => subitem.id);
           // 选中单位复选框
           this.handleTreeChoose(this.unitTree, chooseIdAry, e.target.checked);
@@ -765,10 +773,17 @@ export default {
           this.defaultChooseUnit()
         }
       } else {
-        // let flag = e.target.checked
-        // console.log(subitem, 9)
-        // this.handleTreeAddTreeData(this.unitTree, {chooseId: subitem.id, targetflag: flag });
-        // this.defaultChooseUnit()
+        let flag = e.target.checked
+        subitem.check = flag
+        this.handleTreeAddTreeData(this.unitTree, {chooseId: subitem.id, targetflag: flag });
+        if (father.children && father.children.length > 0) {
+          const chooseAry = father.children.filter(k => {
+            return !k.attrs.noselect && k.check
+          });
+          father.check = chooseAry.length == father.children.filter(k => !k.attrs.noselect).length
+        }
+        this.checkGroupAllChoose()
+        this.defaultChooseUnit()
       }
     },
     // 搜索内容点击
@@ -816,7 +831,6 @@ export default {
       this.handleCheckGroupChoose(this.comGroup)
       // 检查常用组全选
       this.checkGroupAllChoose();
-
       this.defaultChooseUnit()
     },
     // org 选中数据
@@ -922,7 +936,11 @@ export default {
       if (tree && tree.length>0) {
         tree.forEach(item => {
           if (item.children.length != 0) {
-            item.check = (item.children.filter(k => k.check).length == item.children.length);
+            if (item.children && item.children.length > 0) {
+              let len = item.children.filter(k => !k.attrs.noselect && k.check).length;
+              let fatherlen = item.children.filter(k => !k.attrs.noselect).length;
+              item.check = len == fatherlen
+            }
           }
           item.children?.length > 0 && this.handleCheckGroupChoose(item.children)
         })
@@ -1375,6 +1393,15 @@ $bgColor: #efeff2;
       .group-ulchild:hover{
         .select-deletechild{
           display: block;
+        }
+      }
+      .groupcheckbox{
+        display: flex;
+        align-items: center;
+        ::v-deep .ant-checkbox{
+          height: 18px;
+          display: flex;
+          align-items: center;
         }
       }
       .group-ul{
