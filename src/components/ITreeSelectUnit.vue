@@ -110,7 +110,7 @@
               @search="onSearch"
               >
                 <template #enterButton>
-                  <a-button>批量修改份数</a-button>
+                  <a-button type="primary" class="themeBtn">批量修改份数</a-button>
                 </template>
               </a-input-search>
             </div>
@@ -186,7 +186,7 @@
         </div>
       <!--顶部按钮-->
       <div class="treeselect-foot" :style="`bottom:${propData.footBottom}`">
-        <a-button type="primary" @click="handleSure">确定</a-button>
+        <a-button type="primary" class="themeBtn" @click="handleSure">确定</a-button>
         <a-button @click="hanldeNone">取消</a-button>
       </div>
     </div>
@@ -1099,6 +1099,33 @@ export default {
         });
       }
     },
+    convertThemeListAttrToStyleObject() {
+      let themeList = this.propData.themeList;
+      if (!themeList) {
+        return;
+      }
+      const themeNamePrefix =
+        IDM.setting &&
+        IDM.setting.applications &&
+        IDM.setting.applications.themeNamePrefix
+          ? IDM.setting.applications.themeNamePrefix
+          : "idm-theme-";
+      for (let i=0; i<themeList.length; i++) {
+        let item = themeList[i];
+        if(item.key!=IDM.theme.getCurrentThemeInfo()){
+            //此处比对是不渲染输出不用的样式，如果页面会刷新就可以把此处放开
+            continue;
+        }
+        let tempobj = {
+          "background-color": item.mainColor ? item.mainColor.hex8 : "",
+          "border": item.mainColor ? item.mainColor.hex8 : "",
+        };
+        IDM.setStyleToPageHead(
+          `.${themeNamePrefix}${item.key} #${(this.moduleObject.id || "module_demo")} .themeBtn`,
+          tempobj
+        );
+      }
+    },
     async initData() {
       this.handleGetGroupData()
       const params = this.handleParamsFunc()
@@ -1135,6 +1162,7 @@ export default {
     init() {
       this.handleStyle()
       this.initData()
+      this.convertThemeListAttrToStyleObject()
     }
   }
 }
