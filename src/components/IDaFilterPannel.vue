@@ -9,7 +9,7 @@
                 </el-form-item>
                 <el-form-item label="全 宗 号">
                     <el-select v-model="data.no" multiple placeholder="请选择" class="w-full">
-                        <el-option v-for="n in nos" :key="n.value" :label="n.label" :value="n.value"> </el-option>
+                        <el-option v-for="n in fondsNo" :key="n.value" :label="n.label" :value="n.value"> </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="检索信息">
@@ -73,13 +73,12 @@ export default {
                     value: 1
                 }
             ],
-            nos: [
+            fondsNo: [
                 {
                     label: '0001 文书档案',
                     value: 1
                 }
             ],
-
             whereTypes: [
                 {
                     label: '且',
@@ -155,11 +154,7 @@ export default {
             return this.conditionitems.find((n) => n.value == item)?.where || []
         },
         addCondition(item, index) {
-            this.data.conditions.splice(index + 1, 0, {
-                type: 'and',
-                item: 1,
-                where: 1
-            })
+            this.data.conditions.splice(index + 1, 0, _.cloneDeep(item))
         },
         removeCondition(item, index) {
             this.data.conditions.splice(index, 1)
