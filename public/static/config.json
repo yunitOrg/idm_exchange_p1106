@@ -38,6 +38,13 @@
       "className": "ImoduleHead",
       "comType": "common",
       "comLangue": "vue"
+    },
+    {
+        "classId": "idm.componet.db.IDaFilterPannel",
+        "comName": "档案筛选面板",
+        "className": "IDaFilterPannel",
+        "comType": "common",
+        "comLangue": "vue"
     }
   ]
 }
