@@ -1,7 +1,7 @@
 {
-    "classId": "idm.componet.db.IDaFilterPannel",
+    "classId": "idm.componet.db.IFilterPannel",
     "comName": "档案筛选面板",
-    "className": "IDaFilterPannel",
+    "className": "IFilterPannel",
     "comType": "common",
     "comLangue": "vue",
     "compositeAttr": [
