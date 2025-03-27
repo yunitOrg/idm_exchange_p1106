@@ -264,9 +264,17 @@ export default {
         },
         fetchSearchKey(searchParam) {
             return window.IDM.http
-                .post('ctrl/archive/search/addSearchParam', {
-                    searchParam
-                })
+                .post(
+                    'ctrl/archive/search/addSearchParam',
+                    {
+                        searchParam
+                    },
+                    {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                )
                 .then(({ data }) => data.data.searchParamKey)
         },
         viewTemplate() {
