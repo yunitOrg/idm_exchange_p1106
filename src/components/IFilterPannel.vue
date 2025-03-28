@@ -266,9 +266,9 @@ export default {
             return window.IDM.http
                 .post(
                     'ctrl/archive/search/addSearchParam',
-                    {
+                    JSON.stringify({
                         searchParam
-                    },
+                    }),
                     {
                         headers: {
                             'Content-Type': 'application/json'
@@ -278,13 +278,11 @@ export default {
                 .then(({ data }) => data.data.searchParamKey)
         },
         viewTemplate() {
-            this.fetchSearchKey(this.conditionParams).then((key) => {
-                top.layer.open({
-                    title: '检索模版',
-                    type: 2,
-                    content: window.IDM.url.getWebPath(`ctrl/list/250319092208sq8x43vH2MYG7xA346N?moduleId=250319090934qsa5CCFaQV6GeJOdvwe&searchParamKey=${key}`),
-                    area: ['80vw', '80vh']
-                })
+            top.layer.open({
+                title: '检索模版',
+                type: 2,
+                content: window.IDM.url.getWebPath(`ctrl/list/250319092208sq8x43vH2MYG7xA346N?moduleId=250319090934qsa5CCFaQV6GeJOdvwe`),
+                area: ['80vw', '80vh']
             })
         },
         saveTemplate() {
