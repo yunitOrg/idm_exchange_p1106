@@ -70,16 +70,22 @@
                 <el-form-item label="归档年度">
                     <div class="flex gap-2">
                         <el-select v-model="data.yearStart" filterable default-first-option>
-                            <el-option :value="1900" label="不限"></el-option>
-                            <el-option v-for="n in Array.from({ length: year - 1989 }, (_, i) => year - i)" :key="n" :value="n" :label="n" :disabled="n > data.yearEnd"></el-option>
+                            <el-option value="1900" label="不限"></el-option>
+                            <el-option
+                                v-for="n in Array.from({ length: year - 1989 }, (_, i) => year - i)"
+                                :key="n"
+                                :value="n.toString()"
+                                :label="n.toString()"
+                                :disabled="n > data.yearEnd"
+                            ></el-option>
                         </el-select>
                         -
                         <el-select v-model="data.yearEnd" filterable default-first-option>
                             <el-option
                                 v-for="n in Array.from({ length: year - 1989 }, (_, i) => year - i)"
                                 :key="n"
-                                :value="n"
-                                :label="n == year ? '至今' : n"
+                                :value="n.toString()"
+                                :label="n == year ? '至今' : n.toString()"
                                 :disabled="n < data.yearStart"
                             ></el-option>
                         </el-select>
@@ -122,8 +128,8 @@ export default {
             data: {
                 template: '',
                 conditions: [],
-                yearStart: 1900,
-                yearEnd: year,
+                yearStart: '1900',
+                yearEnd: year.toString(),
                 fond: []
             },
             listFrameUrl: ''

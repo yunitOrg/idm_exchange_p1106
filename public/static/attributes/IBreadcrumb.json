@@ -1,0 +1,18 @@
+{
+    "classId": "idm.componet.exchange.IBreadcrumb",
+    "comName": "面包屑导航",
+    "className": "IBreadcrumb",
+    "comType": "common",
+    "comLangue": "vue",
+    "compositeAttr": [
+        {
+            "type": "input",
+            "layoutType": "inline",
+            "text": "唯一标识",
+            "bindKey": "ctrlId",
+            "disabled": true,
+            "default": "@[packageid]",
+            "desc": ""
+        }
+    ]
+}

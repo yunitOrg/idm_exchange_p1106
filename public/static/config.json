@@ -40,9 +40,16 @@
       "comLangue": "vue"
     },
     {
-        "classId": "idm.componet.db.IFilterPannel",
+        "classId": "idm.componet.exchange.IFilterPannel",
         "comName": "档案筛选面板",
         "className": "IFilterPannel",
+        "comType": "common",
+        "comLangue": "vue"
+    },
+    {
+        "classId": "idm.componet.exchange.IBreadcrumb",
+        "comName": "面包屑导航",
+        "className": "IBreadcrumb",
         "comType": "common",
         "comLangue": "vue"
     }

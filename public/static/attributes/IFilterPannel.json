@@ -1,5 +1,5 @@
 {
-    "classId": "idm.componet.db.IFilterPannel",
+    "classId": "idm.componet.exchange.IFilterPannel",
     "comName": "档案筛选面板",
     "className": "IFilterPannel",
     "comType": "common",
