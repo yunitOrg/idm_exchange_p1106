@@ -7,7 +7,7 @@
                         <el-radio-group v-model="data.template" size="small" class="flex-1 w-0">
                             <el-radio v-for="n in templates" :key="n.id" :label="n.id" :border="true">{{ n.bt }}</el-radio>
                         </el-radio-group>
-                        <el-button v-if="template.data.length > 4" @click="template.expand = !template.expand" size="small">{{ template.expand ? '收起' : '更多' }}</el-button>
+                        <el-button v-if="template.data.length > 5" @click="template.expand = !template.expand" size="small">{{ template.expand ? '收起' : '更多' }}</el-button>
                     </div>
                 </el-form-item>
                 <el-form-item label="全 宗 号">
@@ -140,7 +140,7 @@ export default {
             if (this.template.expand) {
                 return this.template.data
             }
-            return this.template.data.slice(0, 4)
+            return this.template.data.slice(0, 5)
         },
         fondOptions() {
             return this.fonds.map((n) => ({
