@@ -822,9 +822,9 @@ export default {
     // 选择单位
     handleChoose(item) {
       let flag = item.check
-      let fatherobj = this.handleTreeGetChooseId(this.unitTree, item.pid);
-      let chooseTrueCheck = fatherobj.children.filter(item => item.check)
-      fatherobj.check = fatherobj.children.length == chooseTrueCheck.length
+      // let fatherobj = this.handleTreeGetChooseId(this.unitTree, item.pid);
+      // let chooseTrueCheck = fatherobj.children.filter(item => item.check)
+      // fatherobj.check = fatherobj.children.length == chooseTrueCheck.length
 
       // 检查常用组选中
       this.handleTreeAddTreeData(this.comGroup, {chooseId: item.id, targetflag: flag })

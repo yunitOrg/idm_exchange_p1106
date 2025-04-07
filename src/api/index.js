@@ -107,8 +107,9 @@ export default {
     * @Desc 树形-单位选择-常用组
     * @Author hjp
     */
-    async ApiGetTreeListGroup({infotype, pk, moduleId, exchangeModeId, sendType,selectAttvalue,isJoint,flat,templateId, operationFlag, sendLevel, mode, recordId}) {
+    async ApiGetTreeListGroup({isdir, infotype, pk, moduleId, exchangeModeId, sendType,selectAttvalue,isJoint,flat,templateId, operationFlag, sendLevel, mode, recordId}) {
         let formdata = new FormData();
+        isdir && formdata.append('isdir', isdir)
         sendLevel && formdata.append('sendLevel', sendLevel)
         infotype && formdata.append('infotype', infotype)
         pk && formdata.append('pk', pk)
