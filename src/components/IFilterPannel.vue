@@ -7,7 +7,7 @@
                         <el-radio-group v-model="data.template" size="small" class="flex-1 w-0">
                             <el-radio v-for="n in templates" :key="n.id" :label="n.id" :border="true">{{ n.bt }}</el-radio>
                         </el-radio-group>
-                        <el-button v-if="template.data.length > 5" @click="template.expand = !template.expand" size="small">{{ template.expand ? '收起' : '更多' }}</el-button>
+                        <el-button v-if="template.data.length > 4" @click="template.expand = !template.expand" size="small">{{ template.expand ? '收起' : '更多' }}</el-button>
                     </div>
                 </el-form-item>
                 <el-form-item label="全 宗 号">
@@ -140,7 +140,7 @@ export default {
             if (this.template.expand) {
                 return this.template.data
             }
-            return this.template.data.slice(0, 5)
+            return this.template.data.slice(0, 4)
         },
         fondOptions() {
             return this.fonds.map((n) => ({
@@ -263,7 +263,12 @@ export default {
             return this.filterItems.find((n) => n.filterCode == filterCode)
         },
         addCondition(item, index) {
-            this.data.conditions.splice(index + 1, 0, _.cloneDeep(item))
+            this.data.conditions.splice(index + 1, 0, {
+                ..._.cloneDeep(item),
+                filterValue: '',
+                filterStart: '',
+                filterEnd: ''
+            })
         },
         removeCondition(item, index) {
             this.data.conditions.splice(index, 1)
@@ -351,7 +356,13 @@ export default {
             display: none;
         }
         .el-radio__label {
-            padding: 0;
+            padding: 3px 0;
+            display: block;
+            width: 80px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         &.is-checked {
             background: #dff6ff;

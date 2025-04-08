@@ -1,10 +1,12 @@
 <template>
     <div idm-ctrl="idm_module" :id="moduleObject.id" :idm-ctrl-id="moduleObject.id">
         <div class="flex items-center menu-list">
-            <a-icon type="environment" />
+            <svg-icon iconClass="location" />
             <div>当前页：</div>
-            <div v-for="nav in navs" :key="nav.id" class="flex items-center menu-item">
-                <div>{{ nav.menuName }}</div>
+            <div class="flex items-center">
+                <div v-for="nav in navs" :key="nav.id" class="flex items-center menu-item">
+                    <div>{{ nav.menuName }}</div>
+                </div>
             </div>
         </div>
     </div>
@@ -32,6 +34,9 @@ export default {
                 const subNav = current.children.find((n) => n.id == this.current.id)
                 if (subNav) {
                     return [current, subNav]
+                }
+                if (current.id == this.current.id) {
+                    return [current]
                 }
                 return carry.concat([])
             }, [])
@@ -64,6 +69,10 @@ export default {
         font-size: 16px;
         color: rgba(0, 115, 202, 1);
         padding: 5px 10px;
+        > svg {
+            fill: rgba(0, 115, 202, 1);
+            margin-right: 10px;
+        }
     }
     &-item {
         &:after {
@@ -71,6 +80,9 @@ export default {
             content: '/';
             color: #999;
             padding: 5px;
+        }
+        &:first-child {
+            font-weight: bold;
         }
         &:last-child {
             &:after {
