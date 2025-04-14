@@ -583,7 +583,8 @@ export default {
     // 更新已选的数字
     updateChooseNum(ary) {
       if (ary?.length <= 0) return
-      ary[0].page1 = 1;
+      let params = this.handleParamsFunc();
+      ary[0].page1 = params.fh ? (parseInt(params.fh)+1) : 1;
       ary[0].page2 = ary[0].copycop;
       let defaultCopy = ary[0].copycop, defaultPage1 = ary[0].page1, defaultPage2 = ary[0].page2;
       ary.forEach((k, i) => {
