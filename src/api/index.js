@@ -7,7 +7,7 @@ export default {
     * @Desc 单位选择-常用组-单位
     * @Author hjp
     */
-    async ApiExchangeList({isdir, sendLevel, pk, moduleId, operationFlag, flat, mode, recordId}) {
+    async ApiExchangeList({isdir,sendLevel, pk, moduleId, operationFlag, flat, mode, recordId}) {
         let formdata = new FormData();
         isdir && formdata.append('isdir', isdir)
         sendLevel && formdata.append('sendLevel', sendLevel)
