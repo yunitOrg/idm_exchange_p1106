@@ -585,7 +585,7 @@ export default {
       if (ary?.length <= 0) return
       let params = this.handleParamsFunc();
       ary[0].page1 = params.fh ? (parseInt(params.fh)+1) : 1;
-      ary[0].page2 = ary[0].copycop;
+      ary[0].page2 = params.fh ? (parseInt(params.fh) + parseInt(ary[0].copycop)) : ary[0].copycop;
       let defaultCopy = ary[0].copycop, defaultPage1 = ary[0].page1, defaultPage2 = ary[0].page2;
       ary.forEach((k, i) => {
         if (i > 0) {
