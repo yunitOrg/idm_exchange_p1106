@@ -1,6 +1,6 @@
 <template>
     <div idm-ctrl="idm_module" :id="moduleObject.id" :idm-ctrl-id="moduleObject.id" class="flex flex-col">
-        <div class="flex justify-center">
+        <div class="flex justify-center search-container">
             <el-form label-width="80px" label-position="left" class="form">
                 <el-form-item label="常用模版">
                     <div class="flex items-start gap-2">
@@ -10,7 +10,7 @@
                         <el-button v-if="template.data.length > 4" @click="template.expand = !template.expand" size="small">{{ template.expand ? '收起' : '更多' }}</el-button>
                     </div>
                 </el-form-item>
-                <el-form-item label="全 宗 号">
+                <el-form-item label="全 宗 号" v-show="showAll">
                     <el-cascader
                         v-model="data.fond"
                         :options="fondOptions"
@@ -22,7 +22,7 @@
                         clearable
                     ></el-cascader>
                 </el-form-item>
-                <el-form-item label="检索信息">
+                <el-form-item label="检索信息" v-show="showAll">
                     <div class="flex flex-col condition-list">
                         <div v-for="(condition, i) in data.conditions" :key="i" class="flex gap-2 condition-item">
                             <div style="width: 60px; text-align: right">
@@ -67,7 +67,7 @@
                         </div>
                     </div>
                 </el-form-item>
-                <el-form-item label="归档年度">
+                <el-form-item label="归档年度" v-show="showAll">
                     <div class="flex gap-2">
                         <el-select v-model="data.yearStart" filterable default-first-option>
                             <el-option value="1900" label="不限"></el-option>
@@ -95,10 +95,12 @@
                     <el-button @click="search" type="primary">检索</el-button>
                     <el-button @click="viewTemplate">检索模版</el-button>
                     <el-button @click="saveTemplate">保存为模版</el-button>
+                    <el-button @click="exportTemplate">导出</el-button>
                 </div>
+                <div class="expanded" :class="{open:showAll}" @click="showAll = !showAll;">高级检索</div>
             </el-form>
         </div>
-        <iframe :src="listFrameUrl" class="w-full list-frame"></iframe>
+        <iframe :src="listFrameUrl" class="w-full list-frame" :style="{height:showAll?'70vh':'calc(100vh - 177px)'}"></iframe>
     </div>
 </template>
 <script>
@@ -108,6 +110,7 @@ export default {
     data() {
         const year = new Date().getFullYear()
         return {
+            showAll:false,
             year,
             template: {
                 data: [],
@@ -309,6 +312,9 @@ export default {
                 })
             })
         },
+        exportTemplate() {
+            $(".list-frame").contents().find("button[op='exportXls']").click()
+        },
         search() {
             this.fetchSearchKey(this.conditionParams).then((key) => {
                 this.listFrameUrl = window.IDM.url.getWebPath(`ctrl/list/250324093129UzcvL2G3daLlcfmEPLL?moduleId=2406041600297BTvDAGGotrv6bHRewb&searchParamKey=${key}`)
@@ -331,11 +337,35 @@ export default {
 </script>
 <style lang="scss" scoped>
 @use '../style/common.scss';
+.search-container{
+    overflow: hidden;
+}
 .gap-2 {
     gap: 20px;
 }
 .form {
     width: min(80%, 920px);
+    position: relative;
+    .expanded{
+        width: auto;
+        padding: 0 24px 0 10px;
+        height: 32px;
+        line-height: 32px;
+        font-size: 12px;
+        border-radius: 3px;
+        text-align: center;
+        background: #56a9ff;
+        color: #fff;
+        position: absolute;
+        right: -120px;
+        top: 18px;
+        background-position: 94% center;
+        background-repeat: no-repeat;
+        background-image: url('../assets/arrow-right.png');
+        &.open{
+           background-image: url('../assets/arrow-down.png');
+        }
+    }
     :deep(.el-form-item__label) {
         font-weight: 500;
     }
