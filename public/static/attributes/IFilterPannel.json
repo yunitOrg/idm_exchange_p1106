@@ -22,9 +22,9 @@
                 {
                     "type": "actionSelect",
                     "layoutType": "block",
-                    "text": "点击事件",
+                    "text": "加入素材库点击事件",
                     "bindKey": "clickFunctions",
-                    "desc": ""
+                    "desc": "参数为{commonParam: 组件信息, customParam: 用户自定义参数}"
                 }
             ]
         }

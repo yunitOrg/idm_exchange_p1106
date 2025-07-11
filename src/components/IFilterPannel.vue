@@ -96,6 +96,7 @@
                     <el-button @click="viewTemplate">检索模版</el-button>
                     <el-button @click="saveTemplate">保存为模版</el-button>
                     <el-button @click="exportTemplate">导出</el-button>
+                    <el-button v-if="urlObject.fid!=null" @click="addToMaterial">加入素材库</el-button>
                 </div>
                 <div class="expanded" :class="{open:showAll}" @click="showAll = !showAll;">高级检索</div>
             </el-form>
@@ -110,6 +111,11 @@ export default {
     data() {
         const year = new Date().getFullYear()
         return {
+            propData: this._propData?.compositeAttr || this.$root?.propData?.compositeAttr || {
+                clickFunctions: "",
+                isShowSck:"fid!=null"
+            },
+            urlObject:{},
             showAll:false,
             year,
             template: {
@@ -245,6 +251,8 @@ export default {
         }
     },
     mounted() {
+        this.urlObject =window.IDM.url.queryObject();
+        console.log(this.urlObject);
         this.initData()
     },
     methods: {
@@ -331,7 +339,33 @@ export default {
         },
         logicalChange(value, condition) {
             condition.filterValue = ''
-        }
+        },
+        addToMaterial(){
+            this.customFunctionHandle(this.propData.clickFunctions);
+        },
+        customFunctionHandle(customFunction, param = {}) {
+            let urlObject = window.IDM.url.queryObject();
+            let pageId = window.IDM.broadcast && window.IDM.broadcast.pageModule ? window.IDM.broadcast.pageModule.id : "";
+            var clickFunction = customFunction;
+            clickFunction && clickFunction.forEach((item1) => {
+                window[item1.name] &&
+                    window[item1.name].call(this, {
+                        urlData: urlObject,
+                        pageId,
+                        commonParam: this.commonParam(),
+                        customParam: item1.param,
+                        ...param,
+                        this: this,
+                    });
+            });
+        },
+        commonParam() {
+            return {
+                moduleObject: this.moduleObject,
+                pageId: window.IDM.broadcast && window.IDM.broadcast.pageModule ?window.IDM.broadcast.pageModule.id : '',
+                urlObject: IDM.url.queryObject()
+            };
+        },
     }
 }
 </script>
