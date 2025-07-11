@@ -251,7 +251,7 @@ export default {
         }
     },
     mounted() {
-        this.urlObject =window.IDM.url.queryObject();
+        this.urlObject = 
         console.log(this.urlObject);
         this.initData()
     },
