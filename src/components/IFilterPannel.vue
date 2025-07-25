@@ -101,7 +101,16 @@
                 <div class="expanded" :class="{open:showAll}" @click="showAll = !showAll;">高级检索</div>
             </el-form>
         </div>
-        <iframe :src="listFrameUrl" class="w-full list-frame" :style="{height:showAll?'70vh':'calc(100vh - 177px)'}"></iframe>
+        <div class="simpleFormData">
+            <span v-if="data.fond.length">全宗号：{{data.fond.join(",")}}</span>
+            <span>
+                <template v-for="(condition, i) in data.conditions">
+                {{i==0?'当':whereTypes.find((item)=>{return item.value == condition.logicalRelation}).label}}{{filterItems.find((item)=>{return item.filterCode == condition.filterCode}).filterName}}{{getFilterItem(condition.filterCode).logicalConditionList.find((item)=>{return item.logicalConditionCode == condition.logicalConditionCode}).logicalConditionName}}“{{!['IS NULL', 'IS NOT NULL'].includes(condition.logicalConditionCode)&&condition.logicalConditionCode == '<>'?condition.filterStart +'-' + condition.filterEnd:condition.filterValue}}”
+                </template>
+            </span>
+            <span>归档年度：{{data.yearStart == '1900'?'不限':data.yearStart}}-{{data.yearEnd == year?'至今':data.yearEnd}}</span>
+        </div>
+        <iframe :src="listFrameUrl" class="w-full list-frame" :style="{height:showAll?'70vh':'calc(100vh - 198px)'}"></iframe>
     </div>
 </template>
 <script>
@@ -251,7 +260,7 @@ export default {
         }
     },
     mounted() {
-        this.urlObject = 
+        this.urlObject = window.IDM?.url?.queryObject() || {};
         console.log(this.urlObject);
         this.initData()
     },
@@ -263,7 +272,8 @@ export default {
             window.IDM.http.get('ctrl/archive/search/getFilterItems').then(({ data }) => {
                 this.filterItems = data.data
             })
-            this.fetchTemplates()
+            this.fetchTemplates();
+            this.search();
         },
         fetchTemplates() {
             window.IDM.http.get('ctrl/archive/search/getSearchTemplate').then(({ data }) => {
@@ -324,6 +334,7 @@ export default {
             $(".list-frame").contents().find("button[op='exportXls']").click()
         },
         search() {
+            this.showAll = false;
             this.fetchSearchKey(this.conditionParams).then((key) => {
                 this.listFrameUrl = window.IDM.url.getWebPath(`ctrl/list/250324093129UzcvL2G3daLlcfmEPLL?moduleId=2406041600297BTvDAGGotrv6bHRewb&searchParamKey=${key}`)
             })
@@ -371,6 +382,13 @@ export default {
 </script>
 <style lang="scss" scoped>
 @use '../style/common.scss';
+.simpleFormData{
+    padding: 0 20px;
+    font-size: 14px;
+    span+span{
+        margin-left: 20px;
+    }
+}
 .search-container{
     overflow: hidden;
 }
