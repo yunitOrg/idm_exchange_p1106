@@ -110,7 +110,7 @@
             </span>
             <span>归档年度：{{data.yearStart == '1900'?'不限':data.yearStart}}-{{data.yearEnd == year?'至今':data.yearEnd}}</span>
         </div>
-        <iframe :src="listFrameUrl" class="w-full list-frame" :style="{height:showAll?'70vh':'calc(100vh - 198px)'}"></iframe>
+        <iframe v-if="showIframe" :src="listFrameUrl" class="w-full list-frame" :style="{height:showAll?'70vh':'calc(100vh - 198px)'}"></iframe>
     </div>
 </template>
 <script>
@@ -150,7 +150,8 @@ export default {
                 yearEnd: year.toString(),
                 fond: []
             },
-            listFrameUrl: ''
+            listFrameUrl: '',
+            showIframe:false,
         }
     },
     computed: {
@@ -334,9 +335,13 @@ export default {
             $(".list-frame").contents().find("button[op='exportXls']").click()
         },
         search() {
+            var that = this;
             this.showAll = false;
+            this.showIframe = false;
+            this.listFrameUrl = "";
             this.fetchSearchKey(this.conditionParams).then((key) => {
-                this.listFrameUrl = window.IDM.url.getWebPath(`ctrl/list/250324093129UzcvL2G3daLlcfmEPLL?moduleId=2406041600297BTvDAGGotrv6bHRewb&searchParamKey=${key}`)
+                this.listFrameUrl = window.IDM.url.getWebPath(`${that.propData.searchJumpUrl}?moduleId=2406041600297BTvDAGGotrv6bHRewb&searchParamKey=${key}`)
+                this.showIframe = true;
             })
         },
         fileterCodeChange(value, condition) {
