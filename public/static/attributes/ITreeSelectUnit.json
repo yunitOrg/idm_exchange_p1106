@@ -182,6 +182,24 @@
       "desc": "点击？查看高级设置用法指南",
       "children": [
         {
+          "type": "radio",
+          "layoutType": "block",
+          "text": "是否获取默认已选机构份数",
+          "desc": "",
+          "bindKey": "isGetDefaultPrintNum",
+          "default": false,
+          "dictionary": [
+            {
+                "label": "是",
+                "value": true
+            },
+            {
+                "label": "否",
+                "value": false
+            }
+        ]
+        },
+        {
           "type": "actionSelect",
           "layoutType": "block",
           "text": "确定按钮",

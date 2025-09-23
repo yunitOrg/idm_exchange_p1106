@@ -1007,16 +1007,21 @@ export default {
     },
     getDefaultCopycop() {
       let val = 1;
-      try{
-        if(top.DSF.isXForm()) {
-          val = top.DSF.getElementValueByKey("B0014");
-          if (val == "" || val == null || val == undefined) {
-            val = this.defaultPrintNum;
-          }
-        }
-      }catch(e) {
+      if(this.propData.isGetDefaultPrintNum==true){
         val = this.defaultPrintNum;
+      }else{
+        try{
+          if(top.DSF.isXForm()) {
+            val = top.DSF.getElementValueByKey("B0014");
+            if (val == "" || val == null || val == undefined) {
+              val = this.defaultPrintNum;
+            }
+          }
+        }catch(e) {
+          val = this.defaultPrintNum;
+        }
       }
+      console.log(val,"val");
       return val
     },
     // copycop：份数 page1-page2：编号
