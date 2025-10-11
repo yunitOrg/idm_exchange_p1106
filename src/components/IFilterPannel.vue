@@ -10,7 +10,7 @@
                         <el-button v-if="template.data.length > 4" @click="template.expand = !template.expand" size="small">{{ template.expand ? '收起' : '更多' }}</el-button>
                     </div>
                 </el-form-item>
-                <el-form-item label="全 宗 号" v-show="showAll">
+                <el-form-item label="全 宗" v-show="showAll">
                     <el-cascader
                         v-model="data.fond"
                         :options="fondOptions"
@@ -31,10 +31,13 @@
                                     <el-option v-for="m in whereTypes" :key="m.value" :label="m.label" :value="m.value"></el-option>
                                 </el-select>
                             </div>
+                
                             <el-select v-model="condition.filterCode" @change="(value) => fileterCodeChange(value, condition)" style="width: 110px">
+                             
                                 <el-option v-for="m in filterItems" :key="m.filterCode" :label="m.filterName" :value="m.filterCode"></el-option>
                             </el-select>
                             <el-select v-model="condition.logicalConditionCode" @change="(v) => logicalChange(v, condition)" style="width: 95px">
+                              
                                 <el-option
                                     v-for="m in getFilterItem(condition.filterCode).logicalConditionList"
                                     :key="m.logicalConditionCode"
@@ -122,7 +125,8 @@ export default {
         return {
             propData: this._propData?.compositeAttr || this.$root?.propData?.compositeAttr || {
                 clickFunctions: "",
-                isShowSck:"fid!=null"
+                isShowSck:"fid!=null",
+                searchJumpUrl:"/p1000/idm/index.html#/preview/250729071300Ov3rrjEzPW4lg7MpkAW"
             },
             urlObject:{},
             showAll:false,
@@ -258,7 +262,16 @@ export default {
                     this.data.fond = fonds.map((n, i) => [n, types[i]])
                 }
             }
-        }
+        },
+        'data.fond': {
+            handler(value) {
+                console.log(value);
+                 window.IDM.http.get(`ctrl/archive/search/getFilterItems?fondsNo=${this.data.fond.join(',')}`).then(({ data }) => {
+                    this.filterItems = data.data
+                })
+            }
+        },
+
     },
     mounted() {
         this.urlObject = window.IDM?.url?.queryObject() || {};
@@ -270,7 +283,7 @@ export default {
             window.IDM.http.get('ctrl/archive/search/getArchiveTypeList').then(({ data }) => {
                 this.fonds = data.data
             })
-            window.IDM.http.get('ctrl/archive/search/getFilterItems').then(({ data }) => {
+            window.IDM.http.get(`ctrl/archive/search/getFilterItems?fondsNo=${this.data.fond.join(',')}`).then(({ data }) => {
                 this.filterItems = data.data
             })
             this.fetchTemplates();
