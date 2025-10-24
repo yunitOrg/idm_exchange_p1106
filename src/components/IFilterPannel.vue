@@ -167,7 +167,7 @@ export default {
         },
         fondOptions() {
             return this.fonds.map((n) => ({
-                label: n.fondsNo,
+                label: n.fondsName,
                 value: n.fondsNo,
                 children: n.archiveTypeList.map((n) => ({
                     label: n.archiveTypeName,
