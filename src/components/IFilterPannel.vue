@@ -102,6 +102,8 @@
                     <el-button v-if="urlObject.fid!=null" @click="addToMaterial">加入素材库</el-button>
                 </div>
                 <div class="expanded" :class="{open:showAll}" @click="showAll = !showAll;">高级检索</div>
+                <div v-if="urlObject.fileRelaId!=null ||  (urlObject.fileRelaIds && urlObject.fileRelaIds.length>0)" class="expanded expanded2"  @click="addToMaterial2">关联文件</div>
+
             </el-form>
         </div>
         <div class="simpleFormData">
@@ -125,6 +127,7 @@ export default {
         return {
             propData: this._propData?.compositeAttr || this.$root?.propData?.compositeAttr || {
                 clickFunctions: "",
+                clickFunctions2:"",
                 isShowSck:"fid!=null",
                 searchJumpUrl:"/p1000/idm/index.html#/preview/250729071300Ov3rrjEzPW4lg7MpkAW"
             },
@@ -372,6 +375,10 @@ export default {
         addToMaterial(){
             this.customFunctionHandle(this.propData.clickFunctions);
         },
+        //关联文件的点击事件
+        addToMaterial2(){
+            this.customFunctionHandle(this.propData.clickFunctions2);
+        },
         customFunctionHandle(customFunction, param = {}) {
             let urlObject = window.IDM.url.queryObject();
             let pageId = window.IDM.broadcast && window.IDM.broadcast.pageModule ? window.IDM.broadcast.pageModule.id : "";
@@ -434,6 +441,15 @@ export default {
         background-image: url('../assets/arrow-right.png');
         &.open{
            background-image: url('../assets/arrow-down.png');
+        }
+    }
+    .expanded2{
+        right: -250px;
+        padding: 0 10px;
+        cursor: pointer;
+        background-image: none;
+        &.open{
+           background-image: none;
         }
     }
     :deep(.el-form-item__label) {

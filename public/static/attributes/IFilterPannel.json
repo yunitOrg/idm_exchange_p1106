@@ -33,6 +33,13 @@
                     "text": "加入素材库点击事件",
                     "bindKey": "clickFunctions",
                     "desc": "参数为{commonParam: 组件信息, customParam: 用户自定义参数}"
+                },
+                {
+                    "type": "actionSelect",
+                    "layoutType": "block",
+                    "text": "关联文件点击事件",
+                    "bindKey": "clickFunctions2",
+                    "desc": "参数为{commonParam: 组件信息, customParam: 用户自定义参数}"
                 }
             ]
         }
