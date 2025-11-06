@@ -240,6 +240,8 @@ export default {
                 logicalRelation: 'AND',
                 logicalConditionCode: n.logicalConditionList[0]?.logicalConditionCode
             }))
+            window.filterCode=this.data.conditions.map(n => n.filterCode)
+            console.log(this.data.conditions,"检索信息watch");
         },
         'data.template': {
             handler(value) {
@@ -291,6 +293,7 @@ export default {
             })
             this.fetchTemplates();
             this.search();
+            
         },
         fetchTemplates() {
             window.IDM.http.get('ctrl/archive/search/getSearchTemplate').then(({ data }) => {
@@ -352,9 +355,12 @@ export default {
         },
         search() {
             var that = this;
+            //获取this.data.conditions中的filterCode
             this.showAll = false;
             this.showIframe = false;
             this.listFrameUrl = "";
+            window.filterCode=this.data.conditions.map(n => n.filterCode)
+            console.log(this.data.conditions,"检索信息");
             this.fetchSearchKey(this.conditionParams).then((key) => {
                 this.listFrameUrl = window.IDM.url.getWebPath(`${that.propData.searchJumpUrl}?moduleId=2406041600297BTvDAGGotrv6bHRewb&searchParamKey=${key}`)
                 this.showIframe = true;
