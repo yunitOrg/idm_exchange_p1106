@@ -240,7 +240,8 @@ export default {
                 logicalRelation: 'AND',
                 logicalConditionCode: n.logicalConditionList[0]?.logicalConditionCode
             }))
-            window.filterCode=this.data.conditions.map(n => n.filterCode)
+            //将filterCode值存放在sessionStorage
+            sessionStorage.setItem('filterCode',this.data.conditions.map(n => n.filterCode).join(','))
             console.log(this.data.conditions,"检索信息watch");
         },
         'data.template': {
@@ -359,7 +360,7 @@ export default {
             this.showAll = false;
             this.showIframe = false;
             this.listFrameUrl = "";
-            window.filterCode=this.data.conditions.map(n => n.filterCode)
+             sessionStorage.setItem('filterCode',this.data.conditions.map(n => n.filterCode).join(','))
             console.log(this.data.conditions,"检索信息");
             this.fetchSearchKey(this.conditionParams).then((key) => {
                 this.listFrameUrl = window.IDM.url.getWebPath(`${that.propData.searchJumpUrl}?moduleId=2406041600297BTvDAGGotrv6bHRewb&searchParamKey=${key}`)
