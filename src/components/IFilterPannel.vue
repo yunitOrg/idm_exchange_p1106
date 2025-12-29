@@ -10,7 +10,7 @@
                         <el-button v-if="template.data.length > 4" @click="template.expand = !template.expand" size="small">{{ template.expand ? '收起' : '更多' }}</el-button>
                     </div>
                 </el-form-item>
-                <el-form-item label="全 宗" v-show="showAll">
+                <!-- <el-form-item label="全 宗" v-show="showAll">
                     <el-cascader
                         v-model="data.fond"
                         :options="fondOptions"
@@ -21,7 +21,7 @@
                         class="w-full"
                         clearable
                     ></el-cascader>
-                </el-form-item>
+                </el-form-item> -->
                 <el-form-item label="检索信息" v-show="showAll">
                     <div class="flex flex-col condition-list">
                         <div v-for="(condition, i) in data.conditions" :key="i" class="flex gap-2 condition-item">
@@ -70,7 +70,7 @@
                         </div>
                     </div>
                 </el-form-item>
-                <el-form-item label="归档年度" v-show="showAll">
+                <!-- <el-form-item label="归档年度" v-show="showAll">
                     <div class="flex gap-2">
                         <el-select v-model="data.yearStart" filterable default-first-option>
                             <el-option value="1900" label="不限"></el-option>
@@ -93,7 +93,7 @@
                             ></el-option>
                         </el-select>
                     </div>
-                </el-form-item>
+                </el-form-item> -->
                 <div class="flex justify-center form-actions">
                     <el-button @click="search" type="primary">检索</el-button>
                     <el-button @click="viewTemplate">检索模版</el-button>
@@ -113,7 +113,7 @@
                 {{i==0?'当':whereTypes.find((item)=>{return item.value == condition.logicalRelation}).label}}{{filterItems.find((item)=>{return item.filterCode == condition.filterCode}).filterName}}{{getFilterItem(condition.filterCode).logicalConditionList.find((item)=>{return item.logicalConditionCode == condition.logicalConditionCode}).logicalConditionName}}“{{!['IS NULL', 'IS NOT NULL'].includes(condition.logicalConditionCode)&&condition.logicalConditionCode == '<>'?condition.filterStart +'-' + condition.filterEnd:condition.filterValue}}”
                 </template>
             </span>
-            <span>归档年度：{{data.yearStart == '1900'?'不限':data.yearStart}}-{{data.yearEnd == year?'至今':data.yearEnd}}</span>
+            <!-- <span>归档年度：{{data.yearStart == '1900'?'不限':data.yearStart}}-{{data.yearEnd == year?'至今':data.yearEnd}}</span> -->
         </div>
         <iframe v-if="showIframe" :src="listFrameUrl" class="w-full list-frame" :style="{height:showAll?'70vh':'calc(100vh - 198px)'}"></iframe>
     </div>
@@ -129,7 +129,7 @@ export default {
                 clickFunctions: "",
                 clickFunctions2:"",
                 isShowSck:"fid!=null",
-                searchJumpUrl:"/p1000/idm/index.html#/preview/250729071300Ov3rrjEzPW4lg7MpkAW"
+                searchJumpUrl:"/ctrl/archiveProjectController/openAdvancedSearchPage"
             },
             urlObject:{},
             showAll:false,
@@ -153,8 +153,8 @@ export default {
             data: {
                 template: '',
                 conditions: [],
-                yearStart: '1900',
-                yearEnd: year.toString(),
+                yearStart: '',//1900
+                yearEnd: '',//year.toString()
                 fond: []
             },
             listFrameUrl: '',
@@ -241,8 +241,8 @@ export default {
                 logicalConditionCode: n.logicalConditionList[0]?.logicalConditionCode
             }))
             //将filterCode值存放在sessionStorage
-            sessionStorage.setItem('filterCode',this.data.conditions.map(n => n.filterCode).join(','))
-            console.log(this.data.conditions,"检索信息watch");
+            // sessionStorage.setItem('filterCode',this.data.conditions.map(n => n.filterCode).join(','))
+            // console.log(this.data.conditions,"检索信息watch");
         },
         'data.template': {
             handler(value) {
@@ -286,18 +286,21 @@ export default {
     },
     methods: {
         initData() {
-            window.IDM.http.get('ctrl/archive/search/getArchiveTypeList').then(({ data }) => {
-                this.fonds = data.data
-            })
-            window.IDM.http.get(`ctrl/archive/search/getFilterItems?fondsNo=${this.data.fond.join(',')}`).then(({ data }) => {
+            // window.IDM.http.get('http://localhost:8080/DreamOne/ctrl/archive/search/getArchiveTypeList').then(({ data }) => {
+            //     this.fonds = data.data
+            // })
+            window.IDM.http.get(`/ctrl/archive/search/getFilterItems?fondsNo=${this.data.fond.join(',')}`).then(({ data }) => {
                 this.filterItems = data.data
+                this.$nextTick(() => {
+                    this.search();
+                })
             })
             this.fetchTemplates();
-            this.search();
+            
             
         },
         fetchTemplates() {
-            window.IDM.http.get('ctrl/archive/search/getSearchTemplate').then(({ data }) => {
+            window.IDM.http.get('/ctrl/archive/search/getSearchTemplate').then(({ data }) => {
                 this.template.data = data.data
             })
         },
@@ -318,7 +321,7 @@ export default {
         fetchSearchKey(searchParam) {
             return window.IDM.http
                 .post(
-                    'ctrl/archive/search/addSearchParam',
+                    '/ctrl/archive/search/addSearchParam',
                     JSON.stringify({
                         searchParam
                     }),
@@ -334,7 +337,7 @@ export default {
             top.layer.open({
                 title: '检索模版',
                 type: 2,
-                content: window.IDM.url.getWebPath(`ctrl/list/250319092208sq8x43vH2MYG7xA346N?moduleId=250319090934qsa5CCFaQV6GeJOdvwe`),
+                content: window.IDM.url.getWebPath(`/ctrl/list/250319092208sq8x43vH2MYG7xA346N?moduleId=250319090934qsa5CCFaQV6GeJOdvwe`),
                 area: ['80vw', '80vh']
             })
         },
@@ -343,7 +346,7 @@ export default {
                 top.layer.open({
                     title: '保存为模版',
                     type: 2,
-                    content: window.IDM.url.getWebPath(`ctrl/formControl/sysForm?from=list&moduleId=250319090934qsa5CCFaQV6GeJOdvwe&searchParamKey=${key}`),
+                    content: window.IDM.url.getWebPath(`/ctrl/formControl/sysForm?from=list&moduleId=250319090934qsa5CCFaQV6GeJOdvwe&searchParamKey=${key}`),
                     area: ['1050px', '310px'],
                     end: () => {
                         this.fetchTemplates()
@@ -360,12 +363,16 @@ export default {
             this.showAll = false;
             this.showIframe = false;
             this.listFrameUrl = "";
-             sessionStorage.setItem('filterCode',this.data.conditions.map(n => n.filterCode).join(','))
-            console.log(this.data.conditions,"检索信息");
-            this.fetchSearchKey(this.conditionParams).then((key) => {
-                this.listFrameUrl = window.IDM.url.getWebPath(`${that.propData.searchJumpUrl}?moduleId=2406041600297BTvDAGGotrv6bHRewb&searchParamKey=${key}`)
-                this.showIframe = true;
-            })
+            // sessionStorage.setItem('filterCode',this.data.conditions.map(n => n.filterCode).join(','))
+            // console.log(this.data.conditions,"检索信息");
+            // this.fetchSearchKey(this.conditionParams).then((key) => {
+            //     this.listFrameUrl = window.IDM.url.getWebPath(`${that.propData.searchJumpUrl}?moduleId=2406041600297BTvDAGGotrv6bHRewb&searchParamKey=${key}`)
+            //     this.showIframe = true;
+            // })
+            console.log(this.data.conditions.map(n => n.filterCode).join(','),"ifarme");
+            
+            this.listFrameUrl = window.IDM.url.getWebPath(`${that.propData.searchJumpUrl}?filterCode=${this.data.conditions.map(n => n.filterCode).join(',')}`)
+            this.showIframe = true;
         },
         fileterCodeChange(value, condition) {
             const item = this.getFilterItem(condition.filterCode)

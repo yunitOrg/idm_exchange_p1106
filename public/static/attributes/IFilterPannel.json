@@ -20,7 +20,7 @@
           "text": "搜索列表页地址",
           "desc": "搜索列表页地址默认为：ctrl/list/250324093129UzcvL2G3daLlcfmEPLL",
           "bindKey": "searchJumpUrl",
-          "default": "ctrl/list/250324093129UzcvL2G3daLlcfmEPLL"
+          "default": "ctrl/archiveProjectController/openAdvancedSearchPage"
         },
         {
             "type": "group",
