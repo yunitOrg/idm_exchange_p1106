@@ -369,9 +369,13 @@ export default {
             //     this.listFrameUrl = window.IDM.url.getWebPath(`${that.propData.searchJumpUrl}?moduleId=2406041600297BTvDAGGotrv6bHRewb&searchParamKey=${key}`)
             //     this.showIframe = true;
             // })
-            console.log(this.data.conditions.map(n => n.filterCode).join(','),"ifarme");
-            
-            this.listFrameUrl = window.IDM.url.getWebPath(`${that.propData.searchJumpUrl}?filterCode=${this.data.conditions.map(n => n.filterCode).join(',')}`)
+            console.log(JSON.stringify(this.data.conditions))
+            // 1. 将this.data.conditions转换为JSON字符串
+            let filtersStr= JSON.stringify(this.data.conditions)
+            // 2. URL编码
+            const encodedFilters = encodeURIComponent(filtersStr);
+
+            this.listFrameUrl = window.IDM.url.getWebPath(`${that.propData.searchJumpUrl}?filters=${encodedFilters}`)        
             this.showIframe = true;
         },
         fileterCodeChange(value, condition) {
