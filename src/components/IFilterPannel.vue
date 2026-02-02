@@ -5,7 +5,16 @@
                 <el-form-item label="常用模版">
                     <div class="flex items-start gap-2">
                         <el-radio-group v-model="data.template" size="small" class="flex-1 w-0">
-                            <el-radio v-for="n in templates" :key="n.id" :label="n.id" :border="true">{{ n.bt }}</el-radio>
+                            <!-- 修改处：添加 @click.native.prevent="toggleTemplate(n.id)" -->
+                            <el-radio 
+                                v-for="n in templates" 
+                                :key="n.id" 
+                                :label="n.id" 
+                                :border="true"
+                                @click.native.prevent="toggleTemplate(n.id)"
+                            >
+                                {{ n.bt }}
+                            </el-radio>
                         </el-radio-group>
                         <el-button v-if="template.data.length > 4" @click="template.expand = !template.expand" size="small">{{ template.expand ? '收起' : '更多' }}</el-button>
                     </div>
@@ -60,7 +69,7 @@
                                     <!-- <div v-else-if="getFilterItem(condition.filterCode).filterController == 'controlComboBox'" class="flex gap-2">
                                         <el-select v-model="condition.filterValues" multiple filterable allow-create default-first-option class="flex-1"> </el-select>
                                     </div> -->
-                                    <el-input v-else v-model="condition.filterValue"></el-input>
+                                    <el-input v-else v-model="condition.filterValue" clearable placeholder="请输入" ></el-input>
                                 </template>
                             </div>
                             <div class="flex items-center gap-2 condition-actions">
@@ -98,7 +107,7 @@
                     <el-button @click="search" type="primary">检索</el-button>
                     <el-button @click="viewTemplate">检索模版</el-button>
                     <el-button @click="saveTemplate">保存为模版</el-button>
-                    <el-button @click="exportTemplate">导出</el-button>
+                    <!-- <el-button @click="exportTemplate">导出</el-button> -->
                     <el-button v-if="urlObject.fid!=null" @click="addToMaterial">加入素材库</el-button>
                 </div>
                 <div class="expanded" :class="{open:showAll}" @click="showAll = !showAll;">高级检索</div>
@@ -245,30 +254,51 @@ export default {
             // console.log(this.data.conditions,"检索信息watch");
         },
         'data.template': {
-            handler(value) {
-                const searchParam = JSON.parse(this.template.data.find((n) => n.id == value).searchParam || [])
-                this.data.conditions = searchParam
-                    .filter((n) => !['ARCHIVE_YEAR', 'FONDS_NO', 'ARCHIVE_TYPE'].includes(n.filterCode))
-                    .map((n) => {
-                        if (n.filterController == 'controlDateTime' && n.logicalConditionCode == '<>') {
-                            const dates = n.filterValue.split(' - ')
-                            n.filterStart = dates[0]
-                            n.filterEnd = dates[1]
-                        }
-                        return n
-                    })
-                const years = searchParam.find((n) => n.filterCode == 'ARCHIVE_YEAR')?.filterValue.split(' - ')
-                if (years) {
-                    this.data.yearStart = years[0]
-                    this.data.yearEnd = years[1]
-                }
-                const fonds = searchParam.find((n) => n.filterCode == 'FONDS_NO')?.filterValue.split(',')
-                const types = searchParam.find((n) => n.filterCode == 'ARCHIVE_TYPE')?.filterValue.split(',')
-                if (fonds) {
-                    this.data.fond = fonds.map((n, i) => [n, types[i]])
-                }
+        handler(value) {
+            // 新增：如果 value 为空（取消选中时），清空条件或重置为初始状态
+            if (!value) {
+                // 这里可以选择重置为空白条件，或者保持不变，根据需求调整
+                // 示例：重置回默认的一行空条件
+                this.data.conditions = [{
+                    filterCode: this.filterItems[0]?.filterCode || '',
+                    filterValue: '',
+                    logicalRelation: 'AND',
+                    logicalConditionCode: this.filterItems[0]?.logicalConditionList[0]?.logicalConditionCode || ''
+                }];
+                this.data.yearStart = '';
+                this.data.yearEnd = '';
+                this.data.fond = [];
+                return; // 结束执行，防止下面报错
             }
-        },
+
+            // 原有逻辑
+            const templateData = this.template.data.find((n) => n.id == value);
+            // 安全校验：防止找不到数据报错
+            if (!templateData) return;
+
+            const searchParam = JSON.parse(templateData.searchParam || [])
+            this.data.conditions = searchParam
+                .filter((n) => !['ARCHIVE_YEAR', 'FONDS_NO', 'ARCHIVE_TYPE'].includes(n.filterCode))
+                .map((n) => {
+                    if (n.filterController == 'controlDateTime' && n.logicalConditionCode == '<>') {
+                        const dates = n.filterValue.split(' - ')
+                        n.filterStart = dates[0]
+                        n.filterEnd = dates[1]
+                    }
+                    return n
+                })
+            const years = searchParam.find((n) => n.filterCode == 'ARCHIVE_YEAR')?.filterValue.split(' - ')
+            if (years) {
+                this.data.yearStart = years[0]
+                this.data.yearEnd = years[1]
+            }
+            const fonds = searchParam.find((n) => n.filterCode == 'FONDS_NO')?.filterValue.split(',')
+            const types = searchParam.find((n) => n.filterCode == 'ARCHIVE_TYPE')?.filterValue.split(',')
+            if (fonds) {
+                this.data.fond = fonds.map((n, i) => [n, types[i]])
+            }
+        }
+    },
         'data.fond': {
             handler(value) {
                 console.log(value);
@@ -303,6 +333,16 @@ export default {
             window.IDM.http.get('/ctrl/archive/search/getSearchTemplate').then(({ data }) => {
                 this.template.data = data.data
             })
+        },
+        // 新增：切换模版选中状态
+        toggleTemplate(id) {
+            if (this.data.template === id) {
+                // 如果当前已经选中该值，则清空（取消选中）
+                this.data.template = '';
+            } else {
+                // 否则选中该值
+                this.data.template = id;
+            }
         },
         getFilterItem(filterCode) {
             return this.filterItems.find((n) => n.filterCode == filterCode)
