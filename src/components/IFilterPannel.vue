@@ -80,7 +80,7 @@
                                                 v-for="m in (getFilterItem(condition.filterCode).childrenCode || [])" 
                                                 :key="m.codeValue" 
                                                 :label="m.codeName" 
-                                                :value="m.codeValue"
+                                                :value="m.codeName"
                                             ></el-option>
                                         </el-select>
                                     </div>
@@ -134,13 +134,13 @@
             <span v-if="data.fond.length">全宗号：{{data.fond.join(",")}}</span>
             <span>
                 <template v-for="(condition, i) in data.conditions">
-                    <!-- 前面的逻辑保持不变 -->
+                {{i==0?'当':whereTypes.find((item)=>{return item.value == condition.logicalRelation}).label}}{{filterItems.find((item)=>{return item.filterCode == condition.filterCode}).filterName}}{{getFilterItem(condition.filterCode).logicalConditionList.find((item)=>{return item.logicalConditionCode == condition.logicalConditionCode}).logicalConditionName}}“{{!['IS NULL', 'IS NOT NULL'].includes(condition.logicalConditionCode)&&condition.logicalConditionCode == '<>'?condition.filterStart +'-' + condition.filterEnd:condition.filterValue}}”
+                </template>
+                <!-- <template v-for="(condition, i) in data.conditions">
                     {{i==0?'当':whereTypes.find((item)=>{return item.value == condition.logicalRelation}).label}}{{filterItems.find((item)=>{return item.filterCode == condition.filterCode}).filterName}}{{getFilterItem(condition.filterCode).logicalConditionList.find((item)=>{return item.logicalConditionCode == condition.logicalConditionCode}).logicalConditionName}}
                     
-                    <!-- 修改这里：调用方法获取显示名称 -->
                     “{{ getDisplayValue(condition) }}”
-                    
-                </template>
+                </template> -->
             </span>
             <!-- <span>归档年度：{{data.yearStart == '1900'?'不限':data.yearStart}}-{{data.yearEnd == year?'至今':data.yearEnd}}</span> -->
         </div>
