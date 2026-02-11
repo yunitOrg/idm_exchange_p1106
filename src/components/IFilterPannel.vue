@@ -66,9 +66,24 @@
                                         <el-date-picker v-else v-model="condition.filterValue" type="date" placeholder="选择日期" value-format="yyyy-MM-dd" class="flex-1">
                                         </el-date-picker>
                                     </div>
-                                    <!-- <div v-else-if="getFilterItem(condition.filterCode).filterController == 'controlComboBox'" class="flex gap-2">
-                                        <el-select v-model="condition.filterValues" multiple filterable allow-create default-first-option class="flex-1"> </el-select>
-                                    </div> -->
+                                   <div v-else-if="getFilterItem(condition.filterCode).filterController == 'controlComboBox'" class="flex gap-2">
+                                      
+                                        <el-select 
+                                            v-model="condition.filterValue" 
+                                            filterable 
+                                            clearable
+                                            class="flex-1"
+                                            placeholder="请选择"
+                                        >
+                                         
+                                            <el-option 
+                                                v-for="m in (getFilterItem(condition.filterCode).childrenCode || [])" 
+                                                :key="m.codeValue" 
+                                                :label="m.codeName" 
+                                                :value="m.codeValue"
+                                            ></el-option>
+                                        </el-select>
+                                    </div>
                                     <el-input v-else v-model="condition.filterValue" clearable placeholder="请输入" ></el-input>
                                 </template>
                             </div>
@@ -119,7 +134,12 @@
             <span v-if="data.fond.length">全宗号：{{data.fond.join(",")}}</span>
             <span>
                 <template v-for="(condition, i) in data.conditions">
-                {{i==0?'当':whereTypes.find((item)=>{return item.value == condition.logicalRelation}).label}}{{filterItems.find((item)=>{return item.filterCode == condition.filterCode}).filterName}}{{getFilterItem(condition.filterCode).logicalConditionList.find((item)=>{return item.logicalConditionCode == condition.logicalConditionCode}).logicalConditionName}}“{{!['IS NULL', 'IS NOT NULL'].includes(condition.logicalConditionCode)&&condition.logicalConditionCode == '<>'?condition.filterStart +'-' + condition.filterEnd:condition.filterValue}}”
+                    <!-- 前面的逻辑保持不变 -->
+                    {{i==0?'当':whereTypes.find((item)=>{return item.value == condition.logicalRelation}).label}}{{filterItems.find((item)=>{return item.filterCode == condition.filterCode}).filterName}}{{getFilterItem(condition.filterCode).logicalConditionList.find((item)=>{return item.logicalConditionCode == condition.logicalConditionCode}).logicalConditionName}}
+                    
+                    <!-- 修改这里：调用方法获取显示名称 -->
+                    “{{ getDisplayValue(condition) }}”
+                    
                 </template>
             </span>
             <!-- <span>归档年度：{{data.yearStart == '1900'?'不限':data.yearStart}}-{{data.yearEnd == year?'至今':data.yearEnd}}</span> -->
@@ -211,12 +231,18 @@ export default {
             return this.data.conditions
                 .map((n) => {
                     const item = this.getFilterItem(n.filterCode)
+                    
+                    // --- 新增/修改逻辑开始 ---
+                    // 处理 controlComboBox：将数组转换为逗号分隔的字符串
+                    if (item && item.filterController === 'controlComboBox' && Array.isArray(n.filterValue)) {
+                        n.filterValue = n.filterValue.join(',')
+                    }
+                    // --- 新增/修改逻辑结束 ---
+
                     if (item.filterController == 'controlDateTime' && n.logicalConditionCode == '<>') {
                         n.filterValue = `${n.filterStart} - ${n.filterEnd}`
                     }
-                    // if (item.filterController == 'controlComboBox') {
-                    //     n.filterValue = n.filterValues.join(',')
-                    // }
+                    
                     return {
                         filterCode: n.filterCode,
                         filterValue: n.filterValue,
@@ -232,7 +258,7 @@ export default {
                         logicalRelation: 'AND'
                     }
                 ])
-                .concat(this.fondParams || [])
+                 .concat(this.fondParams || [])
                 .filter((n) => {
                     if (!['IS NULL', 'IS NOT NULL'].includes(n.logicalConditionCode) && n.filterValue == '') {
                         return false
@@ -255,31 +281,41 @@ export default {
         },
         'data.template': {
         handler(value) {
-            // 新增：如果 value 为空（取消选中时），清空条件或重置为初始状态
-            if (!value) {
-                // 这里可以选择重置为空白条件，或者保持不变，根据需求调整
-                // 示例：重置回默认的一行空条件
-                this.data.conditions = [{
+           if (!value) {
+                 // ... 清空逻辑保持你原来的 ...
+                 this.data.conditions = [{
                     filterCode: this.filterItems[0]?.filterCode || '',
                     filterValue: '',
                     logicalRelation: 'AND',
                     logicalConditionCode: this.filterItems[0]?.logicalConditionList[0]?.logicalConditionCode || ''
                 }];
-                this.data.yearStart = '';
-                this.data.yearEnd = '';
-                this.data.fond = [];
-                return; // 结束执行，防止下面报错
+                    this.data.yearStart = '';
+                    this.data.yearEnd = '';
+                    this.data.fond = [];
+                return;
             }
 
-            // 原有逻辑
             const templateData = this.template.data.find((n) => n.id == value);
-            // 安全校验：防止找不到数据报错
             if (!templateData) return;
 
             const searchParam = JSON.parse(templateData.searchParam || [])
             this.data.conditions = searchParam
                 .filter((n) => !['ARCHIVE_YEAR', 'FONDS_NO', 'ARCHIVE_TYPE'].includes(n.filterCode))
                 .map((n) => {
+                    // --- 新增逻辑：处理 ComboBox 回显 ---
+                    // 必须先获取 filterItem 定义才能知道是不是下拉框
+                    // 注意：这里有个风险，如果 filterItems 还没加载完，可能找不到 item。
+                    // 通常模版加载在 filterItems 之后，如果顺序不确定，这里需要健壮性判断。
+                    const itemDef = this.getFilterItem(n.filterCode); 
+                    
+                    if (itemDef && itemDef.filterController === 'controlComboBox') {
+                        // 如果有逗号分隔的字符串，转为数组；否则为空数组
+                        n.filterValue = n.filterValue ? n.filterValue.split(',') : [];
+                    } else {
+                        n.filterValue = [];
+                    }
+                    // ----------------------------------
+
                     if (n.filterController == 'controlDateTime' && n.logicalConditionCode == '<>') {
                         const dates = n.filterValue.split(' - ')
                         n.filterStart = dates[0]
@@ -345,12 +381,15 @@ export default {
             }
         },
         getFilterItem(filterCode) {
-            return this.filterItems.find((n) => n.filterCode == filterCode)
+          return this.filterItems.find((n) => n.filterCode == filterCode) || {} 
         },
         addCondition(item, index) {
+            // 判断当前要添加的这个配置是不是下拉框
+            const isCombo = item.filterController === 'controlComboBox';
+            
             this.data.conditions.splice(index + 1, 0, {
                 ..._.cloneDeep(item),
-                filterValue: '',
+                filterValue: isCombo ? [] :'', // 显式初始化数组
                 filterStart: '',
                 filterEnd: ''
             })
@@ -418,14 +457,59 @@ export default {
             this.listFrameUrl = window.IDM.url.getWebPath(`${that.propData.searchJumpUrl}?filters=${encodedFilters}`)        
             this.showIframe = true;
         },
+        // 新增：用于格式化显示筛选值
+        getDisplayValue(condition) {
+            // 1. 获取当前条件的配置项
+            const item = this.getFilterItem(condition.filterCode);
+            
+            // 2. 处理日期范围 (保留原逻辑)
+            if (!['IS NULL', 'IS NOT NULL'].includes(condition.logicalConditionCode) && condition.logicalConditionCode == '<>') {
+                return condition.filterStart + ' - ' + condition.filterEnd;
+            }
+
+            // 3. 处理下拉框 (controlComboBox) - 核心修改点
+            if (item && item.filterController === 'controlComboBox') {
+                const options = item.childrenCode || [];
+                const val = condition.filterValue;
+
+                // 如果值是数组（多选情况），则转换所有选项并用逗号拼接
+                if (Array.isArray(val)) {
+                    return val.map(v => {
+                        const found = options.find(opt => opt.codeValue == v);
+                        return found ? found.codeName : v;
+                    }).join(',');
+                }
+                
+                // 如果值是字符串（单选情况）
+                const found = options.find(opt => opt.codeValue == val);
+                return found ? found.codeName : val;
+            }
+
+            // 4. 其他情况（文本框等）直接返回值
+            return condition.filterValue;
+        },
         fileterCodeChange(value, condition) {
             const item = this.getFilterItem(condition.filterCode)
-            condition.logicalConditionCode = item.logicalConditionList[0].logicalConditionCode
-            // if (item.filterController == 'controlComboBox') {
-            //     this.$set(condition, 'filterValues', [])
-            //     return
-            // }
+            
+            // 设置默认逻辑符
+            if(item.logicalConditionList && item.logicalConditionList.length > 0){
+                condition.logicalConditionCode = item.logicalConditionList[0].logicalConditionCode
+            }
+
+          
+            // 如果是下拉框，初始化 filterValue 为空数组
+            if (item.filterController === 'controlComboBox') {
+                this.$set(condition, 'filterValue', []) // 使用 $set 确保响应式
+            } else {
+                // 如果不是下拉框，可以清理掉这个属性（可选）
+                if(condition.filterValue) condition.filterValue = []; 
+            }
+            // --- 新增逻辑结束 ---
+
             condition.filterValue = ''
+            // 同时也清空时间
+            condition.filterStart = ''
+            condition.filterEnd = ''
         },
         logicalChange(value, condition) {
             condition.filterValue = ''
