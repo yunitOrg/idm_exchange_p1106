@@ -130,21 +130,24 @@
 
             </el-form>
         </div>
-        <div class="simpleFormData">
-            <span v-if="data.fond.length">全宗号：{{data.fond.join(",")}}</span>
-            <span>
-                <template v-for="(condition, i) in data.conditions">
-                {{i==0?'当':whereTypes.find((item)=>{return item.value == condition.logicalRelation}).label}}{{filterItems.find((item)=>{return item.filterCode == condition.filterCode}).filterName}}{{getFilterItem(condition.filterCode).logicalConditionList.find((item)=>{return item.logicalConditionCode == condition.logicalConditionCode}).logicalConditionName}}“{{!['IS NULL', 'IS NOT NULL'].includes(condition.logicalConditionCode)&&condition.logicalConditionCode == '<>'?condition.filterStart +'-' + condition.filterEnd:condition.filterValue}}”
-                </template>
-                <!-- <template v-for="(condition, i) in data.conditions">
-                    {{i==0?'当':whereTypes.find((item)=>{return item.value == condition.logicalRelation}).label}}{{filterItems.find((item)=>{return item.filterCode == condition.filterCode}).filterName}}{{getFilterItem(condition.filterCode).logicalConditionList.find((item)=>{return item.logicalConditionCode == condition.logicalConditionCode}).logicalConditionName}}
-                    
-                    “{{ getDisplayValue(condition) }}”
-                </template> -->
-            </span>
-            <!-- <span>归档年度：{{data.yearStart == '1900'?'不限':data.yearStart}}-{{data.yearEnd == year?'至今':data.yearEnd}}</span> -->
+        <div class="w-full list-frame-container" :style="{height:showAll?'70vh':'calc(100vh - 198px)'}">
+            <div class="simpleFormData">
+                <span v-if="data.fond.length">全宗号：{{data.fond.join(",")}}</span>
+                <span>
+                    <template v-for="(condition, i) in data.conditions">
+                    {{i==0?'当':whereTypes.find((item)=>{return item.value == condition.logicalRelation}).label}}{{filterItems.find((item)=>{return item.filterCode == condition.filterCode}).filterName}}{{getFilterItem(condition.filterCode).logicalConditionList.find((item)=>{return item.logicalConditionCode == condition.logicalConditionCode}).logicalConditionName}}“{{!['IS NULL', 'IS NOT NULL'].includes(condition.logicalConditionCode)&&condition.logicalConditionCode == '<>'?condition.filterStart +'-' + condition.filterEnd:condition.filterValue}}”
+                    </template>
+                    <!-- <template v-for="(condition, i) in data.conditions">
+                        {{i==0?'当':whereTypes.find((item)=>{return item.value == condition.logicalRelation}).label}}{{filterItems.find((item)=>{return item.filterCode == condition.filterCode}).filterName}}{{getFilterItem(condition.filterCode).logicalConditionList.find((item)=>{return item.logicalConditionCode == condition.logicalConditionCode}).logicalConditionName}}
+                        
+                        “{{ getDisplayValue(condition) }}”
+                    </template> -->
+                </span>
+                <!-- <span>归档年度：{{data.yearStart == '1900'?'不限':data.yearStart}}-{{data.yearEnd == year?'至今':data.yearEnd}}</span> -->
+            </div>
+
+            <iframe :src="listFrameUrl" class=" list-frame" :style="{width:'100%'}"></iframe>
         </div>
-        <iframe v-if="showIframe" :src="listFrameUrl" class="w-full list-frame" :style="{height:showAll?'70vh':'calc(100vh - 198px)'}"></iframe>
     </div>
 </template>
 <script>
@@ -652,8 +655,14 @@ export default {
         }
     }
 }
-.list-frame {
-    border: none;
-    height: 70vh;
+.list-frame-container{
+    position: relative;
+    .simpleFormData{
+        position: absolute;
+    }
+    .list-frame {
+        border: none;
+        height: 100%;
+    }
 }
 </style>
