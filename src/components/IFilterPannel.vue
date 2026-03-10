@@ -659,6 +659,7 @@ export default {
     position: relative;
     .simpleFormData{
         position: absolute;
+        top: 25px;
     }
     .list-frame {
         border: none;
