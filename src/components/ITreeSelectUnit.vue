@@ -309,6 +309,18 @@ export default {
     this.moduleObject = this.$root.moduleObject;
     this.init()
     this.setHeight = { "height": document.body.offsetHeight + 'px' }
+    
+    // 获取选择的单位、文件、附件 2026年3月25日16:54:32@luy 提供全局方法给父页面调用
+    window.getTreeSelectData=()=>{
+      return {
+        // 单位
+        chooseUnit: this.chooseUnit,
+        // 文件
+        chooseFile: this.fileLib.filter(item => item.checkboxItem),
+        // 附件
+        chooseRelationFile: this.chooseFile.filter(item => item.checkboxItem)
+      }
+    }
   },
   methods: {
     // 批量修改
