@@ -26,7 +26,7 @@
       "comLangue": "vue"
     },
     {
-      "classId": "idm.componet.exchange.Itreeselectunit",
+      "classId": "idm.componet.exchange.ITreeSelectUnit",
       "comName": "树形选择单位",
       "className": "ITreeSelectUnit",
       "comType": "common",
@@ -55,7 +55,7 @@
     },
     {
       "classId": "idm.componet.exchange.ITreeSelectUnit2",
-      "comName": "树形选择单位",
+      "comName": "树形选择单位2",
       "className": "ITreeSelectUnit2",
       "comType": "common",
       "comLangue": "vue"

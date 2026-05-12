@@ -1,6 +1,6 @@
 {
   "classId": "idm.componet.exchange.ITreeSelectUnit2",
-  "comName": "选择单位",
+  "comName": "树形选择单位2",
   "className": "ITreeSelectUnit2",
   "comType": "common",
   "comLangue": "vue",

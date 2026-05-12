@@ -1,25 +1,25 @@
 export default {
     // 获取系统配置
     handleGetSystemSetting(key) {
-        return IDM.http.getSync('/ctrl/idm/form/getSysConfigInfo', { key })
+        return IDM.http.getSync('ctrl/idm/form/getSysConfigInfo', { key })
     },
     /**
     * @Desc 单位选择-常用组-单位
     * @Author hjp
     */
-    async ApiExchangeList({isdir,sendLevel, pk, moduleId, operationFlag, flat, mode, recordId}) {
+    async ApiExchangeList({ isdir, sendLevel, pk, moduleId, operationFlag, flat, mode, recordId }) {
         let formdata = new FormData();
         isdir && formdata.append('isdir', isdir)
         sendLevel && formdata.append('sendLevel', sendLevel)
         pk && formdata.append('pk', pk)
         moduleId && formdata.append('moduleId', moduleId)
         operationFlag && formdata.append('operationFlag', operationFlag)
-        flat &&  formdata.append('flat', flat)
+        flat && formdata.append('flat', flat)
         mode && formdata.append('mode', mode)
         recordId && formdata.append('recordId', recordId)
         const { data } = await window.IDM.http.post('ctrl/customExchange/selSendRange', formdata, {
             headers: {
-            'Content-Type': 'application/json'
+                'Content-Type': 'application/json'
             },
         })
         return data
@@ -28,14 +28,14 @@ export default {
     * @Desc 单位选择-附件
     * @Author hjp
     */
-    async ApiUnitExchangeList({moduleId, pk, selectAtt}) {
+    async ApiUnitExchangeList({ moduleId, pk, selectAtt }) {
         let formdata = new FormData();
         moduleId && formdata.append('moduleId', moduleId)
         pk && formdata.append('pk', pk)
         selectAtt && formdata.append('selectAtt', selectAtt)
         const { data } = await window.IDM.http.post('ctrl/remoteExchangeView/attachmentData', formdata, {
             headers: {
-            'Content-Type': 'application/json'
+                'Content-Type': 'application/json'
             },
         })
         return data
@@ -44,14 +44,14 @@ export default {
     * @Desc 单位选择-文件
     * @Author hjp
     */
-    async ApiUnitFileList({moduleId, pk, selectFileRelationValue}) {
+    async ApiUnitFileList({ moduleId, pk, selectFileRelationValue }) {
         let formdata = new FormData();
         moduleId && formdata.append('moduleId', moduleId)
         pk && formdata.append('pk', pk)
         selectFileRelationValue && formdata.append('selectFileRelationValue', selectFileRelationValue)
         const { data } = await window.IDM.http.post('ctrl/remoteExchangeView/fileRelationData', formdata, {
             headers: {
-            'Content-Type': 'application/json'
+                'Content-Type': 'application/json'
             },
         })
         return data
@@ -60,14 +60,14 @@ export default {
     * @Desc 单位选择-更新常用组
     * @Author hjp
     */
-    async ApiUpdateGroup({groupId, ids, texts}) {
+    async ApiUpdateGroup({ groupId, ids, texts }) {
         let formdata = new FormData();
         formdata.append('groupId', groupId)
         formdata.append('ids', ids)
         formdata.append('texts', texts)
         const { data } = await window.IDM.http.post('ctrl/remoteZsdw/updateZsdwGroup', formdata, {
             headers: {
-            'Content-Type': 'application/json'
+                'Content-Type': 'application/json'
             },
         })
         return data
@@ -76,39 +76,39 @@ export default {
     * @Desc 单位选择-创建组
     * @Author hjp
     */
-    async ApiSaveGroup({name, ids, texts}) {
+    async ApiSaveGroup({ name, ids, texts }) {
         let formdata = new FormData();
         formdata.append('name', name)
         formdata.append('ids', ids)
         formdata.append('texts', texts)
         const { data } = await window.IDM.http.post('ctrl/remoteZsdw/saveZsdwGroup', formdata, {
             headers: {
-            'Content-Type': 'application/json'
+                'Content-Type': 'application/json'
             },
         })
         return data
     },
-     /**
-    * @Desc 单位选择-删除组
-    * @Author hjp
-    */
-     async ApiDeleteGroup({groupId}) {
+    /**
+   * @Desc 单位选择-删除组
+   * @Author hjp
+   */
+    async ApiDeleteGroup({ groupId }) {
         let formdata = new FormData();
         formdata.append('groupId', groupId)
         const { data } = await window.IDM.http.post('ctrl/remoteZsdw/delZsdwGroup', formdata, {
             headers: {
-            'Content-Type': 'application/json'
+                'Content-Type': 'application/json'
             },
         })
         return data
     },
-    
+
 
     /**
     * @Desc 树形-单位选择-常用组
     * @Author hjp
     */
-    async ApiGetTreeListGroup({isdir, infotype, pk, moduleId, exchangeModeId, sendType,selectAttvalue,isJoint,flat,templateId, operationFlag, sendLevel, mode, recordId}) {
+    async ApiGetTreeListGroup({ isdir, infotype, pk, moduleId, exchangeModeId, sendType, selectAttvalue, isJoint, flat, templateId, operationFlag, sendLevel, mode, recordId }) {
         let formdata = new FormData();
         isdir && formdata.append('isdir', isdir)
         sendLevel && formdata.append('sendLevel', sendLevel)
@@ -126,7 +126,7 @@ export default {
         recordId && formdata.append('recordId', recordId)
         const { data } = await window.IDM.http.post('ctrl/customExchange/selSendRange', formdata, {
             headers: {
-            'Content-Type': 'application/json'
+                'Content-Type': 'application/json'
             },
         })
         return data
