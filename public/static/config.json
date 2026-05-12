@@ -52,6 +52,13 @@
         "className": "IBreadcrumb",
         "comType": "common",
         "comLangue": "vue"
+    },
+    {
+      "classId": "idm.componet.exchange.ITreeSelectUnit2",
+      "comName": "树形选择单位",
+      "className": "ITreeSelectUnit2",
+      "comType": "common",
+      "comLangue": "vue"
     }
   ]
 }
