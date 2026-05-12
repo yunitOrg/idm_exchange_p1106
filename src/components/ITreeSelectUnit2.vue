@@ -21,8 +21,6 @@
             <span class="selecttip-icon"></span>
             <span>选择机构</span>
           </div>
-
-          <!-- 新增 Tab 页签区域，加入 ref="unitTabs" 以便动态计算高度 -->
           <div class="unit-tabs" ref="unitTabs" v-show="!showSearchDialog && tabList.length > 0">
             <div v-for="tab in tabList" :key="tab.id" class="unit-tab-item" :class="{ 'active': activeTabKey === tab.id }"
               @click="activeTabKey = tab.id">
@@ -30,11 +28,8 @@
             </div>
           </div>
 
-          <!-- 左侧单位树容器，使用专属的 leftSetHeight (已减去 Tab 高度) -->
           <div class="unit-box" :style="leftSetHeight">
             <a-spin class="select-loading" :spinning="loading"></a-spin>
-
-            <!-- 根据 Tab 切换展示树 -->
             <div class="unit-list" v-show="!showSearchDialog">
               <div v-for="(item, index) in tabList" :key="index" v-show="activeTabKey === item.id">
                 <!-- 这里展示当前 Tab 对应的顶级节点 -->
@@ -46,12 +41,10 @@
                   <span v-else>{{ item.name }}</span>
                   <span class="namecol" @click="hadnleAllChoose(item)">(全选下级)</span>
                 </div>
-                <!-- 递归展示子级 -->
                 <treeSelectUnit2 :item="item" v-show="item.shrink" ref="treeSelect"></treeSelectUnit2>
               </div>
             </div>
 
-            <!-- 搜索结果 -->
             <div v-show="showSearchDialog">
               <div class="searchul" v-if="pinyinAryAll.length > 0">
                 <div v-for="(item, index) in pinyinAryAll" :key="index" :class="{
@@ -89,7 +82,6 @@
               <span v-if="tablelist.enableDown == 1">下载次数</span>
             </span>
           </div>
-          <!-- 右侧已选容器，继续使用 setHeight -->
           <div class="chooseAly" :style="setHeight">
             <div class="choose-line" v-for="(item, index) in chooseUnit" :key="index">
               <span class="w40">{{ item.name }}</span>
@@ -152,7 +144,6 @@
           </div>
         </div>
       </div>
-      <!--顶部按钮-->
       <div class="treeselect-foot" :style="`bottom:${propData.footBottom}`">
         <a-button type="primary" class="themeBtn" @click="handleSure">确定</a-button>
         <a-button @click="hanldeNone">取消</a-button>
@@ -176,8 +167,8 @@ export default {
   data() {
     return {
       numValue: '',
-      setHeight: {}, // 用于右侧的高度
-      leftSetHeight: {}, // 新增：专属左侧带Tab的高度计算
+      setHeight: {}, 
+      leftSetHeight: {}, 
       defaultPrintNum: 1,
       loading: false,
       // 总数据
@@ -191,7 +182,6 @@ export default {
       chooseFile: [],
       // 附件数据
       fileLib: [],
-      // Tab 列表（原来的 unitTree 分拆）
       tabList: [],
       activeTabKey: '',
       // 选择的单位
@@ -207,7 +197,6 @@ export default {
     }
   },
   watch: {
-    // 监听 Tab 切换，切换时确保当前 Tab 及其第一层级展开
     activeTabKey(newVal) {
       if (newVal) {
         let currentTab = this.tabList.find(t => t.id === newVal);
@@ -217,7 +206,6 @@ export default {
           if (!this.defaultTreeKeys.includes(currentTab.id)) {
             this.defaultTreeKeys.push(currentTab.id);
           }
-          // 确保第一层子节点也是展开状态
           if (currentTab.children && currentTab.children.length > 0) {
             currentTab.children.forEach(child => {
               this.$set(child, 'shrink', true);
@@ -282,17 +270,11 @@ export default {
       else if ((!flag || this.fileLib.length) && (!flag && this.chooseFile.length)) {
         height = contentHeight - (this.$refs.selectLibItem?.offsetHeight || 0) - (this.$refs.selectFileItem?.offsetHeight || 0);
       }
-
-      // 赋值右侧的高度保持原本逻辑不变
       this.setHeight = { "height": height + 'px' }
-
-      // 动态获取新加的 tab 区域的高度
       let tabHeight = 0;
       if (this.$refs.unitTabs && !this.showSearchDialog && this.tabList.length > 0) {
         tabHeight = this.$refs.unitTabs.offsetHeight || 0;
       }
-
-      // 左侧高度需额外减去 tab 的高度
       this.leftSetHeight = { "height": (height - tabHeight) + 'px' }
     },
     handleGetImg(item) {
@@ -320,7 +302,6 @@ export default {
       } else {
         this.showSearchDialog = false;
       }
-      // 添加重新计算高度，以适应 tab 隐藏/展示带来的高度变化
       this.$nextTick(() => {
         this.handleSetHeight();
       });
@@ -526,10 +507,8 @@ export default {
         this.tablelist = obj;
         let { codeList } = obj;
 
-        // 过滤顶级节点作为 Tab，排除 zsdwRootGroup
         let tabs = codeList.filter(item => item.pid === "0" && item.id !== 'zsdwRootGroup');
 
-        // 初始化时将所有 Tab 及其第一级子节点推入 defaultTreeKeys 默认展开
         tabs.forEach(tab => {
           if (!this.defaultTreeKeys.includes(tab.id)) {
             this.defaultTreeKeys.push(tab.id);
@@ -550,8 +529,6 @@ export default {
           this.activeTabKey = this.tabList[0].id;
         }
         this.handleDataBack();
-
-        // 确保数据渲染后计算高度
         this.$nextTick(() => {
           this.handleSetHeight();
         });
