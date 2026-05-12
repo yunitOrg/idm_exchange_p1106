@@ -1,7 +1,8 @@
 export default {
+    // http://localhost:8080/DreamWeb/ctrl
     // 获取系统配置
     handleGetSystemSetting(key) {
-        return IDM.http.getSync('ctrl/idm/form/getSysConfigInfo', { key })
+        return IDM.http.getSync('/ctrl/idm/form/getSysConfigInfo', { key })
     },
     /**
     * @Desc 单位选择-常用组-单位
@@ -17,7 +18,7 @@ export default {
         flat && formdata.append('flat', flat)
         mode && formdata.append('mode', mode)
         recordId && formdata.append('recordId', recordId)
-        const { data } = await window.IDM.http.post('ctrl/customExchange/selSendRange', formdata, {
+        const { data } = await window.IDM.http.post('/ctrl/customExchange/selSendRange', formdata, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -33,7 +34,7 @@ export default {
         moduleId && formdata.append('moduleId', moduleId)
         pk && formdata.append('pk', pk)
         selectAtt && formdata.append('selectAtt', selectAtt)
-        const { data } = await window.IDM.http.post('ctrl/remoteExchangeView/attachmentData', formdata, {
+        const { data } = await window.IDM.http.post('/ctrl/remoteExchangeView/attachmentData', formdata, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -49,7 +50,7 @@ export default {
         moduleId && formdata.append('moduleId', moduleId)
         pk && formdata.append('pk', pk)
         selectFileRelationValue && formdata.append('selectFileRelationValue', selectFileRelationValue)
-        const { data } = await window.IDM.http.post('ctrl/remoteExchangeView/fileRelationData', formdata, {
+        const { data } = await window.IDM.http.post('/ctrl/remoteExchangeView/fileRelationData', formdata, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -65,7 +66,7 @@ export default {
         formdata.append('groupId', groupId)
         formdata.append('ids', ids)
         formdata.append('texts', texts)
-        const { data } = await window.IDM.http.post('ctrl/remoteZsdw/updateZsdwGroup', formdata, {
+        const { data } = await window.IDM.http.post('/ctrl/remoteZsdw/updateZsdwGroup', formdata, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -81,7 +82,7 @@ export default {
         formdata.append('name', name)
         formdata.append('ids', ids)
         formdata.append('texts', texts)
-        const { data } = await window.IDM.http.post('ctrl/remoteZsdw/saveZsdwGroup', formdata, {
+        const { data } = await window.IDM.http.post('/ctrl/remoteZsdw/saveZsdwGroup', formdata, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -95,7 +96,7 @@ export default {
     async ApiDeleteGroup({ groupId }) {
         let formdata = new FormData();
         formdata.append('groupId', groupId)
-        const { data } = await window.IDM.http.post('ctrl/remoteZsdw/delZsdwGroup', formdata, {
+        const { data } = await window.IDM.http.post('/ctrl/remoteZsdw/delZsdwGroup', formdata, {
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -124,7 +125,7 @@ export default {
         templateId && formdata.append('templateId', templateId)
         operationFlag && formdata.append('operationFlag', operationFlag)
         recordId && formdata.append('recordId', recordId)
-        const { data } = await window.IDM.http.post('ctrl/customExchange/selSendRange', formdata, {
+        const { data } = await window.IDM.http.post('/ctrl/customExchange/selSendRange', formdata, {
             headers: {
                 'Content-Type': 'application/json'
             },

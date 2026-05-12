@@ -105,7 +105,7 @@
             <span v-if="data.fond.length">全宗号：{{data.fond.join(",")}}</span>
             <span>
                 <template v-for="(condition, i) in data.conditions">
-                {{i==0?'当':whereTypes.find((item)=>{return item.value == condition.logicalRelation}).label}}{{filterItems.find((item)=>{return item.filterCode == condition.filterCode}).filterName}}{{getFilterItem(condition.filterCode).logicalConditionList.find((item)=>{return item.logicalConditionCode == condition.logicalConditionCode}).logicalConditionName}}“{{!['IS NULL', 'IS NOT NULL'].includes(condition.logicalConditionCode)&&condition.logicalConditionCode == '<>'?condition.filterStart +'-' + condition.filterEnd:condition.filterValue}}”
+                {{i==0?'当':whereTypes.find((item)=>{return item.value == condition.logicalRelation}).label}}{{filterItems.find((item)=>{return item.filterCode == condition.filterCode}).filterName}}{{getFilterItem(condition.filterCode).logicalConditionList.find((item)=>{return item.logicalConditionCode == condition.logicalConditionCode}).logicalConditionName}}“{{!['IS NULL', 'IS NOT NULL'].includes(condition.logicalConditionCode)&&condition.logicalConditionCode == ''?condition.filterStart +'-' + condition.filterEnd:condition.filterValue}}”
                 </template>
             </span>
             <span>归档年度：{{data.yearStart == '1900'?'不限':data.yearStart}}-{{data.yearEnd == year?'至今':data.yearEnd}}</span>

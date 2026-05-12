@@ -21,27 +21,74 @@
             <span class="selecttip-icon"></span>
             <span>选择机构</span>
           </div>
+
+          <!-- 页签区域 -->
           <div class="unit-tabs" ref="unitTabs" v-show="!showSearchDialog && tabList.length > 0">
-            <div v-for="tab in tabList" :key="tab.id" class="unit-tab-item" :class="{ 'active': activeTabKey === tab.id }"
-              @click="activeTabKey = tab.id">
+            <div v-for="tab in tabList" :key="tab.id" class="unit-tab-item"
+              :class="{ 'active': activeTabKey === tab.id }" @click="activeTabKey = tab.id">
               {{ tab.name }}
             </div>
           </div>
 
           <div class="unit-box" :style="leftSetHeight">
             <a-spin class="select-loading" :spinning="loading"></a-spin>
+
             <div class="unit-list" v-show="!showSearchDialog">
               <div v-for="(item, index) in tabList" :key="index" v-show="activeTabKey === item.id">
-                <!-- 这里展示当前 Tab 对应的顶级节点 -->
-                <div class="unit-name">
-                  <a-icon class="jiaicon mr5" :type="item.shrink ? 'minus' : 'plus'" @click="handleAddKeys(item)" />
-                  <a-checkbox v-if="!item.attrs.noselect" v-model="item.check" @change="(e) => handleFirstGen(item)">
-                    <span>{{ item.name }}</span>
-                  </a-checkbox>
-                  <span v-else>{{ item.name }}</span>
-                  <span class="namecol" @click="hadnleAllChoose(item)">(全选下级)</span>
+
+                <!-- 【常用组】的专属渲染结构 -->
+                <div v-if="item.id === 'zsdwRootGroup'" class="comgroup-box">
+                  <div class="group-name">
+                    <div class="flex">
+                      <a-icon class="jiaicon mr5" :type="item.shrink ? 'minus' : 'plus'" @click="handleAddKeys(item)" />
+                      <span>{{ item.name }}</span>
+                      <span class="namecol" @click="chooseGroup(item)">(全选下级)</span>
+                    </div>
+                    <div class="group-right">
+                      <div class="flex">
+                        <div class="renew flex" @click="handleUpdateGroup">
+                          <div class="renew-img renew-img1"></div>更新组
+                        </div>
+                        <div class="flex" @click="handleNewGroup">
+                          <div class="renew-img renew-img2"></div>创建组
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- 小组列表 -->
+                  <div class="group-children" v-show="item.shrink" v-for="(subitem, subindex) in item.children"
+                    :key="subindex">
+                    <div class="flex" :data="subitem.shrink">
+                      <a-icon class="jiaicon mr5" :type="subitem.shrink ? 'minus' : 'plus'"
+                        @click="handleAddKeys(subitem)" />
+                      <a-checkbox v-model="subitem.check" @change="(e) => handleAddGroup(e, subitem, 'group')">
+                        <span>{{ subitem.name }}</span>
+                      </a-checkbox>
+                      <!--删除组-->
+                      <div class="select-delete"><img src="../assets/delete.png" alt=""
+                          @click="hadnleDelectUnit(subitem, subindex)"></div>
+                    </div>
+                    <!--删除组的单位-->
+                    <div class="group-ul" v-show="subitem.shrink">
+                      <div class="flex group-ulchild" v-for="(child, childindex) in subitem.children" :key="childindex">
+                        <a-checkbox v-model="child.check" @change="(e) => handleAddGroup(e, child, 'single', subitem)"
+                          :disabled="child.attrs.noselect" class="groupcheckbox">
+                          <div class="groupcheckbox">
+                            <span>{{ child.name }}</span>
+                          </div>
+                        </a-checkbox>
+                        <div class="select-deletechild"><img src="../assets/delete.png" alt=""
+                            @click="handleDeleteSingleUnit(subitem, child, childindex)"></div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <treeSelectUnit2 :item="item" v-show="item.shrink" ref="treeSelect"></treeSelectUnit2>
+
+                <!-- 【普通树节点】渲染结构 (直接调用子组件，取消顶级节点重复展示) -->
+                <template v-else>
+                  <treeSelectUnit2 class="first-level" :item="item" ref="treeSelect"></treeSelectUnit2>
+                </template>
+
               </div>
             </div>
 
@@ -61,7 +108,8 @@
         <div class="treeselect-right">
           <div class="treeselect-allnum search-combg">
             <span>已选择数量：<span>{{ chooseUnit.length }}</span></span>
-            <div class="flex" v-if="tablelist.enableCopy == 1 || (tablelist.enableCopy != 1 && tablelist.enablePage == 1)">
+            <div class="flex"
+              v-if="tablelist.enableCopy == 1 || (tablelist.enableCopy != 1 && tablelist.enablePage == 1)">
               <a-input-search v-model="numValue" placeholder="请输入" @search="onSearch">
                 <template #enterButton>
                   <a-button type="primary" class="themeBtn">批量修改份数</a-button>
@@ -88,8 +136,9 @@
               <div class="w10 choosecopy">
                 <a-input-number style="width: 60px" :min="1" v-if="tablelist.enableCopy == 1" v-model="item.copycop"
                   @change="(val) => inputChange(val, item)"></a-input-number>
-                <a-input-number style="width: 60px" :min="1" v-if="tablelist.enableCopy != 1 && tablelist.enablePage == 1"
-                  v-model="item.copycop" @change="(val) => inputChange(val, item)"></a-input-number>
+                <a-input-number style="width: 60px" :min="1"
+                  v-if="tablelist.enableCopy != 1 && tablelist.enablePage == 1" v-model="item.copycop"
+                  @change="(val) => inputChange(val, item)"></a-input-number>
               </div>
               <div class="w20 choosepage">
                 <template v-if="tablelist.enablePage == 1">
@@ -149,6 +198,27 @@
         <a-button @click="hanldeNone">取消</a-button>
       </div>
     </div>
+
+    <!-- 弹框区 -->
+    <a-modal title="请选择常用组" :visible="dialogGroup.visible" centered width="300px" @ok="handleChooseGroup"
+      cancelText="取消" okText="确定" @cancel="dialogGroup.visible = false">
+      <div class="dialog-choose-ul">
+        <a-radio-group v-model="dialogGroup.value">
+          <a-radio v-for="(item, index) in dialogGroup.groupary" :key="index" :value="item.id" class="dialog-radio">{{
+            item.name }}</a-radio>
+        </a-radio-group>
+      </div>
+    </a-modal>
+    <a-modal title="创建组" :visible="dialogCreategroup.visible" centered width="300px" @ok="handleCreateSure"
+      cancelText="取消" okText="确定" @cancel="dialogCreategroup.visible = false">
+      <div class="dialog-create-center">
+        <a-textarea v-model="dialogCreategroup.value" placeholder="请填写组名称" :auto-size="{ minRows: 3, maxRows: 5 }" />
+      </div>
+    </a-modal>
+    <a-modal v-model="deleteDialog.visible" title="信息" centered width="300px" cancelText="取消" okText="确定"
+      @ok="handleDelteGroup">
+      <p>确定要删除?</p>
+    </a-modal>
   </div>
 </template>
 
@@ -167,28 +237,27 @@ export default {
   data() {
     return {
       numValue: '',
-      setHeight: {}, 
-      leftSetHeight: {}, 
+      setHeight: {},
+      leftSetHeight: {},
       defaultPrintNum: 1,
       loading: false,
-      // 总数据
       tablelist: {},
-      // 默认展开
       defaultTreeKeys: [],
       showSearchDialog: false,
-      // 搜索内容
       searchName: '',
-      // 文件数据
       chooseFile: [],
-      // 附件数据
       fileLib: [],
-      tabList: [],
+      comGroup: [],  // 保存常用组数据引用
+      unitTree: [],  // 保存除常用组以外的正常单位分类
+      tabList: [],   // 承载顶部全部页签
       activeTabKey: '',
-      // 选择的单位
       chooseUnit: [],
-      // 总拼音数据
       pinyinAryAll: [],
       moduleObject: {},
+      // 常用组弹框相关状态
+      dialogGroup: { value: '', visible: false, groupary: [] },
+      dialogCreategroup: { visible: false, value: '', chooseAry: [] },
+      deleteDialog: { visible: false, flag: "", delteid: "", deleteindex: '' },
       propData: this.$root.propData.compositeAttr || {
         height: '100vh',
         footBottom: '0px',
@@ -201,7 +270,6 @@ export default {
       if (newVal) {
         let currentTab = this.tabList.find(t => t.id === newVal);
         if (currentTab) {
-          // 确保当前 tab 是展开状态
           this.$set(currentTab, 'shrink', true);
           if (!this.defaultTreeKeys.includes(currentTab.id)) {
             this.defaultTreeKeys.push(currentTab.id);
@@ -238,6 +306,189 @@ export default {
     }
   },
   methods: {
+    /* =================== 常用组相关逻辑 =================== */
+    handleChooseGroup() {
+      let ary = this.getTreeCheckData(this.unitTree);
+      this.handleUpdate(this.dialogGroup.value, ary, () => {
+        this.handleGetGroupData();
+        this.dialogGroup.visible = false;
+      })
+    },
+    handleUpdateGroup() {
+      let alyChoose = []
+      this.comGroup.forEach(item => {
+        item.children && item.children.forEach(k => {
+          k.check && alyChoose.push(k)
+        })
+      })
+      if (alyChoose.length <= 0) {
+        message.error('请选择小组')
+        return
+      } else if (alyChoose.length == 1) {
+        let current = alyChoose[0];
+        let ary = this.getTreeCheckData(this.unitTree);
+        this.handleUpdate(current.id, ary, () => {
+          this.handleGetGroupData();
+        });
+      } else {
+        this.dialogGroup.groupary = alyChoose
+        this.dialogGroup.value = alyChoose[0].id
+        this.dialogGroup.visible = true
+      }
+    },
+    handleNewGroup() {
+      let chooseData = this.getTreeCheckData(this.unitTree)
+      if (chooseData.length <= 0) {
+        message.error('请选择单位')
+        return
+      }
+      this.dialogCreategroup.value = '';
+      this.dialogCreategroup.chooseAry = chooseData;
+      this.dialogCreategroup.visible = true;
+    },
+    async handleCreateSure() {
+      let ids = '', texts = '';
+      this.dialogCreategroup.chooseAry.forEach(item => {
+        ids += `,${item.id}`;
+        texts += `,${item.name}`
+      })
+      let obj = {
+        name: this.dialogCreategroup.value,
+        ids: ids.slice(1),
+        texts: texts.slice(1)
+      }
+      let res = await API.ApiSaveGroup(obj)
+      if (res.code == '200') {
+        message.success(res.message);
+        this.dialogCreategroup.visible = false;
+        this.handleGetGroupData();
+      } else {
+        this.dialogCreategroup.visible = false;
+        message.success(res.message)
+      }
+    },
+    async handleUpdate(groupId, targetAry, fn) {
+      let ids = '', texts = '';
+      targetAry.forEach(item => {
+        ids += `,${item.id}`;
+        texts += `,${item.name}`
+      })
+      let obj = {
+        groupId: groupId,
+        ids: ids.slice(1),
+        texts: texts.slice(1)
+      }
+      let res = await API.ApiUpdateGroup(obj)
+      if (res.code == '200') {
+        message.success(res.message);
+        fn && fn()
+      } else {
+        message.success(res.message)
+      }
+    },
+    async handleDelteGroup() {
+      if (this.deleteDialog.flag == "unit") {
+        this.handleUpdate(this.deleteDialog.delteid, this.deleteDialog.groupary, () => {
+          this.deleteDialog.visible = false;
+          this.handleGetGroupData()
+        })
+      } else if (this.deleteDialog.flag == "group") {
+        let res = await API.ApiDeleteGroup({ groupId: this.deleteDialog.delteid });
+        if (res.code == "200") {
+          this.deleteDialog.visible = false;
+          this.handleGetGroupData();
+        }
+      }
+    },
+    handleDeleteSingleUnit(father, item, index) {
+      let updateAry = father.children.filter(k => k.id != item.id);
+      this.deleteDialog.groupary = updateAry
+      this.deleteDialog.delteid = father.id;
+      this.deleteDialog.flag = "unit";
+      this.deleteDialog.visible = true;
+    },
+    hadnleDelectUnit(item, index) {
+      this.deleteDialog.delteid = item.id;
+      this.deleteDialog.flag = "group";
+      this.deleteDialog.deleteindex = index;
+      this.deleteDialog.visible = true;
+    },
+    getGroupAllId(tree, allId = []) {
+      if (tree && tree.length > 0) {
+        tree.forEach(item => {
+          item.children.length == 0 && allId.push(item.id)
+          return item.children?.length > 0 && this.getGroupAllId(item.children, allId)
+        })
+      }
+      return allId
+    },
+    checkGroupAllChoose() {
+      let group = this.comGroup[0]?.children || [];
+      if (this.comGroup[0]) {
+        this.comGroup[0].check = group.length && (group.filter(item => item.check).length == group.length);
+      }
+    },
+    chooseGroup(item) {
+      item.check = !item.check;
+      this.handleTreeAddTreeData(this.comGroup, { check: item.check });
+      let chooseIdAry = this.getGroupAllId(this.comGroup)
+      this.handleTreeChoose(this.unitTree, chooseIdAry, item.check);
+      this.defaultChooseUnit()
+    },
+    handleAddGroup(e, subitem, type, father) {
+      if (type == 'group') {
+        if (subitem.children?.length > 0) {
+          subitem.check = e.target.checked;
+          subitem.children.forEach(k => {
+            if (!k.attrs.noselect) k.check = e.target.checked
+          })
+          let chooseIdAry = subitem.children.map(subitem => subitem.id);
+          this.handleTreeChoose(this.unitTree, chooseIdAry, e.target.checked);
+          this.handleTreeChoose(this.comGroup, chooseIdAry, e.target.checked);
+          this.handleCheckGroupChoose(this.comGroup)
+          this.checkGroupAllChoose()
+          this.defaultChooseUnit()
+        }
+      } else {
+        let flag = e.target.checked
+        subitem.check = flag
+        this.handleTreeAddTreeData(this.unitTree, { chooseId: subitem.id, targetflag: flag });
+        if (father && father.children && father.children.length > 0) {
+          const chooseAry = father.children.filter(k => !k.attrs.noselect && k.check);
+          father.check = chooseAry.length == father.children.filter(k => !k.attrs.noselect).length
+        }
+        this.checkGroupAllChoose()
+        this.defaultChooseUnit()
+      }
+    },
+    handleCheckGroupChoose(tree) {
+      if (tree && tree.length > 0) {
+        tree.forEach(item => {
+          if (item.children.length != 0) {
+            if (item.children && item.children.length > 0) {
+              let len = item.children.filter(k => !k.attrs.noselect && k.check).length;
+              let fatherlen = item.children.filter(k => !k.attrs.noselect).length;
+              item.check = len == fatherlen
+            }
+          }
+          item.children?.length > 0 && this.handleCheckGroupChoose(item.children)
+        })
+      }
+    },
+    handleBackGroup(chooseIdAry, fn) {
+      let group = this.comGroup[0]?.children
+      group && group.length && group.forEach(item => {
+        if (chooseIdAry.includes(item.id)) {
+          item.check = true;
+          item.children.forEach(k => k.check = true);
+          let groupchooseIdAry = item.children.map(item => item.id);
+          chooseIdAry = chooseIdAry.concat(groupchooseIdAry);
+        }
+      })
+      fn && fn(chooseIdAry);
+    },
+
+    /* =================== 基础交互与生命周期 =================== */
     onSearch() {
       if (this.chooseUnit && this.chooseUnit.length > 0) {
         this.chooseUnit.forEach(item => item.copycop = this.numValue)
@@ -382,68 +633,39 @@ export default {
         })
       }
     },
-    hadnleAllChoose(item) {
-      item.check = !item.check;
-      this.hadnleTreeCheck(item, item.check);
-      this.defaultChooseUnit();
-    },
-    hadnleNextAllChoose(item) {
-      item.check = !item.check;
-      this.hadnleTreeCheck(item, item.check);
-      this.defaultChooseUnit();
-    },
-    getFileIcon(fileName) {
-      let format = '';
-      if (fileName) {
-        format = fileName.split('.').pop().toLowerCase();
-        switch (format) {
-          case "doc": case "docx": case "wps": format = "word"; break;
-          case "xls": case "xlsx": format = "xlsx"; break;
-          case "htm": case "html": format = "html"; break;
-          case "ppt": case "pptx": format = "ppt"; break;
-          case "png": case "jpg": case "jpeg": case "gif": format = "img"; break;
-          default: format = "common"; break;
-        }
-      }
-      return format;
-    },
-    propDataWatchHandle(propData) {
-      this.propData = propData.compositeAttr || {};
-      this.init()
-    },
-    handleStyle() {
-      let styleObject = {};
-      for (const key in this.propData) {
-        if (this.propData.hasOwnProperty.call(this.propData, key)) {
-          const element = this.propData[key]
-          if (!element && element !== false && element != 0) continue
-          switch (key) {
-            case 'width': styleObject['width'] = element; break
-            case 'height': styleObject['height'] = element; break
-            case 'ulbox': IDM.style.setBoxStyle(styleObject, element); break
-            case 'bgColor': styleObject['background-color'] = element && element.hex8; break
-            case 'boxShadow': styleObject['box-shadow'] = element; break
-            case 'boxborder': IDM.style.setBorderStyle(styleObject, element); break
-          }
-        }
-      }
-      window.IDM.setStyleToPageHead(this.moduleObject.id + " .itreeselectunit2", styleObject);
-    },
     hadnleSearchChoose(item) {
       if (item.attrs.noselect) return
       item.check = !item.check;
       if (item.children && item.children.length > 0) {
         this.hadnleTreeCheck(item, item.check);
       }
+      this.handleTreeAddTreeData(this.comGroup, { chooseId: item.id, targetflag: item.check })
+      this.handleCheckGroupChoose(this.comGroup)
+      this.checkGroupAllChoose();
       this.defaultChooseUnit();
     },
     handleFirstGen(item) {
       this.hadnleTreeCheck(item, item.check);
+      this.handleTreeAddTreeData(this.comGroup, { chooseId: item.id, targetflag: item.check })
+      this.handleCheckGroupChoose(this.comGroup)
+      this.checkGroupAllChoose();
       this.defaultChooseUnit()
     },
     handleChoose(item) {
       this.handleTreeAddTreeData(this.tabList, { chooseId: item.id, targetflag: item.check });
+      this.handleTreeAddTreeData(this.comGroup, { chooseId: item.id, targetflag: item.check })
+      this.handleCheckGroupChoose(this.comGroup)
+      this.checkGroupAllChoose();
       this.defaultChooseUnit()
+    },
+    hadnleNextAllChoose(item) {
+      item.check = !item.check;
+      this.hadnleTreeCheck(item, item.check);
+      let chooseIdAry = this.getGroupAllId([item]);
+      this.handleTreeChoose(this.comGroup, chooseIdAry, item.check);
+      this.handleCheckGroupChoose(this.comGroup)
+      this.checkGroupAllChoose();
+      this.defaultChooseUnit();
     },
     handleTreeChoose(tree, chooseIdAry, chooseType) {
       if (tree && tree.length > 0) {
@@ -507,27 +729,34 @@ export default {
         this.tablelist = obj;
         let { codeList } = obj;
 
-        let tabs = codeList.filter(item => item.pid === "0" && item.id !== 'zsdwRootGroup');
+        // 【提取常用组并加入到页签最前面】
+        let group = codeList.filter(item => item.id === 'zsdwRootGroup');
+        group.forEach(item => { item.name = "常用组"; item.shrink = true; });
+        this.hanldeAddField(group, this.defaultTreeKeys);
+        this.comGroup = group; // 保存引用
 
+        // 【提取其余正常单位并加入页签】
+        let tabs = codeList.filter(item => item.pid === "0" && item.id !== 'zsdwRootGroup');
         tabs.forEach(tab => {
-          if (!this.defaultTreeKeys.includes(tab.id)) {
-            this.defaultTreeKeys.push(tab.id);
-          }
+          if (!this.defaultTreeKeys.includes(tab.id)) this.defaultTreeKeys.push(tab.id);
           if (tab.children && tab.children.length > 0) {
             tab.children.forEach(child => {
-              if (!this.defaultTreeKeys.includes(child.id)) {
-                this.defaultTreeKeys.push(child.id);
-              }
+              if (!this.defaultTreeKeys.includes(child.id)) this.defaultTreeKeys.push(child.id);
             })
           }
         })
-
         this.hanldeAddField(tabs, this.defaultTreeKeys);
+        this.unitTree = tabs; // 保存引用用于提取已勾选单位
 
-        this.tabList = tabs;
+        // 组装总Tab
+        this.tabList = [];
+        if (group.length > 0) this.tabList.push(...group);
+        if (tabs.length > 0) this.tabList.push(...tabs);
+
         if (this.tabList.length > 0) {
           this.activeTabKey = this.tabList[0].id;
         }
+
         this.handleDataBack();
         this.$nextTick(() => {
           this.handleSetHeight();
@@ -539,14 +768,21 @@ export default {
     hanldeReply(data) {
       if (data && data.ids) {
         let chooseIdAry = data.ids.split(',')
-        this.handleTreeChoose(this.tabList, chooseIdAry, true);
-        this.defaultChooseUnit()
+        this.handleBackGroup(chooseIdAry, (chooseIdAry) => {
+          this.handleTreeChoose(this.unitTree, chooseIdAry, true);
+          this.handleTreeChoose(this.comGroup, chooseIdAry, true);
+          this.handleCheckGroupChoose(this.comGroup);
+          this.checkGroupAllChoose();
+          this.defaultChooseUnit()
+        });
       }
     },
     handleDataBack() {
       if (this.chooseUnit?.length > 0) {
         let chooseIdAry = this.chooseUnit.map(item => item.id);
-        this.handleTreeChoose(this.tabList, chooseIdAry, true);
+        this.handleTreeChoose(this.unitTree, chooseIdAry, true);
+        this.handleTreeChoose(this.comGroup, chooseIdAry, true);
+        this.handleCheckGroupChoose(this.comGroup);
         this.defaultChooseUnit()
       }
       if (this.moduleObject.env !== 'production') return;
@@ -569,7 +805,8 @@ export default {
       return val
     },
     defaultChooseUnit() {
-      this.chooseUnit = this.getTreeCheckData(this.tabList);
+      // 获取正常单位里勾选的（因为常用组里的单位在正常树里也有，用unitTree查就能保证不多不少）
+      this.chooseUnit = this.getTreeCheckData(this.unitTree);
       let num = this.getDefaultCopycop();
       this.chooseUnit.forEach(item => {
         if (this.tablelist.enableCopy == 1 || this.tablelist.enablePage == 1) {
@@ -625,6 +862,43 @@ export default {
         window[name] && window[name].call(this, { _this: this, params: params });
       }
     },
+    getFileIcon(fileName) {
+      let format = '';
+      if (fileName) {
+        format = fileName.split('.').pop().toLowerCase();
+        switch (format) {
+          case "doc": case "docx": case "wps": format = "word"; break;
+          case "xls": case "xlsx": format = "xlsx"; break;
+          case "htm": case "html": format = "html"; break;
+          case "ppt": case "pptx": format = "ppt"; break;
+          case "png": case "jpg": case "jpeg": case "gif": format = "img"; break;
+          default: format = "common"; break;
+        }
+      }
+      return format;
+    },
+    propDataWatchHandle(propData) {
+      this.propData = propData.compositeAttr || {};
+      this.init()
+    },
+    handleStyle() {
+      let styleObject = {};
+      for (const key in this.propData) {
+        if (this.propData.hasOwnProperty.call(this.propData, key)) {
+          const element = this.propData[key]
+          if (!element && element !== false && element != 0) continue
+          switch (key) {
+            case 'width': styleObject['width'] = element; break
+            case 'height': styleObject['height'] = element; break
+            case 'ulbox': IDM.style.setBoxStyle(styleObject, element); break
+            case 'bgColor': styleObject['background-color'] = element && element.hex8; break
+            case 'boxShadow': styleObject['box-shadow'] = element; break
+            case 'boxborder': IDM.style.setBorderStyle(styleObject, element); break
+          }
+        }
+      }
+      window.IDM.setStyleToPageHead(this.moduleObject.id + " .itreeselectunit2", styleObject);
+    },
     async initData() {
       this.handleGetGroupData()
       const params = this.handleParamsFunc()
@@ -677,6 +951,120 @@ $primaryColor: #0a74dd;
       &:hover {
         color: $primaryColor;
       }
+    }
+  }
+
+  /* 常用组CSS部分 */
+  .comgroup-box {
+    &:hover {
+      .namecol {
+        display: block !important;
+      }
+
+      .group-right {
+        display: block;
+      }
+    }
+
+    .group-name {
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      span {
+        font-size: 16px;
+      }
+    }
+
+    .group-children {
+      line-height: 32px;
+      padding-left: 20px;
+
+      &:hover .select-delete {
+        display: block;
+      }
+
+      ::v-deep .ant-checkbox-inner {
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .group-ulchild:hover .select-deletechild {
+      display: block;
+    }
+
+    .groupcheckbox {
+      display: flex;
+      align-items: center;
+
+      ::v-deep .ant-checkbox {
+        height: 18px;
+        display: flex;
+        align-items: center;
+      }
+    }
+
+    .group-ul {
+      padding-left: 40px;
+    }
+
+    span {
+      font-size: 14px;
+      color: #333;
+      max-width: 250px;
+      white-space: nowrap;
+      display: inline-block;
+      vertical-align: middle;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .select-delete {
+      display: none;
+      cursor: pointer;
+      width: 23px;
+      height: 100%;
+      color: #999;
+    }
+
+    .select-deletechild {
+      display: none;
+      cursor: pointer;
+      width: 23px;
+      height: 100%;
+      color: #999;
+      margin-left: 5px;
+    }
+  }
+
+  .group-right {
+    display: none;
+    font-size: 14px;
+
+    div {
+      cursor: pointer;
+    }
+
+    .renew {
+      margin-right: 30px;
+    }
+
+    .renew-img {
+      width: 16px;
+      height: 16px;
+      margin-right: 5px;
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+    }
+
+    .renew-img1 {
+      background-image: url('../assets/new.png');
+    }
+
+    .renew-img2 {
+      background-image: url('../assets/create.png');
     }
   }
 
@@ -817,6 +1205,8 @@ $primaryColor: #0a74dd;
       height: 32px;
       line-height: 32px;
       background-color: $bgColor;
+      display: flex;
+      align-items: center;
 
       .selecttip-icon {
         margin-right: 5px;
@@ -914,23 +1304,29 @@ $primaryColor: #0a74dd;
         font-size: 16px;
       }
     }
+
+    // 抵消子组件默认带来的 20px 缩进，使被提级的原二级节点能靠左侧对齐
+    ::v-deep .first-level {
+      margin-left: 0 !important;
+    }
   }
 
-  .treeselect-foot{
+  .treeselect-foot {
     width: 100%;
     line-height: 55px;
     background-color: $bgColor;
-    // position: absolute;
     bottom: 0;
     text-align: right;
     padding: 0 30px;
     position: absolute;
-    button{
+
+    button {
       width: 78px;
       height: 32px;
       font-size: 16px;
     }
-    button+button{
+
+    button+button {
       margin-left: 20px;
     }
   }
