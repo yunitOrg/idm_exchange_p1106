@@ -55,7 +55,7 @@
     },
     {
       "classId": "idm.componet.exchange.ITreeSelectUnit2",
-      "comName": "树形选择单位2",
+      "comName": "蒙政通树形选择单位2",
       "className": "ITreeSelectUnit2",
       "comType": "common",
       "comLangue": "vue"
