@@ -59,7 +59,16 @@
             <tbody>
                 <tr v-for="(item, index) in archiveGridList" :key="index">
                     <td>{{ item.archiveTypeText }}</td>
-                    <td>{{ item.archiveCount }}</td>
+                    <td>
+                        <a
+                            v-if="enableArchiveUrlJump && item.archiveUrl"
+                            class="archive-count-link"
+                            :href="getArchiveUrl(item.archiveUrl)"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >{{ item.archiveCount }}</a>
+                        <span v-else>{{ item.archiveCount }}</span>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -71,6 +80,12 @@ import locale from 'ant-design-vue/es/locale/zh_CN'
 import API from '../api/archive'
 import moment from 'moment'
 export default {
+    props: {
+        enableArchiveUrlJump: {
+            type: Boolean,
+            default: false
+        }
+    },
     data() {
         return {
             locale,
@@ -86,6 +101,9 @@ export default {
     },
     mounted() {},
     methods: {
+        getArchiveUrl(archiveUrl) {
+            return window.IDM && window.IDM.url ? window.IDM.url.getWebPath(archiveUrl) : archiveUrl
+        },
         // 下拉框数据
         hanldeSelectData(data) {
             this.selectData = data
@@ -175,5 +193,9 @@ export default {
 .echartsBox {
     width: 100%;
     height: 400px;
+}
+.archive-count-link {
+    color: #1890ff;
+    cursor: pointer;
 }
 </style>

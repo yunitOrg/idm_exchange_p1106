@@ -25,7 +25,10 @@
         <ReadComponent ref="readComponent"></ReadComponent>
       </template>
       <template v-if="current == 3">
-        <UseComponent ref="useComponent"></UseComponent>
+        <UseComponent
+          ref="useComponent"
+          :enable-archive-url-jump="propData.enableArchiveUrlJump"
+        ></UseComponent>
       </template>
     </div>
   </div>
@@ -64,6 +67,7 @@ export default {
       moduleObject: {},
       propData: this.$root.propData.compositeAttr || {
         defaultPageIndex: 1,
+        enableArchiveUrlJump: false,
         archiveNumList: [
           {
             key: 2,

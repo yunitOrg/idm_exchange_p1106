@@ -28,6 +28,14 @@
           "default": "1"
         },
         {
+          "type": "switch",
+          "layoutType": "inline",
+          "text": "利用次数跳转",
+          "desc": "开启后，档案利用统计接口返回 archiveUrl 时，点击利用次数将在浏览器新页签打开对应页面",
+          "bindKey": "enableArchiveUrlJump",
+          "default": false
+        },
+        {
           "type": "table",
           "text": "档案数量统计",
           "desc": "可以显示隐藏筛选项，修改名字, 索引是：1、2、3、4",
