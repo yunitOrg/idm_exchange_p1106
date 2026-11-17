@@ -4,7 +4,7 @@ export default {
      * @Author hjp
      */
     async ApiQuerySource() {
-        const { data } = await window.IDM.http.get('http://localhost:8080/DreamBOS/ctrl/archive/statistics/getQueryDataSource?sourceType=1')
+        const { data } = await window.IDM.http.get('ctrl/archive/statistics/getQueryDataSource?sourceType=1')
         return data
     },
     /**
@@ -12,7 +12,7 @@ export default {
      * @Author hjp
      */
     async ApiQueryCountData(params) {
-        const { data } = await window.IDM.http.get('http://localhost:8080/DreamBOS/ctrl/archive/statistics/getArchiveStatisticsCountData', params)
+        const { data } = await window.IDM.http.get('ctrl/archive/statistics/getArchiveStatisticsCountData', params)
         return data
     },
     /**
@@ -20,7 +20,7 @@ export default {
      * @Author hjp
      */
     async ApiQueryReadData({ archicvePeriod, archiveYear }) {
-        const { data } = await window.IDM.http.get('http://localhost:8080/DreamBOS/ctrl/archive/statistics/getArchiveStatisticsBorrowData', { archicvePeriod, archiveYear })
+        const { data } = await window.IDM.http.get('ctrl/archive/statistics/getArchiveStatisticsBorrowData', { archicvePeriod, archiveYear })
         return data
     },
     /**
@@ -28,7 +28,7 @@ export default {
      * @Author hjp
      */
     async ApiQueryTakeData(params) {
-        const { data } = await window.IDM.http.get('http://localhost:8080/DreamBOS/ctrl/archive/statistics/getArchiveStatisticsUsedData', params)
+        const { data } = await window.IDM.http.get('ctrl/archive/statistics/getArchiveStatisticsUsedData', params)
         return data
     }
 }
