@@ -13,7 +13,7 @@
         </div>
         <!--搜索-->
         <div class="table-search">
-            <div class="super-middle" style="width: 25%">
+            <div class="super-middle" style="width: 20%">
                 <span class="super-mr10">全宗号</span>
                 <a-select v-model="search.fondsNo" allowClear style="width: 50%">
                     <a-select-option :value="item.value" v-for="(item, index) in selectData.archiveFondList" :key="index">
@@ -21,7 +21,7 @@
                     </a-select-option>
                 </a-select>
             </div>
-            <div class="super-middle" style="width: 25%">
+            <div class="super-middle" style="width: 20%">
                 <span class="super-mr10">保管期限</span>
                 <a-select v-model="search.archicvePeriod" allowClear style="width: 50%">
                     <a-select-option :value="item.value" v-for="(item, index) in selectData.arvhivePeriodList" :key="index">
@@ -29,7 +29,7 @@
                     </a-select-option>
                 </a-select>
             </div>
-            <div class="super-middle" style="width: 25%">
+            <div class="super-middle" style="width: 20%">
                 <span class="super-mr10">年度</span>
                 <a-config-provider :locale="locale">
                     <a-date-picker
@@ -43,7 +43,11 @@
                     />
                 </a-config-provider>
             </div>
-            <div style="width: 25%">
+            <div class="super-middle" style="width: 20%">
+                <span class="super-mr10">部门名称</span>
+                <a-input v-model="search.archiveDeptName" allowClear placeholder="请输入部门名称" style="width: 50%" />
+            </div>
+            <div style="width: 20%">
                 <a-button class="h40 super-btn" type="primary" @click="handleSearch">检索</a-button>
             </div>
         </div>
@@ -54,6 +58,8 @@
                 <tr>
                     <td>分类</td>
                     <td>利用次数</td>
+                    <td>下载量次数</td>
+                    <td>浏览量次数</td>
                 </tr>
             </thead>
             <tbody>
@@ -69,6 +75,8 @@
                         >{{ item.archiveCount }}</a>
                         <span v-else>{{ item.archiveCount }}</span>
                     </td>
+                    <td>{{ item.downloadCount }}</td>
+                    <td>{{ item.viewCount }}</td>
                 </tr>
             </tbody>
         </table>
@@ -95,6 +103,7 @@ export default {
             archiveGridList: [],
             search: {
                 archicvePeriod: '',
+                archiveDeptName: '',
                 archiveYear: moment(moment().format('YYYY'))
             }
         }

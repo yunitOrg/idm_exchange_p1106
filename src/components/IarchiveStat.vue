@@ -66,7 +66,7 @@ export default {
       selectData: {},
       moduleObject: {},
       propData: this.$root.propData.compositeAttr || {
-        defaultPageIndex: 1,
+        defaultPageIndex: 3,
         enableArchiveUrlJump: false,
         archiveNumList: [
           {
