@@ -191,8 +191,9 @@ export default {
         },
         // 柱状图+表格
         contentTable(data) {
-            this.initBar(data.archiveList)
-            this.archiveGridList = data.archiveList || []
+            const archiveList = data.archiveList || []
+            this.initBar(archiveList.filter((item) => item.archiveTypeText !== '合计'))
+            this.archiveGridList = archiveList
         }
     }
 }
